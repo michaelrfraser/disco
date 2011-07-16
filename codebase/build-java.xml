@@ -1,0 +1,425 @@
+<?xml version="1.0"?>
+<!--
+                 Welcome to the Calytrix Disco build file
+
+       Contained in this file are all the properties and build targets
+       relating to the main Disco library. This file is not meant to
+       be usd by itself, but rather to be imported by the main build.xml
+       file, where project-wide properties are set.
+
+       NOTE: This file has been adapted from the build system of the Portico Open
+             Source RTI (released under the CDDL)
+-->
+
+<project name="disco-java" default="java.compile">
+
+	<!-- ================================================================================= -->
+	<!--                              Properties Declarations                              -->
+	<!-- ================================================================================= -->
+
+	<!-- ==== Basic Properties ==== -->
+	<property name="java.build.dir"           location="${build.dir}/java"/>
+	<property name="java.build.classes.dir"   location="${java.build.dir}/classes"/>
+
+	<!-- ==== Compiler Properties ==== -->
+	<property name="java.compiler.optimize"   value="true"/>
+	<property name="java.compiler.debug"      value="true"/>
+	<property name="java.compiler.debuglevel" value="lines,vars,source"/>
+	<property name="java.compiler.source"     value="1.6"/>
+	<property name="java.compiler.target"     value="1.6"/>
+
+	<!-- ==== Source Related Properties ==== -->
+	<property name="java.src.dir"             location="src-java/disco"/>
+
+	<!-- ==== Test Related Properties ==== -->
+	<property name="java.test.src.dir"        location="src-java/test"/>
+	<property name="java.test.build.dir"      location="${java.build.dir}/test"/>
+	<property name="java.test.classes.dir"    location="${java.test.build.dir}/classes"/>
+	<property name="java.test.reports.dir"    location="${java.test.build.dir}/reports"/>
+
+	<!-- ==== Jar Files ==== -->
+	<property name="java.disco.jar"           location="${dist.sandbox.dir}/lib/calytrix-disco.jar"/>
+
+	<!-- ==== Misc Properties ==== -->
+	<property name="java.resources.jar.dir"   location="${resources.dir}/jar"/>
+
+	<!-- ==== Javadoc Properties ==== -->
+	<property name="java.doc.dir"             location="${dist.documentation.dir}/javadoc"/><!-- generated -->
+	<property name="java.doc.disco.dir"       location="${java.doc.dir}/disco"/>
+	<property name="java.doc.external"        value="http://java.sun.com/j2se/1.6.0/docs/api/"/>
+	<property name="java.doc.header"          value="copyright Calytrix Technologies ${YEAR}."/>
+	<property name="java.doc.footer"          value="copyright Calytrix Technologies ${YEAR}."/>
+	<property name="java.doc.windowtitle"
+			  value="${app.shortname} [${app.version} build] Javadoc documentation"/>
+
+	<!-- ==== Library Path Definitions ==== -->
+	<!-- These properties are set so that any information relating to a specific path
+	     for a library can be changed in a single spot. The properties should be used
+	     when defining paths and the like later in the build file -->
+	<property name="log4j.dir"             location="${lib.dir}/log4j/apache-log4j-1.2.16"/>
+
+	<!-- include jar file property for TestNG so we can reference it when loading its ant tasks -->
+	<property name="testng.dir"            location="${lib.dir}/testng/testng-5.12.1"/>
+	<property name="testng.jar"            location="${testng.dir}/testng-5.12.1.jar"/>
+
+	<!-- ==== Classpath Declarations ==== -->
+	<path id="lib.testng.classpath">
+		<fileset dir="${testng.dir}" includes="**/*.jar"/>
+	</path>
+
+	<path id="lib.log4j.classpath">
+		<fileset dir="${log4j.dir}" includes="**/*.jar"/>
+	</path>
+
+	<path id="java.compile.classpath">
+		<path refid="lib.log4j.classpath"/>
+	</path>
+
+	<path id="java.test.classpath">
+		<path refid="java.compile.classpath"/>
+		<path refid="lib.testng.classpath"/>
+		<pathelement path="${java.build.classes.dir}"/>
+		<pathelement path="${java.test.classes.dir}"/>
+		<pathelement path="${resources.dir}/jar"/>
+		<pathelement path="${resources.dir}/test-data"/>
+		<pathelement path="${resources.dir}/dist"/>
+	</path>
+
+	<!-- ================================================================================= -->
+	<!--                                Target Declarations                                -->
+	<!-- ================================================================================= -->
+
+	<!-- =========================================================== -->
+	<!-- >>>> Target: java.clean                                     -->
+	<!-- =========================================================== -->
+	<target name="java.clean">
+		<delete dir="${java.build.dir}"/>
+		<delete dir="${java.doc.dir}"/>
+		<delete dir="${documentation.dir}"/>
+		<delete dir="logs"/>
+	</target>
+
+	<!-- =========================================================== -->
+	<!-- >>>> Target: java.init                                      -->
+	<!-- =========================================================== -->
+	<target name="java.init" depends="init">
+	</target>
+
+	<!-- ================================================================================= -->
+	<!--                            (Target Group) Java Compile                            -->
+	<!-- ================================================================================= -->
+	<target name="java.compile" depends="java.compile.production,java.compile.tests">
+	</target>
+
+	<!-- =============================== -->
+	<!-- (macro): javac macro definition -->
+	<!-- =============================== -->
+	<macrodef name="jcompile" description="Compile java source code with default properties">
+		<!-- Attributes -->
+		<attribute name="src"/>
+		<attribute name="out"/>
+		<attribute name="classpath"/>
+		<element name="javacbody" implicit="yes" optional="yes"/>
+		<!-- Task Definition -->
+		<sequential>
+			<!-- make sure the directory exists -->
+			<mkdir dir="@{out}"/>
+
+			<!-- do the compile -->
+			<javac srcdir="@{src}"
+			       destdir="@{out}"
+			       classpathref="@{classpath}"
+			       debug="${java.compiler.debug}"
+			       debuglevel="${java.compiler.debuglevel}"
+			       source="${java.compiler.source}"
+			       target="${java.compiler.target}"
+			       includeAntRuntime="false">
+				<javacbody/>
+			</javac>
+		</sequential>
+	</macrodef>
+
+	<!-- *********************************** -->
+	<!-- **** Target: java.compile.init **** -->
+	<!-- *********************************** -->
+	<target name="java.compile.init" depends="init,svn">
+		<!-- Print out some information and do some initialization -->
+		<echo>Compiling java source code...</echo>
+
+		<!-- set up some directory structure -->
+		<mkdir dir="${java.build.dir}"/>
+		<mkdir dir="${java.build.classes.dir}"/>
+
+		<!-- copy the build.version file into place -->
+		<copy todir="${java.build.classes.dir}" overwrite="true">
+			<fileset dir="${basedir}">
+				<include name="build.version"/>
+			</fileset>
+			<filterset begintoken="[" endtoken="]">
+				<filter token="svn.revision" value="${svn.revision}"/>
+			</filterset>
+		</copy>
+
+		<property name="java.compiler.optimize" value="false"/>
+		<echo>JAVA VERSION: ${java.version}</echo>
+		<echo>debug / debug level: ${java.compiler.debug} / ${java.compiler.debuglevel}</echo>
+		<echo>source compat: ${java.compiler.source} </echo>
+	</target>
+
+	<!-- ***************************************** -->
+	<!-- **** Target: java.compile.production **** -->
+	<!-- ***************************************** -->
+	<target name="java.compile.production" depends="java.compile.init">
+		<jcompile src="${java.src.dir}"
+		          out="${java.build.classes.dir}"
+		          classpath="java.compile.classpath"/>
+	</target>
+
+	<!-- ************************************ -->
+	<!-- **** Target: java.compile.tests **** -->
+	<!-- ************************************ -->
+	<target name="java.compile.tests" depends="java.compile.production" unless="devbuild">
+		<!-- set up the required directories -->
+		<mkdir dir="${java.test.build.dir}"/>
+		<mkdir dir="${java.test.classes.dir}"/>
+		<!-- run the compile -->
+		<jcompile src="${java.test.src.dir}"
+		          out="${java.test.classes.dir}"
+		          classpath="java.test.classpath"/>
+	</target>
+
+	<!-- ================================================================================= -->
+	<!--                          (Target Group) Java Unit Testing                         -->
+	<!-- ================================================================================= -->
+	<!-- ******************************** -->
+	<!-- **** Target: java.test.init **** -->
+	<!-- ******************************** -->
+	<target name="java.test.init" depends="java.compile.tests">
+		<echo>Starting unit testing...</echo>
+
+		<!-- set up the directory structure -->
+		<mkdir dir="${java.test.reports.dir}"/>
+
+		<!-- bring in the testng task -->
+		<taskdef resource="testngtasks" classpath="${testng.jar}"/>
+
+		<!-- Sets the verbosity level for TestNG. Will only set it if it isn't already present -->
+		<property name="test.level" value="1"/><!-- between 1 and 10 -->
+
+		<!-- Sets the location of the root dir from which all files should be loaded for the test.
+		     Where possible, all files should be loaded as system resources, but for some tests it
+		     is not possible to do this (FileUtilities is a good example). If the test.root.dir
+		     property is provided, then the next statement will have no effect. -->
+		<property name="test.root.dir" value="."/>
+	</target>
+
+	<!-- *************************** -->
+	<!-- **** Target: java.test **** -->
+	<!-- *************************** -->
+	<target name="java.test" depends="java.test.init" unless="devbuild">
+		<echo>===============================================</echo>
+		<echo>      Executing Calytrix Disco Test Suite      </echo>
+		<echo>===============================================</echo>
+
+		<!-- make sure the dir to hold the reports is created -->
+		<mkdir dir="${java.test.reports.dir}"/>
+
+		<!-- remove the old log directories -->
+		<delete dir="logs"/>
+
+		<!-- need separate executions for when "groups" is specified and
+		     when it is not. sadly, this is only a problem on windows -->
+		<if>
+			<isset property="test.groups"/>
+			<then>
+				<!-- run a suite of tests from a given directory -->
+				<testng classpathref="java.test.classpath"
+						outputDir="${java.test.reports.dir}"
+						failureProperty="java.test.failed"
+						verbose="${test.level}"
+						listener="DiscoTestListener"
+						haltonfailure="false"
+						haltonskipped="false"
+						groups="${test.groups}">
+					<classfileset dir="${java.test.classes.dir}">
+						<include name="**/*Test.class"/>
+						<include name="**/TestSetup.class"/>
+					</classfileset>
+					<jvmarg value="-Dtest.loglevel=${test.loglevel}"/>
+					<jvmarg value="-Dtest.fileLogLevel=${test.fileLogLevel}"/>
+					<jvmarg value="-Dtest.root.dir=${test.root.dir}"/>
+				</testng>
+			</then>
+			<else>
+				<!-- run a suite of tests from a given directory -->
+				<testng classpathref="java.test.classpath"
+						outputDir="${java.test.reports.dir}"
+						failureProperty="java.test.failed"
+						verbose="${test.level}"
+						listener="DiscoTestListener"
+						haltonfailure="false"
+						haltonskipped="false">
+					<classfileset dir="${java.test.classes.dir}">
+						<include name="**/*Test.class"/>
+						<include name="**/TestSetup.class"/>
+					</classfileset>
+					<jvmarg value="-Dtest.loglevel=${test.loglevel}"/>
+					<jvmarg value="-Dtest.fileLogLevel=${test.fileLogLevel}"/>
+					<jvmarg value="-Dtest.root.dir=${test.root.dir}"/>
+				</testng>
+			</else>
+		</if>
+
+		<!-- generate some results -->
+		<!--
+		<junitreport todir="${java.test.reports.dir}/@{suite}">
+			<fileset dir="${java.test.reports.dir}/@{suite}" includes="*/*.xml"/>
+			<report format="frames" todir="${java.test.reports.dir}/@{suite}"/>
+		</junitreport>
+		-->
+
+		<!-- check the result -->
+		<fail if="java.test.failed" message="SOME UNIT TESTS FAILED (@{suite})"/>
+	</target>
+
+	<!-- ================================================================================= -->
+	<!--                       (Target Group) Java Sandbox Generation                      -->
+	<!-- ================================================================================= -->
+	<target name="java.sandbox" depends="java.sandbox.jar,java.sandbox.win32,java.sandbox.macos">
+	</target>
+
+	<!-- *********************************** -->
+	<!-- **** Target: java.sandbox.init **** -->
+	<!-- *********************************** -->
+	<target name="java.sandbox.init" depends="java.init">
+		<!-- check to see if we need to re-create the jar file -->
+		<uptodate property="java.jar.notrequired" targetfile="${java.disco.jar}">
+			<srcfiles dir="${java.build.classes.dir}" includes="**/*.class"/>
+			<srcfiles dir="${java.resources.jar.dir}" includes="**/*"/>
+		</uptodate>
+
+		<!-- create the required directories -->
+		<mkdir dir="${dist.dir}"/>
+		<mkdir dir="${dist.sandbox.dir}"/>
+
+		<!-- copy across the dependant libraries -->
+		<mkdir dir="${dist.lib.dir}"/>
+		<copy todir="${dist.lib.dir}">
+			<fileset dir="${lib.dir}">
+				<include name="**/*"/>
+				<exclude name="testng/*/**"/>
+			</fileset>
+		</copy>
+
+		<!-- copy across distribution resources (configuration, scripts, etc...) -->
+		<copy todir="${dist.sandbox.dir}">
+			<fileset dir="${resources.dist.dir}">
+				<include name="**/*"/>
+			</fileset>
+		</copy>
+
+		<!-- chmod shell scripts -->
+		<!--<chmod dir="${dist.bin.dir}" perm="777" includes="**/*"/>-->
+	</target>
+
+	<!-- ************************************ -->
+	<!-- **** TARGET: java.sandbox.win32 **** -->
+	<!-- ************************************ -->
+	<!-- This will make things happier for windows environments by
+	     renaming files to .txt and changind the eol format to crlf -->
+	<target name="java.sandbox.win32" depends="java.sandbox.init" if="platform.win32">
+		<!-- move some files to .txt extensions -->
+		<move file="${dist.sandbox.dir}/README" tofile="${dist.sandbox.dir}/README.txt"/>
+
+		<!-- fix eol settings -->
+		<fixcrlf srcdir="${dist.sandbox.dir}"
+		         includes="**/*.bat,README.txt"
+		         eol="crlf"/>
+	</target>
+
+	<!-- ************************************ -->
+	<!-- **** TARGET: java.sandbox.macos **** -->
+	<!-- ************************************ -->
+	<!-- This will make things happier for MacOS X environments by
+	     copying in the application wrapper and the like -->
+	<target name="java.sandbox.macos" depends="java.sandbox.init" if="platform.macos">
+	</target>
+
+	<!-- *********************************** -->
+	<!-- **** Target: java.sandbox.jars **** -->
+	<!-- *********************************** -->
+	<!--<target name="java.sandbox.jar" depends="java.compile,java.sandbox.init" unless="java.jar.notrequired">-->
+	<target name="java.sandbox.jar" depends="java.compile,java.sandbox.init">
+		<!-- generate the classpath for the manifest -->
+		<manifestclasspath property="manifest.classpath" jarfile="${lib.dir}/calytrix-disco.jar">
+			<classpath refid="java.compile.classpath"/>
+		</manifestclasspath>
+
+	    <!-- create the main jar file -->
+		<jar destfile="${java.disco.jar}" filesetmanifest="mergewithoutmain">
+			<fileset dir="${java.build.classes.dir}">
+				<include name="**/*.class"/>
+				<include name="build.version"/>
+			</fileset>
+			<!-- copy the resources across -->
+			<fileset dir="${java.resources.jar.dir}">
+				<include name="**/*"/>
+			</fileset>
+			<!-- license -->
+			<fileset dir="." includes="LICENSE.disco"/>
+			<!-- MANIFEST -->
+			<manifest>
+				<attribute name="Built-By" value="Calytrix Technologies"/>
+				<attribute name="Main-Class" value="com.calytrix.disco.Main"/>
+				<attribute name="Class-Path" value="../ ${manifest.classpath}"/>
+				<section name="${app.mainpackage}">
+					<attribute name="Implementation-Title" value="Calytrix Disco"/>
+					<attribute name="Implementation-Version" value="${app.version}.${svn.revision} ${TODAY}"/>
+					<attribute name="Implementation-Vendor" value="Calytrix Technologies"/>
+				</section>
+			</manifest>
+		</jar>
+	</target>
+
+	<!-- ================================================================================= -->
+	<!--                       (Target Group) Java Release Generation                      -->
+	<!-- ================================================================================= -->
+	<target name="java.release" depends="java.release.init,java.test,java.sandbox,java.doc">
+	</target>
+
+	<!-- *********************************** -->
+	<!-- **** Target: java.release.init **** -->
+	<!-- *********************************** -->
+	<target name="java.release.init" depends="clean,init">
+		<!-- set the "build.release" property -->
+		<property name="build.release" value="${app.version}"/>
+
+		<echo>THIS IS A RELEASE BUILD.</echo>
+	</target>
+
+	<!-- =========================================================== -->
+	<!--                       Javadoc Targets                       -->
+	<!-- =========================================================== -->
+	<target name="java.doc" depends="java.init" unless="devbuild">
+		<echo>Generating javadocs for all production source (${java.src.dir})</echo>
+
+		<!-- create the directories -->
+		<mkdir dir="${java.doc.dir}"/>
+
+		<!-- run javadoc for the HLA interfaces -->
+		<echo>Generating Calytrix Disco API documentation</echo>
+		<mkdir dir="${java.doc.dir}"/>
+		<javadoc author="false"
+		         destdir="${java.doc.dir}"
+		         packagenames="com.calytrix.disco.*"
+		         sourcepath="${java.src.dir}"
+				 link="${java.doc.external}"
+		         use="true"
+		         version="true"
+		         breakiterator="true">
+			<classpath refid="java.compile.classpath"/>
+		</javadoc>
+	</target>
+
+</project>
+

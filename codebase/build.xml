@@ -1,0 +1,208 @@
+<?xml version="1.0"?>
+<!--
+                 Welcome to the Calytrix Disco build file
+
+       Contained in this file are all the properties and build targets
+       relating to the main Disco library. This file provides the main
+       targets for building the Disco library. It sets project-wide properties
+       and imports other build files to do the bulk of its work.
+
+       NOTE: This file has been adapted from the build system of the Portico Open
+             Source RTI (released under the CDDL)
+-->
+<project name="disco" default="compile" basedir=".">
+
+	<!-- =========================================================== -->
+	<!--                      General Settings                       -->
+	<!-- =========================================================== -->
+	<description>
+		Open source Distributed Interactive Simulation library.
+	</description>
+
+	<!-- =========================================================== -->
+	<!--                       Master Targets                        -->
+	<!-- =========================================================== -->
+	<!--
+	     These are the "master" targets which will complete each task for BOTH
+	     the java and cpp code. If you want a language specific task only, use
+	     the java. or cpp. targets (e.g. java.compile, cpp.sandbox)
+	-->
+	
+	<target name="clean" depends="all.clean"
+		description="Removes all generated build artefacts"/>
+
+	<target name="compile" depends="all.compile"
+		description="Compile all the production and test code"/>
+	
+	<target name="test" depends="all.test"
+	    description="Run all the unit tests"/>
+	
+	<target name="sandbox" depends="all.sandbox"
+		description="Create a sandbox environment to test and validate in"/>
+
+	<target name="release" depends="all.release"
+		description="Create a complete release ready to make public (runs all tests)"/>
+
+	<!-- =========================================================== -->
+	<!--              Import Other Files/General Setup               -->
+	<!-- =========================================================== -->
+	<!-- bring in the ant-contrib tasks -->
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
+	
+	<!-- bring in the svn tasks -->
+	<taskdef resource="org/tigris/subversion/svnant/svnantlib.xml">
+		<classpath>
+			<fileset dir="support/ant-contrib/svn" includes="**/*.jar" />
+		</classpath>
+	</taskdef>
+	
+	<!-- load the environment variables -->
+	<property environment="env"/>
+	<!-- make sure we have JAVA_HOME -->
+	<if>
+		<not><isset property="env.JAVA_HOME"/></not>
+		<then><fail message="The JAVA_HOME environment variable must be set"/></then>
+	</if>
+
+	<!-- load the users properties file -->
+	<property file="${user.home}/.build.properties"/>
+	<property file="build.properties"/>
+
+	<!-- bring in the build version information -->
+	<property file="build.version"/>
+
+	<!-- get the year value -->
+	<tstamp><format property="YEAR" pattern="yyyy"/></tstamp>
+
+	<!-- =========================================================== -->
+	<!--                   Project Wide Properties                   -->
+	<!-- =========================================================== -->
+	<property name="app.mainpackage"        value="com/calytrix/disco"/>
+	<property name="app.version"            value="unknown"/> <!-- set in build.version -->
+	<property name="app.shortname"          value="disco"/> <!-- set in build.version -->
+	<property name="app.license"            location="LICENSE.disco"/>
+
+	<!-- Platform Determination Properties -->
+	<condition property="platform" value="macos"><os family="mac"/></condition>
+	<condition property="platform" value="win32"><os family="windows"/></condition>
+	<condition property="platform" value="linux"><os name="Linux"/></condition>
+	<condition property="platform.macos" value="true"><os family="mac"/></condition>
+	<condition property="platform.win32" value="true"><os family="windows"/></condition>
+	<condition property="platform.linux" value="true"><os name="Linux"/></condition>
+
+	<!-- Location Properties -->
+	<property name="lib.dir"                location="lib"/>
+	<property name="resources.dir"          location="resources"/>
+	<property name="resources.dist.dir"     location="${resources.dir}/dist"/>
+	<property name="etc.dir"                location="${resources.dist.dir}/etc"/>
+	<property name="bin.dir"                location="${resources.dist.dir}/bin"/>
+	<property name="documentation.dir"      location="documentation"/>
+
+	<!-- Generated Build and Distribution Properties -->
+	<property name="build.dir"              location="build"/>
+	<property name="dist.name"              value="${app.shortname}-${app.version}"/>
+	<property name="dist.dir"               location="dist"/>
+	<property name="dist.sandbox.dir"       location="${dist.dir}/${dist.name}"/>
+	<property name="dist.lib.dir"           location="${dist.sandbox.dir}/lib"/>
+	<property name="dist.etc.dir"           location="${dist.sandbox.dir}/etc"/>
+	<property name="dist.bin.dir"           location="${dist.sandbox.dir}/bin"/>
+	<property name="dist.inc.dir"           location="${dist.sandbox.dir}/include"/>
+	<property name="dist.examples.dir"      location="${dist.sandbox.dir}/examples"/>
+	<property name="dist.documentation.dir" location="${dist.sandbox.dir}/documentation"/>
+	<property name="dist.javadoc.dir"       location="${dist.documentation.dir}/javadoc"/>
+	<property name="dist.zip.file"          location="${dist.dir}/${dist.name}.zip"/>
+	<property name="dist.tgz.file"          location="${dist.dir}/${dist.name}.tar.gz"/>
+	<!-- below values should replace above when platform-specific elements are included -->
+	<!--<property name="dist.zip.file" location="${dist.dir}/${dist.name}-${platform}.zip"/>-->
+	<!--<property name="dist.tgz.file" location="${dist.dir}/${dist.name}-${platform}.tar.gz"/>-->
+
+	<!-- =========================================================== -->
+	<!--                  Load Java/C++ Build Files                  -->
+	<!-- =========================================================== -->
+	<!-- NOTE: These must be loaded AFTER the property declarations above
+	           so that those files will have access to them -->
+	<import file="build-java.xml"/>
+	<!--<import file="build-cpp.xml"/>-->
+	<!--<import file="build-installer.xml"/>-->
+
+	<!-- =========================================================== -->
+	<!-- >>>> Target: all.clean                                      -->
+	<!-- =========================================================== -->
+	<target name="all.clean" depends="java.clean">
+		<delete dir="${dist.dir}"/>
+		<delete dir="${build.dir}"/>
+		<delete dir="logs"/>
+
+		<!-- get rid of some common backup files -->
+		<delete>
+			<fileset dir="." includes="**/*.java~"/>
+		</delete>
+		<delete>
+			<fileset dir="." includes="**/*.bak"/>
+		</delete>
+	</target>
+
+	<!-- =========================================================== -->
+	<!-- >>>> Target: init                                           -->
+	<!-- =========================================================== -->
+	<target name="init">
+		<echo message="Building ${ant.project.name}"/>
+	</target>
+
+
+	<!-- =========================================================== -->
+	<!-- >>>> Target: svn                                            -->
+	<!-- =========================================================== -->
+	<target name="svn">
+		<!-- get the latest svn revision information -->
+		<svn svnkit="true">
+			<status path="${basedir}" revisionProperty="svn.revision"/>
+		</svn>
+		<echo>SVN Revision: ${svn.revision}</echo>
+	</target>
+
+	<!-- =========================================================== -->
+	<!-- >>>> Target: all.compile                                    -->
+	<!-- =========================================================== -->
+	<target name="all.compile" depends="java.compile"/>
+
+	<!-- =========================================================== -->
+	<!-- >>>> Target: all.sandbox                                    -->
+	<!-- =========================================================== -->
+	<target name="all.sandbox" depends="svn,java.sandbox"/>
+
+	<!-- =========================================================== -->
+	<!-- >>>> Target: all.test                                       -->
+	<!-- =========================================================== -->
+	<target name="all.test" depends="java.test"/>
+
+	<!-- =========================================================== -->
+	<!-- >>>> Target: all.zips                                       -->
+	<!-- =========================================================== -->
+	<target name="all.release" depends="svn,clean,java.release">
+		<!-- =================================== -->
+		<!-- Windows Release Zip File Generation -->
+		<!-- =================================== -->
+		<if><isset property="platform.win32"/><then>
+		
+		<echo>creating ${dist.zip.file}</echo>
+		<zip destfile="${dist.zip.file}"
+		     basedir="${dist.dir}"
+		     includes="${dist.name}/**/*"/>
+
+		</then></if>
+
+		<!-- ==================================== -->
+		<!-- Unix Release Tar-Zip File Generation -->
+		<!-- ==================================== -->
+		<if><not><isset property="platform.win32"/></not><then>
+		
+		<echo>creating ${dist.tgz.file}</echo>
+		<exec executable="tar" dir="${dist.dir}" failonerror="true">
+			<arg line="-czf ${dist.tgz.file} ./${dist.name}"/>
+		</exec>
+
+		</then></if>
+	</target>
+
+</project>

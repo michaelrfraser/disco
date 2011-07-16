@@ -1,0 +1,25 @@
+If you are reading this, you are most likely looking around for the disco
+source code. Well, you can stop looking because it isn't in here!
+
+As such, if you are one of the few people who want the source code, you can
+check it out of the public Sourceforge Subversion repository from the following
+URL:
+
+https://disco.svn.sourceforge.net/svnroot/disco/trunk
+
+The disco source code provides everything you need to build the library, with
+the exception of Java. To get things running, all you need to do is:
+
+ 1. svn checkout https://disco.svn.sourceforge.net/svnroot/disco/trunk disco
+ 2. cd disco/codebase
+ 3. ant release
+
+This will create a folder called codebase/dist/disco-version. In this folder
+will be all the build artefacts.
+
+This library has been kindly made open source by Calytrix Technologies. Please
+refer to the provided licence for use and distribution terms.
+
+Cheers,
+Tim Pokorny, CTO, Calytrix Technologies
+

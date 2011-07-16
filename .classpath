@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="codebase/src-java/disco"/>
+	<classpathentry kind="src" path="codebase/src-java/test"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="codebase/lib/testng/testng-5.12.1/testng-5.12.1.jar"/>
+	<classpathentry kind="lib" path="codebase/lib/log4j/apache-log4j-1.2.16/log4j-1.2.16.jar"/>
+	<classpathentry kind="output" path="eclipse-build"/>
+</classpath>
