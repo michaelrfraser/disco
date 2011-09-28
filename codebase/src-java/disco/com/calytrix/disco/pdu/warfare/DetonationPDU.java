@@ -14,7 +14,9 @@
  */
 package com.calytrix.disco.pdu.warfare;
 
-import com.calytrix.disco.pdu.PDUType;
+import com.calytrix.disco.pdu.PDU;
+import com.calytrix.disco.pdu.field.PDUType;
+import com.calytrix.disco.pdu.record.PDUHeader;
 
 /**
  * This class represents an Detonation PDU.
@@ -23,7 +25,7 @@ import com.calytrix.disco.pdu.PDUType;
  * 
  * @see "IEEE Std 1278.1-1995 section 4.5.3.3"
  */
-public class DetonationPDU
+public class DetonationPDU extends PDU
 {
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
@@ -36,43 +38,17 @@ public class DetonationPDU
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
-	public DetonationPDU()
+	public DetonationPDU( PDUHeader header )
 	{
-		super();
+		super( header );
+		
+		if ( header.getPDUType() != PDUType.DETONATION )
+	    	throw new IllegalStateException( "Invalid PDUType in Header" );
 	}
 
 	//----------------------------------------------------------
 	//                    INSTANCE METHODS
 	//----------------------------------------------------------
-	public final PDUType getPDUType()
-	{
-		return PDUType.Detonation;
-	}
-
-	/////////////////////////////////////////////////////////////////////////////////////////
-	///////////////////////////////// Serialization Methods /////////////////////////////////
-	/////////////////////////////////////////////////////////////////////////////////////////
-	/**
-	 * This method will serialize the values of the provided PDU into a byte[] and return it.
-	 * 
-	 * @return byte[] containing the serialized form of this PDU
-	 */
-	public byte[] serialize()
-	{
-		return new byte[0];
-	}
-
-	/**
-	 * This method will initialize the local values of this PDU with the information contained
-	 * in the provided buffer. After this method has been called, any previous state in the PDU
-	 * should have been wiped clear and replaced with the new values from the buffer.
-	 * 
-	 * @param buffer The raw bytes to extract the various values for the PDU from
-	 */
-	public void deserialize( byte[] buffer )
-	{
-		// no-op
-	}
 
 	//----------------------------------------------------------
 	//                     STATIC METHODS

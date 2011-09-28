@@ -12,67 +12,76 @@
  *   (that goes for your lawyer as well)
  *
  */
-package com.calytrix.disco.network;
-
-import java.io.IOException;
-import java.net.MulticastSocket;
-import java.util.Queue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.logging.Logger;
-
-import com.calytrix.disco.DiscoException;
-import com.calytrix.disco.config.DiscoProperties;
+package com.calytrix.disco.pdu.field;
 
 /**
- * This class is responsible for connecting to the local network and queuing up received PDUs
- * for later processing.
+ * This field shall specify the type of representation used for the radiation 
+ * pattern from the antenna. The value of this field shall determine the 
+ * interpretation of the Antenna Pattern Parameter field.<br/>
+ * <br/>
+ * This field shall be represented by a 16-bit enumeration
+ * 
+ * @see "Section 9 in EBV-DOC"
  */
-public class PDUReceiver
+public class AntennaPatternType
 {
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
 	//----------------------------------------------------------
-
+	public static final int OMNI_DIRECTIONAL = 0;
+	public static final int BEAM = 1;
+	public static final int SPHERICAL_HARMONIC = 2;
+	
 	//----------------------------------------------------------
 	//                   INSTANCE VARIABLES
 	//----------------------------------------------------------
-	private Logger logger;
-	
-	private Queue<byte[]> receivedPackets;
 
-	// networking variables
-	private MulticastSocket multicastSocket;
-	
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
-	public PDUReceiver( DiscoProperties properties ) throws DiscoException
-	{
-		// basic initialization
-		this.logger = DiscoProperties.getLogger( "disco.network" );
-		this.receivedPackets = new LinkedBlockingQueue<byte[]>();
-		
-		// configure networking
-		this.configure( properties );
-	}
 
 	//----------------------------------------------------------
 	//                    INSTANCE METHODS
 	//----------------------------------------------------------
-	private void configure( DiscoProperties properties ) throws DiscoException
-	{
-		// initialize the socket
-		try
-		{
-			this.multicastSocket = new MulticastSocket( properties.getFullNetworkAddress() );
-		}
-		catch( IOException ioex )
-		{
-			throw new DiscoException( ioex );
-		}
-	}
 
 	//----------------------------------------------------------
 	//                     STATIC METHODS
 	//----------------------------------------------------------
+	/**
+	 * Returns the ordered set of values that this enumerated field can assume
+	 * 
+	 * @return An int[] containing the ordered set of values that this 
+	 * enumeration field can assume
+	 */
+	public static int[] getValues()
+	{
+		int[] values = { OMNI_DIRECTIONAL, BEAM, SPHERICAL_HARMONIC };
+		return values;
+	}
+	
+	/**
+	 * Returns a textual description of the provided field value
+	 * 
+	 * @param value The field value to return a description of
+	 * 
+	 * @return A String representing the description of the specified field
+	 * value
+	 */
+	public static String getDescription( int value )
+	{
+		String description = "Omni-directional";
+		
+		switch( value )
+		{
+			case BEAM:
+				description = "Beam";
+				break;
+				
+			case SPHERICAL_HARMONIC:
+				description = "Spherical harmonic";
+				break;
+		}
+		
+		return description;
+	}
 }

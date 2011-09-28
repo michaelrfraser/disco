@@ -12,21 +12,18 @@
  *   (that goes for your lawyer as well)
  *
  */
-package com.calytrix.disco.pdu;
+package com.calytrix.disco.network;
 
+import java.io.IOException;
+
+import com.calytrix.disco.DiscoException;
+import com.calytrix.disco.pdu.PDU;
+import com.calytrix.disco.pdu.field.PDUType;
+import com.calytrix.disco.pdu.radio.SignalPDU;
+import com.calytrix.disco.pdu.radio.TransmitterPDU;
 import com.calytrix.disco.pdu.record.PDUHeader;
 
-/**
- * This class is the parent of all types that represent PDU data.
- * <p/>
- * A PDU class represents a specific DIS defined PDU message. When a PDU is sensed on the network,
- * the raw data is used to generate an instance of the appropriate {@link PDU} child class. The
- * individual child will contain pdu-specific properties and methods, as well as the logic needed
- * to serialize and deserialize the PDU to and from a raw byte format.
- * <p/>
- * This class defines the common interface for all PDU types.
- */
-public abstract class PDU
+public class PDUCodec
 {
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
@@ -35,53 +32,50 @@ public abstract class PDU
 	//----------------------------------------------------------
 	//                   INSTANCE VARIABLES
 	//----------------------------------------------------------
-	private PDUHeader header;
-	private long received;
-	
+
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
-	public PDU( PDUHeader header )
-	{
-		this.header = header;
-		this.received = System.currentTimeMillis();
-	}
-	
+
 	//----------------------------------------------------------
 	//                    INSTANCE METHODS
 	//----------------------------------------------------------
-	/**
-	 * Each PDU has a specific type, as enumerated in 
-	 * {@link com.calytrix.disco.pdu.field.PDUType}. This method returns the
-	 * specific value for this PDU type. 
-	 */
-	public final short getPDUType()
+	public PDU readPDU( DISInputStream dis ) throws DiscoException
 	{
-		if ( header == null )
-			throw new IllegalStateException( "The PDU instance does not contain a header" );
-		
-		short type = header.getPDUType();
-		return type;
+		try
+		{
+			// Firstly, read the header from the data stream 
+			PDUHeader header = PDUHeader.read( dis );
+			
+			// Create the PDU from the rest of the datastream
+			PDU pdu = readRemainingPDU( header, dis );
+			return pdu;
+		}
+		catch ( IOException ioex )
+		{
+			throw new DiscoException( ioex );
+		}
 	}
 
-	public PDUHeader getHeader()
+	private PDU readRemainingPDU( PDUHeader header, DISInputStream dis ) throws IOException
 	{
-		return header;
-	}
-	
-	public void setHeader( PDUHeader header )
-	{
-		this.header = header;
-	}
-	
-	public long getReceived()
-	{
-		return received;
-	}
-	
-	public void setReceived( long received )
-	{
-		this.received = received;
+		PDU result = null;
+		
+		short pduType = header.getPDUType();
+				
+		switch ( pduType )
+		{
+			case PDUType.TRANSMITTER:
+				
+				result = TransmitterPDU.read( header, dis );
+				break;
+				
+			case PDUType.SIGNAL:
+				result = SignalPDU.read( header, dis );
+				break;
+		}
+				
+		return result;
 	}
 	
 	//----------------------------------------------------------

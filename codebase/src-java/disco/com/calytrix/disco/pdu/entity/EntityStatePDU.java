@@ -15,7 +15,8 @@
 package com.calytrix.disco.pdu.entity;
 
 import com.calytrix.disco.pdu.PDU;
-import com.calytrix.disco.pdu.PDUType;
+import com.calytrix.disco.pdu.field.PDUType;
+import com.calytrix.disco.pdu.record.PDUHeader;
 
 /**
  * This class represents an EntityState PDU.
@@ -38,43 +39,17 @@ public class EntityStatePDU extends PDU
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
-	public EntityStatePDU()
+	public EntityStatePDU( PDUHeader header )
 	{
-		super();
+		super( header );
+		
+		if ( header.getPDUType() != PDUType.ENTITY_STATE )
+	    	throw new IllegalStateException( "Invalid PDUType in Header" );
 	}
 
 	//----------------------------------------------------------
 	//                    INSTANCE METHODS
 	//----------------------------------------------------------
-	public final PDUType getPDUType()
-	{
-		return PDUType.EntityState;
-	}
-
-	/////////////////////////////////////////////////////////////////////////////////////////
-	///////////////////////////////// Serialization Methods /////////////////////////////////
-	/////////////////////////////////////////////////////////////////////////////////////////
-	/**
-	 * This method will serialize the values of the provided PDU into a byte[] and return it.
-	 * 
-	 * @return byte[] containing the serialized form of this PDU
-	 */
-	public byte[] serialize()
-	{
-		return new byte[0];
-	}
-
-	/**
-	 * This method will initialize the local values of this PDU with the information contained
-	 * in the provided buffer. After this method has been called, any previous state in the PDU
-	 * should have been wiped clear and replaced with the new values from the buffer.
-	 * 
-	 * @param buffer The raw bytes to extract the various values for the PDU from
-	 */
-	public void deserialize( byte[] buffer )
-	{
-		// no-op
-	}
 
 	//----------------------------------------------------------
 	//                     STATIC METHODS

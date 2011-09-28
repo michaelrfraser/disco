@@ -12,25 +12,18 @@
  *   (that goes for your lawyer as well)
  *
  */
-package com.calytrix.disco.pdu.radio;
-
-import com.calytrix.disco.pdu.PDU;
-import com.calytrix.disco.pdu.field.PDUType;
-import com.calytrix.disco.pdu.record.PDUHeader;
+package com.calytrix.disco.util;
 
 /**
- * This class represents an Receiver PDU.
- * <p/>
- * PDUs of this type contain information about...
- * 
- * @see "IEEE Std 1278.1-1995 section 4.5.7.4"
+ * Helper class for commonly used floating point operations
  */
-public class ReceiverPDU extends PDU
+public class FloatingPointUtils
 {
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
 	//----------------------------------------------------------
-
+	public static final double FP_EQUALITY_THRESHOLD = 1e-5;
+	
 	//----------------------------------------------------------
 	//                   INSTANCE VARIABLES
 	//----------------------------------------------------------
@@ -38,13 +31,6 @@ public class ReceiverPDU extends PDU
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
-	public ReceiverPDU( PDUHeader header )
-	{
-		super( header );
-		
-		if ( header.getPDUType() != PDUType.RECEIVER )
-	    	throw new IllegalStateException( "Invalid PDUType in Header" );
-	}
 
 	//----------------------------------------------------------
 	//                    INSTANCE METHODS
@@ -53,4 +39,35 @@ public class ReceiverPDU extends PDU
 	//----------------------------------------------------------
 	//                     STATIC METHODS
 	//----------------------------------------------------------
+	/**
+	 * Returns whether the two specified double value are equal. The two values
+	 * will be considered equal if the absolute difference between the values
+	 * is within a predefined threshold.
+	 * 
+	 * @param d1 The first double to compare
+	 * @param d2 The second double to compare
+	 * 
+	 * @return true if the two values are equal, otherwise false
+	 */
+	public static boolean doubleEqual( double d1, double d2 )
+	{
+		double absDiff = Math.abs( d1 - d2 );
+		return absDiff < FP_EQUALITY_THRESHOLD;
+	}
+	
+	/**
+	 * Returns whether the two specified float value are equal. The two values
+	 * will be considered equal if the absolute difference between the values
+	 * is within a predefined threshold.
+	 * 
+	 * @param f1 The first float to compare
+	 * @param f2 The second float to compare
+	 * 
+	 * @return true if the two values are equal, otherwise false
+	 */
+	public static boolean floatEqual( float f1, float f2 )
+	{
+		float absDiff = Math.abs( f1 - f2 );
+		return absDiff < FP_EQUALITY_THRESHOLD;
+	}
 }

@@ -16,7 +16,9 @@ package com.calytrix.disco.config;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.NetworkInterface;
 import java.net.SocketAddress;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Properties;
 
@@ -60,9 +62,11 @@ public class DiscoProperties
 	
 	// networking properties
 	public static final String PROP_NETWORK_ADDRESS          = "disco.network.address";
-	public static final String PROP_NETWORK_ADDRESS_DEFAULT  = "127.0.0.1";
+	public static final String PROP_NETWORK_ADDRESS_DEFAULT  = "226.0.1.1";
 	public static final String PROP_NETWORK_PORT             = "disco.network.port";
 	public static final String PROP_NETWORK_PORT_DEFAULT     = "3000";
+	public static final String PROP_NETWORK_IFACE		 	 = "disco.network.iface";
+	public static final String PROP_NETWORK_IFACE_DEFAULT	 = "localhost";
 
 	//----------------------------------------------------------
 	//                   INSTANCE VARIABLES
@@ -172,6 +176,26 @@ public class DiscoProperties
 		return Integer.parseInt( value );
 	}
 
+	/**
+	 * Gets the configured value for {@link #PROP_NETWORK_IFACE} and returns it 
+	 * as an {@link NetworkInterface}. If there is a problem parsing the address, 
+	 * an exception is thrown. 
+	 */
+	public NetworkInterface getNetworkInterface()
+	{
+		String ifaceName = properties.getProperty( PROP_NETWORK_IFACE,
+		                                           PROP_NETWORK_IFACE_DEFAULT );
+		
+		try
+		{
+			return NetworkInterface.getByName( ifaceName );
+		}
+		catch ( SocketException exception )
+		{
+			throw new DiscoException( exception );
+		}
+	}
+	
 	//----------------------------------------------------------
 	//                     STATIC METHODS
 	//----------------------------------------------------------
