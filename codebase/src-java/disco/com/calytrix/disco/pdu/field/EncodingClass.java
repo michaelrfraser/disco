@@ -55,7 +55,8 @@ public class EncodingClass
 	 */
 	public static byte[] getValues()
 	{
-		byte[] values = { ENCODED_VOICE, RAW_BINARY_DATA, APPLICATION_SPECIFIC_DATA, DATABASE_INDEX };
+		byte[] values = { ENCODED_VOICE, RAW_BINARY_DATA, 
+		                  APPLICATION_SPECIFIC_DATA, DATABASE_INDEX };
 		return values;
 	}
 	
