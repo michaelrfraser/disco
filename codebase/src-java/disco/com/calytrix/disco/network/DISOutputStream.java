@@ -12,17 +12,13 @@
  *   (that goes for your lawyer as well)
  *
  */
-package com.calytrix.disco;
+package com.calytrix.disco.network;
 
-import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 
-@Test(sequential=true, groups={"placeholder"})
-public class PlaceHolderTest extends AbstractTest
+public class DISOutputStream extends DataOutputStream
 {
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
@@ -35,49 +31,17 @@ public class PlaceHolderTest extends AbstractTest
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
-
+	public DISOutputStream( OutputStream out )
+    {
+	    super( out );
+    }
+	
 	//----------------------------------------------------------
 	//                    INSTANCE METHODS
 	//----------------------------------------------------------
-	@BeforeClass(alwaysRun=true)
-	public void beforeClass()
+	public void writeUI8( short value ) throws IOException
 	{
-		super.beforeClass();
-	}
-	
-	@BeforeMethod(alwaysRun=true)
-	public void beforeMethod() throws Exception
-	{
-		super.beforeMethod();
-		
-		// populate instance variables
-	}
-	
-	@AfterMethod(alwaysRun=true)
-	public void afterMethod()
-	{
-		super.afterMethod();
-		
-		// null-out instance variables to ensure not state transfer from test to test
-	}
-	
-	@AfterClass(alwaysRun=true)
-	public void afterClass()
-	{
-		super.afterClass();
-	}
-
-	///////////////////////////////////////////////////////////////////////////////////////////
-	///////////////////////////////////// Testing Methods /////////////////////////////////////
-	///////////////////////////////////////////////////////////////////////////////////////////
-	/**
-	 * This method tests that items can be added to and retrieved from the {@link Repository}
-	 * properly. 
-	 */
-	@Test
-	public void testRepositoryAddAndGet()
-	{
-		Assert.assertEquals( 0, 0 );
+		out.write( value );
 	}
 	
 	//----------------------------------------------------------

@@ -14,6 +14,11 @@
  */
 package com.calytrix.disco;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+
+import com.calytrix.disco.network.DISInputStream;
+
 public class TestUtils
 {
 	//----------------------------------------------------------
@@ -49,5 +54,19 @@ public class TestUtils
 		{
 			e.printStackTrace();
 		}
+	}
+	
+	public static DISInputStream convertToInputStream( ByteArrayOutputStream baos )
+	{
+		byte[] buffer = baos.toByteArray();
+		return convertToInputStream( buffer );
+	}
+	
+	public static DISInputStream convertToInputStream( byte... buffer )
+	{
+		ByteArrayInputStream bais = new ByteArrayInputStream( buffer );
+		DISInputStream dis = new DISInputStream( bais );
+		
+		return dis;
 	}
 }

@@ -23,7 +23,22 @@ import com.calytrix.disco.network.DISInputStream;
  * This field shall specify the encoding used in the Data field of this PDU. 
  * The Encoding Scheme shall be composed of a 2-bit field specifying the 
  * encoding class and a 14-bit field specifying either the encoding type, or the 
- * number of TDL messages contained in this Signal PDU
+ * number of TDL messages contained in this Signal PDU.<br/>
+ * <br/>
+ * The fourteen least significant bits of the encoding scheme shall represent 
+ * encoding type when the encoding class is encoded audio. The valid values of 
+ * encoding type are enumerated in Section 9 of EBV-DOC.<br/>
+ * <br/>
+ * The fourteen least significant bits of the encoding scheme shall be zero when 
+ * the encoding class is not encoded audio and the TDL Type (see 5.4.8.2(e)) is 
+ * zero.<br/>
+ * <br/>
+ * Otherwise, the fourteen least significant bits of the encoding scheme shall 
+ * represent the number of tactical data link messages contained in the data 
+ * section of the Signal PDU.
+ * 
+ * @see "IEEE Std 1278.1-1995 section 5.4.8.2(e)"
+ * @see "Section 9 of EBV-DOC"
  */
 public class EncodingScheme
 {
