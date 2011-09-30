@@ -65,24 +65,21 @@ public class WorldCoordinate
 	@Override
 	public boolean equals( Object other )
 	{
-		boolean equal = false;
+		if( other == this )
+			return true;
 		
-		if ( other == this )
+		if ( other instanceof WorldCoordinate )
 		{
-			equal = true;
-		}
-		else
-		{
-			if ( other instanceof WorldCoordinate )
+			WorldCoordinate asWorldCoordinate = (WorldCoordinate)other;
+			if( FloatingPointUtils.doubleEqual(asWorldCoordinate.x,this.x) &&
+				FloatingPointUtils.doubleEqual(asWorldCoordinate.y,this.y) &&
+				FloatingPointUtils.doubleEqual(asWorldCoordinate.z,this.z) )
 			{
-				WorldCoordinate asWorldCoordinate = (WorldCoordinate)other;
-				equal = FloatingPointUtils.doubleEqual( asWorldCoordinate.x, this.x ) &&
-					FloatingPointUtils.doubleEqual( asWorldCoordinate.y, this.y ) &&
-					FloatingPointUtils.doubleEqual( asWorldCoordinate.z, this.z );
+				return true;
 			}
 		}
 		
-		return equal;
+		return false;
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////

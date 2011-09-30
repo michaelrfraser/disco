@@ -94,9 +94,9 @@ public class PDUReader
 	 */
 	public void start() throws DiscoException
 	{
-		logger.debug( "ATTEMPT: Starting PDUReader" );
+		logger.debug( "Starting PDUReader" );
 		
-		if ( socket == null )
+		if( socket == null )
 		{
 			InetAddress disAddress = properties.getNetworkAddress();
 			int disPort = properties.getNetworkPort();
@@ -106,16 +106,16 @@ public class PDUReader
 			{
 				// How we initialise the socket depends on the address type
 				// that is configured
-				if ( disAddress.isMulticastAddress() )
+				if( disAddress.isMulticastAddress() )
 					socket = socketStartMulticast( disAddress, disPort, iface );
 				else
 					socket = socketStartBroadcast( disAddress, disPort, iface );
 				
-				logger.info( "SUCCESS: PDUReader started!" );
+				logger.info( "PDUReader started!" );
 			}
-			catch ( IOException ioe )
+			catch( IOException ioe )
 			{
-				logger.error( "FAIL: Could not start PDUReader", ioe );
+				logger.error( "Could not start PDUReader", ioe );
 				throw new DiscoException( ioe );
 			}
 						
@@ -139,47 +139,47 @@ public class PDUReader
 	 */
 	public void stop()
 	{
-		logger.debug( "ATTEMPT: Stopping PDUReader" );
+		logger.debug( "Stopping PDUReader" );
 		
-		if ( socket != null )
+		if( socket != null )
 		{
 			socket.close();
 			socket = null;
 			
 			try
 			{
-				logger.debug( "ATTEMPT: Stopping DiscoPDUReceiver thread" );
+				logger.trace( "Stopping DiscoPDUReceiver thread" );
 				
 				// Interrupt the receiver and wait for it to stop
 				receiveThread.interrupt();
 				receiveThread.join();
 				
-				logger.info( "SUCCESS: Stopped DiscoPDUReceiver thread!" );
+				logger.debug( "Stopped DiscoPDUReceiver thread!" );
 			}
-			catch ( InterruptedException ie )
+			catch( InterruptedException ie )
 			{
 				logger.warn( "WARN: Unable to stop the DiscoPDUReceiver thread", ie );
 			}
 			
 			try
 			{
-				logger.debug( "ATTEMPT: Stopping DiscoPDUDispatcher thread" );
+				logger.trace( "Stopping DiscoPDUDispatcher thread" );
 				
 				// Interrupt the PDU dispatcher and wait for it to stop
 				dispatchThread.interrupt();
 				dispatchThread.join();
 				
-				logger.info( "SUCCESS: Stopped DiscoPDUDispatcher thread!" );
+				logger.debug( "Stopped DiscoPDUDispatcher thread!" );
 			}
-			catch ( InterruptedException ie )
+			catch( InterruptedException ie )
 			{
-				logger.warn( "WARN: Unable to stop the DiscoPDUDispatcher thread", ie );
+				logger.warn( "Unable to stop the DiscoPDUDispatcher thread", ie );
 			}
 		}
 		else
 		{
-			// Already Stopped
-			logger.warn( "WARN: Unable to stop PDUReader as it was not started to being with" );
+			// no-op, already stopped
+			
 		}
 	}
 	
@@ -221,15 +221,16 @@ public class PDUReader
 	 * 
 	 * @throws IOException thrown if there was an error connecting the socket
 	 */
-	private DatagramSocket socketStartMulticast( InetAddress address, int port, 
-	                                             NetworkInterface iface ) throws IOException
+	private DatagramSocket socketStartMulticast( InetAddress address, 
+	                                             int port, 
+	                                             NetworkInterface nic ) throws IOException
 	{
 		MulticastSocket asMulticast = new MulticastSocket( port );
 		asMulticast.setTimeToLive( multicastTTL );
 		asMulticast.setTrafficClass( multicastTrafficClass );
 		
 		SocketAddress disAddress = new InetSocketAddress( address, port );
-		asMulticast.joinGroup( disAddress, iface );
+		asMulticast.joinGroup( disAddress, nic );
 		
 		return asMulticast;	
 	}
@@ -246,7 +247,8 @@ public class PDUReader
 	 * 
 	 * @throws IOException thrown if there was an error connecting the socket
 	 */
-	private DatagramSocket socketStartBroadcast( InetAddress address, int port, 
+	private DatagramSocket socketStartBroadcast( InetAddress address,
+	                                             int port, 
 	                                             NetworkInterface iface ) throws IOException
 	{
 		throw new IllegalStateException( "Not currently supported" );
@@ -277,31 +279,31 @@ public class PDUReader
 			DISInputStream dis = new DISInputStream( bais );
 			DatagramPacket packet = new DatagramPacket( rawBytes, PDU_MAX_SIZE );
 			
-			while ( keepReceiving )
+			while( keepReceiving )
 			{
 				try
 				{
 					dis.reset();
-					
+
 					// Receive into DatagramPacket
 					socket.receive( packet );
 					logger.trace( "Read " + packet.getData().length + " bytes from DIS socket" );
-					
+
 					// Deserialise the PDU and place it on the dispatch queue
 					PDU pdu = m_pduCodec.readPDU( dis );
-					if ( pdu != null )
+					if( pdu != null )
 					{
 						logger.trace( "PDU deserialised successfully, adding to dispatch queue" );
 						dispatchQueue.put( pdu );
 					}
 				}
-				catch ( InterruptedException ie )
+				catch( InterruptedException ie )
 				{
 					// Interrupted, so stop receiving and fall through
 					keepReceiving = false;
 					logger.debug( "DiscoPDUReceiver shutting down due to interrupt" );
 				}
-				catch ( IOException ioe )
+				catch( IOException ioe )
 				{
 					// IOException occured, so stop receiving and fall through
 					keepReceiving = false;
@@ -330,21 +332,21 @@ public class PDUReader
 			boolean running = true;
 			
 			// Process while running, or if the queue has content
-			while ( running || dispatchQueue.size() > 0 )
+			while( running || dispatchQueue.size() > 0 )
 			{
 				try
 				{
 					// Get the next notification from the notification queue
 					PDU pdu = dispatchQueue.take();
 					logger.trace( "PDU taken from dispatch queue, notifying listeners" );
-					
+
 					// Broadcast to all listeners
 					listenerLock.lock();
-					for ( IPDUListener listener : listenerSet )
+					for( IPDUListener listener : listenerSet )
 						listener.pduReceived( pdu );
 					listenerLock.unlock();
 				}
-				catch ( InterruptedException ie )
+				catch( InterruptedException ie )
 				{
 					// Interrupted, so stop running
 					running = false;

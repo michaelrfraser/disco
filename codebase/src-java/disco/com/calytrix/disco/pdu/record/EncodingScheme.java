@@ -55,23 +55,20 @@ public class EncodingScheme
 	@Override
 	public boolean equals( Object other )
 	{
-		boolean equal = false;
-		
-		if ( other == this )
+		if( other == this )
+			return true;
+
+		if( other instanceof EncodingScheme )
 		{
-			equal = true;
-		}
-		else
-		{
-			if ( other instanceof EncodingScheme )
+			EncodingScheme asEncodingScheme = (EncodingScheme)other;
+			if( asEncodingScheme.encodingClass == this.encodingClass &&
+				asEncodingScheme.encodingType == this.encodingType )
 			{
-				EncodingScheme asEncodingScheme = (EncodingScheme)other;
-				equal = asEncodingScheme.encodingClass == this.encodingClass &&
-					asEncodingScheme.encodingType == this.encodingType;
+				return true;
 			}
 		}
 		
-		return equal;
+		return false;
 	}
 	
 	

@@ -42,8 +42,11 @@ public class RadioEntityType
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
-	public RadioEntityType( short entityKind, short domain, int country, 
-	                        short category, short nomenclatureVersion, 
+	public RadioEntityType( short entityKind,
+	                        short domain,
+	                        int country, 
+	                        short category,
+	                        short nomenclatureVersion, 
 	                        int nomenclature )
 	{
 		this.entityKind = entityKind;
@@ -63,27 +66,24 @@ public class RadioEntityType
 	@Override
 	public boolean equals( Object other )
 	{
-		boolean equal = false;
+		if( other == this )
+			return true;
 		
-		if ( other == this )
+		if ( other instanceof RadioEntityType )
 		{
-			equal = true;
-		}
-		else
-		{
-			if ( other instanceof RadioEntityType )
+			RadioEntityType asRadioEntityType = (RadioEntityType)other;
+			if( asRadioEntityType.entityKind == this.entityKind &&
+				asRadioEntityType.domain == this.domain &&
+				asRadioEntityType.country == this.country &&
+				asRadioEntityType.category == this.category &&
+				asRadioEntityType.nomenclatureVersion == this.nomenclatureVersion &&
+				asRadioEntityType.nomenclature == this.nomenclature )
 			{
-				RadioEntityType asRadioEntityType = (RadioEntityType)other;
-				equal = asRadioEntityType.entityKind == this.entityKind &&
-					asRadioEntityType.domain == this.domain &&
-					asRadioEntityType.country == this.country &&
-					asRadioEntityType.category == this.category &&
-					asRadioEntityType.nomenclatureVersion == this.nomenclatureVersion &&
-					asRadioEntityType.nomenclature == this.nomenclature;
+				return true;
 			}
 		}
 		
-		return equal;
+		return false;
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////

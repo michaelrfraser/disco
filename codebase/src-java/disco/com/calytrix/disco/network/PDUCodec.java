@@ -51,7 +51,7 @@ public class PDUCodec
 			PDU pdu = readRemainingPDU( header, dis );
 			return pdu;
 		}
-		catch ( IOException ioex )
+		catch( IOException ioex )
 		{
 			throw new DiscoException( ioex );
 		}
@@ -63,10 +63,9 @@ public class PDUCodec
 		
 		short pduType = header.getPDUType();
 				
-		switch ( pduType )
+		switch( pduType )
 		{
 			case PDUType.TRANSMITTER:
-				
 				result = TransmitterPDU.read( header, dis );
 				break;
 				

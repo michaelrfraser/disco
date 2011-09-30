@@ -43,51 +43,58 @@ public class TransmitterPDU extends PDU
 	//----------------------------------------------------------
 	//                   INSTANCE VARIABLES
 	//----------------------------------------------------------
-	private EntityIdentifier m_entityIdentifier;
-	private int m_radioID;
-	private RadioEntityType m_radioEntityType;
-	private short m_transmitState;
-	private short m_inputSource;
-	private AntennaLocation m_antennaLocation;
-	private int m_antennaPatternType;
-	private BigInteger m_transmissionFrequency;
-	private float m_transmissionFrequencyBandwidth;
-	private float m_power;
-	private ModulationType m_modulationType;
-	private int m_cryptoSystem;
-	private int m_cryptoKey;
-	private byte[] m_modulationParameter;
-	private byte[] m_antennaPatternParameter;
+	private EntityIdentifier entityIdentifier;
+	private int radioID;
+	private RadioEntityType radioEntityType;
+	private short transmitState;
+	private short inputSource;
+	private AntennaLocation antennaLocation;
+	private int antennaPatternType;
+	private BigInteger transmissionFrequency;
+	private float transmissionFrequencyBandwidth;
+	private float power;
+	private ModulationType modulationType;
+	private int cryptoSystem;
+	private int cryptoKey;
+	private byte[] modulationParameter;
+	private byte[] antennaPatternParameter;
 	
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
-	public TransmitterPDU( PDUHeader header, EntityIdentifier entityIdentifier,
-	                       int radioID, RadioEntityType radioEntityType, 
-	                       short transmitState, short inputSource, 
-	                       AntennaLocation antennaLocation, int antennaPatternType,
+	public TransmitterPDU( PDUHeader header,
+	                       EntityIdentifier entityIdentifier,
+	                       int radioID,
+	                       RadioEntityType radioEntityType, 
+	                       short transmitState,
+	                       short inputSource, 
+	                       AntennaLocation antennaLocation,
+	                       int antennaPatternType,
 	                       BigInteger transmissionFrequency, 
-	                       float transmissionFrequencyBandwidth, float power,
-	                       ModulationType modulationType, int cryptoSystem, 
-	                       int cryptoKey, byte[] modulationParameter, 
+	                       float transmissionFrequencyBandwidth,
+	                       float power,
+	                       ModulationType modulationType,
+	                       int cryptoSystem, 
+	                       int cryptoKey,
+	                       byte[] modulationParameter, 
 	                       byte[] antennaPatternParameter )
 	{
 		super( header );
 		
-		if ( header.getPDUType() != PDUType.TRANSMITTER )
+		if( header.getPDUType() != PDUType.TRANSMITTER )
 	    	throw new IllegalStateException( "Invalid PDUType in Header" );
 		
-		m_entityIdentifier = entityIdentifier;
-		m_radioID = radioID;
-		m_radioEntityType = radioEntityType;
-		m_transmitState = transmitState;
-		m_inputSource = inputSource;
-		m_antennaLocation = antennaLocation;
-		m_transmissionFrequency = transmissionFrequency;
-		m_transmissionFrequencyBandwidth = transmissionFrequencyBandwidth;
-		m_power = power;
-		m_cryptoSystem = cryptoSystem;
-		m_cryptoKey = cryptoKey;
+		this.entityIdentifier = entityIdentifier;
+		this.radioID = radioID;
+		this.radioEntityType = radioEntityType;
+		this.transmitState = transmitState;
+		this.inputSource = inputSource;
+		this.antennaLocation = antennaLocation;
+		this.transmissionFrequency = transmissionFrequency;
+		this.transmissionFrequencyBandwidth = transmissionFrequencyBandwidth;
+		this.power = power;
+		this.cryptoSystem = cryptoSystem;
+		this.cryptoKey = cryptoKey;
 		
 		setModulation( modulationType, modulationParameter );
 		setAntennaPattern( antennaPatternType, antennaPatternParameter );
@@ -99,11 +106,11 @@ public class TransmitterPDU extends PDU
 	private void setPDULength()
 	{
 		int length = TRANSMITTER_BASE_SIZE;
-		if ( m_modulationParameter != null )
-			length += m_modulationParameter.length;
+		if( modulationParameter != null )
+			length += modulationParameter.length;
 		
-		if ( m_antennaPatternParameter != null )
-			length += m_antennaPatternParameter.length;
+		if( antennaPatternParameter != null )
+			length += antennaPatternParameter.length;
 		
 		PDUHeader header = getHeader();
 		header.setLength( length );
@@ -111,62 +118,62 @@ public class TransmitterPDU extends PDU
 	
 	public EntityIdentifier getEntityIdentifier()
 	{
-		return m_entityIdentifier;
+		return entityIdentifier;
 	}
 	
 	public void setEntityIdentifier( EntityIdentifier entityIdentifier )
 	{
-		m_entityIdentifier = entityIdentifier;
+		this.entityIdentifier = entityIdentifier;
 	}
 	
 	public int getRadioID()
 	{
-		return m_radioID;
+		return radioID;
 	}
 	
 	public void setRadioID( int radioID )
 	{
-		m_radioID = radioID;
+		this.radioID = radioID;
 	}
 	
 	public RadioEntityType getRadioEntityType()
 	{
-		return m_radioEntityType;
+		return radioEntityType;
 	}
 	
 	public void setRadioEntityType( RadioEntityType radioEntityType )
 	{
-		m_radioEntityType = radioEntityType;
+		this.radioEntityType = radioEntityType;
 	}
 	
 	public short getTransmitState()
 	{
-		return m_transmitState;
+		return transmitState;
 	}
 		
 	public void setTransmitState( short transmitState )
 	{
-		m_transmitState = transmitState;
+		this.transmitState = transmitState;
 	}
 	
 	public short getInputSource()
 	{
-		return m_inputSource;
+		return inputSource;
 	}
 	
 	public void setInputSource( short inputSource )
 	{
-		m_inputSource = inputSource;
+		this.inputSource = inputSource;
 	}
 	
 	public int getAntennaPatternType()
 	{
-		return m_antennaPatternType;
+		return antennaPatternType;
 	}
 	
 	public byte[] getAntennaParameter()
 	{
-		return m_antennaPatternParameter;
+		return antennaPatternParameter;
 	}
 	
 	public void setAntennaPattern( int antennaPatternType, byte[] antennaParameter )
@@ -174,91 +181,94 @@ public class TransmitterPDU extends PDU
 		if ( antennaParameter.length % 8 != 0 )
 			throw new IllegalStateException( "Antenna Parameter BLOB must be aligned to 64bit boundary" );
 		
-		m_antennaPatternType = antennaPatternType;
-		m_antennaPatternParameter = antennaParameter;
+		this.antennaPatternType = antennaPatternType;
+		this.antennaPatternParameter = antennaParameter;
 		
 		setPDULength();
 	}
 	
 	public AntennaLocation getAntennaLocation()
 	{
-		return m_antennaLocation;
+		return antennaLocation;
 	}
 	
 	public void setAntennaLocation( AntennaLocation antennaLocation )
 	{
-		m_antennaLocation = antennaLocation;
+		this.antennaLocation = antennaLocation;
 	}
 	
 	public BigInteger getTransmissionFrequency()
 	{
-		return m_transmissionFrequency;
+		return transmissionFrequency;
 	}
 	
 	public void setTransmissionFrequency( BigInteger transmissionFrequency )
 	{
-		m_transmissionFrequency = transmissionFrequency;
+		this.transmissionFrequency = transmissionFrequency;
 	}
 	
 	public float getTransmissionFrequencyBandwidth()
 	{
-		return m_transmissionFrequencyBandwidth;
+		return transmissionFrequencyBandwidth;
 	}
 	
 	public void setTransmissionFrequencyBandwitch( float transmissionFrequencyBandwidth )
 	{
-		m_transmissionFrequencyBandwidth = transmissionFrequencyBandwidth;
+		this.transmissionFrequencyBandwidth = transmissionFrequencyBandwidth;
 	}
 	
 	public float getPower()
 	{
-		return m_power;
+		return power;
 	}
 	
 	public void setPower( float power )
 	{
-		m_power = power;
+		this.power = power;
 	}
 	
 	public ModulationType getModulationType()
 	{
-		return m_modulationType;
+		return modulationType;
 	}
 	
 	public byte[] getModulationParameter()
 	{
-		return m_modulationParameter;
+		return modulationParameter;
 	}
 	
 	public void setModulation( ModulationType modulationType, byte[] modulationParameter )
 	{
-		if ( modulationParameter.length % 8 != 0 )
-			throw new IllegalStateException( "Modulation Parameter BLOB must be aligned to 64bit boundary" );
+		if( (modulationParameter.length % 8) != 0 )
+		{
+			throw new IllegalStateException( "Modulation Parameter BLOB must be aligned to "+
+			                                 "64bit boundary" );
+		}
 		
-		m_modulationType = modulationType;
-		m_modulationParameter = modulationParameter;
+		this.modulationType = modulationType;
+		this.modulationParameter = modulationParameter;
 		
 		setPDULength();
 	}
 	
 	public int getCryptoSystem()
 	{
-		return m_cryptoSystem;
+		return cryptoSystem;
 	}
 	
 	public void setCryptoSystem( int cryptoSystem )
 	{
-		m_cryptoSystem = cryptoSystem;
+		this.cryptoSystem = cryptoSystem;
 	}
 	
 	public int getCryptoKey()
 	{
-		return m_cryptoKey;
+		return cryptoKey;
 	}
 	
 	public void setCryptoKey( int cryptoKey )
 	{
-		m_cryptoKey = cryptoKey;
+		this.cryptoKey = cryptoKey;
 	}
 	
 	//----------------------------------------------------------
@@ -294,12 +304,21 @@ public class TransmitterPDU extends PDU
 		byte[] antennaPatternParameter = new byte[antennaPatternLength];
 		dis.readFully( antennaPatternParameter );
 		
-		return new TransmitterPDU( header, entityIdentifier, radioID, 
-		                        radioEntityType, transmitState, inputSource, 
-		                        antennaLocation, antennaPatternType, 
-		                        transmissionFrequency, 
-		                        transmissionFrequencyBandwidth, power, 
-		                        modulationType, cryptoSystem, cryptoKey, 
-		                        modulationParameter, antennaPatternParameter );
+		return new TransmitterPDU( header,
+		                           entityIdentifier,
+		                           radioID, 
+		                           radioEntityType,
+		                           transmitState,
+		                           inputSource, 
+		                           antennaLocation,
+		                           antennaPatternType, 
+		                           transmissionFrequency, 
+		                           transmissionFrequencyBandwidth,
+		                           power, 
+		                           modulationType,
+		                           cryptoSystem,
+		                           cryptoKey, 
+		                           modulationParameter,
+		                           antennaPatternParameter );
 	}
 }

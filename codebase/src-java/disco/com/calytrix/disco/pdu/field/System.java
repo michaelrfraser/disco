@@ -79,7 +79,7 @@ public class System
 	{
 		String description = "Other";
 		
-		switch ( value )
+		switch( value )
 		{
 			case GENERIC:
 				description = "Generic";

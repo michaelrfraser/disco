@@ -42,9 +42,9 @@ public class DISInputStream extends DataInputStream
 	 * 
 	 * @param in the InputStream to read DIS types from
 	 */
-	public DISInputStream( InputStream in )
+	public DISInputStream( InputStream inputStream )
     {
-	    super( in );
+	    super( inputStream );
     }	
 	
 	//----------------------------------------------------------
@@ -128,7 +128,7 @@ public class DISInputStream extends DataInputStream
 	public void skip16() throws IOException
 	{
 		int skipAmount = skipBytes( 2 );
-		if ( skipAmount < 2 )
+		if( skipAmount < 2 )
 			throw new EOFException();
 	}
 	
@@ -142,7 +142,7 @@ public class DISInputStream extends DataInputStream
 	public void skip24() throws IOException
 	{
 		int skipAmount = skipBytes( 3 );
-		if ( skipAmount < 3 )
+		if( skipAmount < 3 )
 			throw new EOFException();
 	}
 	

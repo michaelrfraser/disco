@@ -74,7 +74,7 @@ public class TransmitState
 	{
 		String description = "Off";
 		
-		switch ( value )
+		switch( value )
 		{
 			case ON_BUT_NOT_TRANSMITTING:
 				description = "On but not transmitting";

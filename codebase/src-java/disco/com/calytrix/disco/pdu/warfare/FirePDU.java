@@ -41,7 +41,7 @@ public class FirePDU extends PDU
 	public FirePDU( PDUHeader header )
 	{
 		super( header );
-		if ( header.getPDUType() != PDUType.FIRE )
+		if( header.getPDUType() != PDUType.FIRE )
 	    	throw new IllegalStateException( "Invalid PDUType in Header" );
 	}
 

@@ -83,8 +83,10 @@ public class ModulationType
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
-	public ModulationType( int spreadSpectrum, int majorModulationType, 
-	                       int detail, int system )
+	public ModulationType( int spreadSpectrum,
+	                       int majorModulationType, 
+	                       int detail,
+	                       int system )
 	{
 		this.spreadSpectrum = spreadSpectrum;
 		this.majorModulationType = majorModulationType;
@@ -101,25 +103,22 @@ public class ModulationType
 	@Override
 	public boolean equals( Object other )
 	{
-		boolean equal = false;
+		if( other == this )
+			return true;
 		
-		if ( other == this )
+		if( other instanceof ModulationType )
 		{
-			equal = true;
-		}
-		else
-		{
-			if ( other instanceof ModulationType )
+			ModulationType asModulationType = (ModulationType)other;
+			if( asModulationType.spreadSpectrum == this.spreadSpectrum &&
+				asModulationType.majorModulationType == this.majorModulationType &&
+				asModulationType.detail == this.detail &&
+				asModulationType.system == this.system )
 			{
-				ModulationType asModulationType = (ModulationType)other;
-				equal = asModulationType.spreadSpectrum == this.spreadSpectrum &&
-					asModulationType.majorModulationType == this.majorModulationType &&
-					asModulationType.detail == this.detail &&
-					asModulationType.system == this.system;
+				return true;
 			}
 		}
 		
-		return equal;
+		return false;
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////

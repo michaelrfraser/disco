@@ -74,7 +74,7 @@ public class MajorModulationType
 	{
 		String description = "Other";
 		
-		switch ( value )
+		switch( value )
 		{
 			case AMPLITUDE:
 				description = "Amplitude";

@@ -41,8 +41,12 @@ public class PDUHeader
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
-	public PDUHeader( short protocolVersion, short exerciseIdentifier, 
-	                  short pduType, short protocolFamily, long timestamp, int length )
+	public PDUHeader( short protocolVersion,
+	                  short exerciseIdentifier, 
+	                  short pduType,
+	                  short protocolFamily,
+	                  long timestamp,
+	                  int length )
 	{
 		this.protocolVersion = protocolVersion;
 		this.exerciseIdentifier = exerciseIdentifier;
@@ -116,8 +120,11 @@ public class PDUHeader
 	
 	public void setLength( int newLength )
 	{
-		if ( newLength < PDU_HEADER_LENGTH )
-			throw new IllegalStateException( "Invalid PDU length " + newLength + " (less than header size)" );
+		if( newLength < PDU_HEADER_LENGTH )
+		{
+			throw new IllegalStateException( "Invalid PDU length " + newLength +
+			                                 " (less than header size)" );
+		}
 		
 		this.length = newLength;
 	}
@@ -146,6 +153,11 @@ public class PDUHeader
 		
 		dis.readUI16(); // padding bytes
 		
-		return new PDUHeader( protocolVersion, exerciseIdentifier, pduType, protocolFamily, timestamp, length );
+		return new PDUHeader( protocolVersion,
+		                      exerciseIdentifier,
+		                      pduType,
+		                      protocolFamily,
+		                      timestamp,
+		                      length );
 	}
 }
