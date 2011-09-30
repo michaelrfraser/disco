@@ -52,23 +52,20 @@ public class EntityIdentifier
 	@Override
 	public boolean equals( Object other )
 	{
-		boolean equal = false;
+		if( other == this )
+			return true;
 		
-		if ( other == this )
+		if( other instanceof EntityIdentifier )
 		{
-			equal = true;
-		}
-		else
-		{
-			if ( other instanceof EntityIdentifier )
+			EntityIdentifier asEntityIdentifier = (EntityIdentifier)other;
+			if( asEntityIdentifier.simulationAddress.equals(this.simulationAddress) &&
+				asEntityIdentifier.entityIdentity == entityIdentity )
 			{
-				EntityIdentifier asEntityIdentifier = (EntityIdentifier)other;
-				equal = asEntityIdentifier.simulationAddress.equals( this.simulationAddress ) &&
-					asEntityIdentifier.entityIdentity == entityIdentity;
+				return true;
 			}
 		}
-		
-		return equal;
+
+		return false;
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////

@@ -40,33 +40,39 @@ public class SignalPDU extends PDU
 	//----------------------------------------------------------
 	//                   INSTANCE VARIABLES
 	//----------------------------------------------------------
-	private EntityIdentifier m_entityIdentifier;
-	private int m_radioID;
-	private EncodingScheme m_encodingScheme;
-	private int m_tdlType;
-	private long m_sampleRate;
-	private int m_dataLength;
-	private int m_samples;
-	private byte[] m_data;
+	private EntityIdentifier entityIdentifier;
+	private int radioID;
+	private EncodingScheme encodingScheme;
+	private int tdlType;
+	private long sampleRate;
+	private int dataLength;
+	private int samples;
+	private byte[] data;
 
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
-	public SignalPDU( PDUHeader header, EntityIdentifier identifier, int radioID, 
-	                  EncodingScheme encodingScheme, int tdlType, long sampleRate, 
-	                  int dataLength, int samples, byte[] data )
+	public SignalPDU( PDUHeader header,
+	                  EntityIdentifier entityIdentifier,
+	                  int radioID, 
+	                  EncodingScheme encodingScheme,
+	                  int tdlType,
+	                  long sampleRate, 
+	                  int dataLength,
+	                  int samples,
+	                  byte[] data )
 	{
 		super( header );
 		
-		if ( header.getPDUType() != PDUType.SIGNAL )
+		if( header.getPDUType() != PDUType.SIGNAL )
 	    	throw new IllegalStateException( "Invalid PDUType in Header" );
 		
-	    m_entityIdentifier = identifier;
-	    m_radioID = radioID;
-	    m_encodingScheme = encodingScheme;
-	    m_tdlType = tdlType;
-	    m_sampleRate = sampleRate;
-	    m_samples = samples;
+	    this.entityIdentifier = entityIdentifier;
+	    this.radioID = radioID;
+	    this.encodingScheme = encodingScheme;
+	    this.tdlType = tdlType;
+	    this.sampleRate = sampleRate;
+	    this.samples = samples;
 	    
 	    setData( dataLength, data );
 	}
@@ -76,72 +82,72 @@ public class SignalPDU extends PDU
 	//----------------------------------------------------------
 	public EntityIdentifier getEntityIdentifier()
 	{
-		return m_entityIdentifier;
+		return entityIdentifier;
 	}
 	
 	public void setEntityIdentifier( EntityIdentifier identifier )
 	{
-		m_entityIdentifier = identifier;
+		entityIdentifier = identifier;
 	}
 	
 	public int getRadioID()
 	{
-		return m_radioID;
+		return radioID;
 	}
 	
 	public void setRadioID( int radioID )
 	{
-		m_radioID = radioID;
+		this.radioID = radioID;
 	}
 	
 	public EncodingScheme getEncodingScheme()
 	{
-		return m_encodingScheme;
+		return encodingScheme;
 	}
 	
 	public void setEncodingScheme( EncodingScheme encodingScheme )
 	{
-		m_encodingScheme = encodingScheme;
+		this.encodingScheme = encodingScheme;
 	}
 	
 	public int getTDLType()
 	{
-		return m_tdlType;
+		return tdlType;
 	}
 	
 	public void setTDLType( int tdlType )
 	{
-		m_tdlType = tdlType;
+		this.tdlType = tdlType;
 	}
 	
 	public long getSampleRate()
 	{
-		return m_sampleRate;
+		return sampleRate;
 	}
 	
 	public void setSampleRate( long sampleRate )
 	{
-		m_sampleRate = sampleRate;
+		this.sampleRate = sampleRate;
 	}
 	
 	public int getDataLength()
 	{
-		return m_dataLength;
+		return dataLength;
 	}
 	
 	public int getSamples()
 	{
-		return m_samples;
+		return samples;
 	}
 	
 	public void setSamples( int samples )
 	{
-		m_samples = samples;
+		this.samples = samples;
 	}
 	
 	public byte[] getData()
 	{
-		return m_data;
+		return data;
 	}
 	
 	public void setData( byte[] data )
@@ -160,11 +166,11 @@ public class SignalPDU extends PDU
 		if ( data.length != requiredBytes )
 			throw new IllegalStateException( "Data size mismatch" );
 		
-		m_dataLength = dataLength;
-		m_data = data;
+		this.dataLength = dataLength;
+		this.data = data;
 		
 		PDUHeader header = getHeader();
-		header.setLength( SIGNAL_BASE_SIZE + m_data.length );
+		header.setLength( SIGNAL_BASE_SIZE + data.length );
 	}
 	
 	//----------------------------------------------------------
@@ -172,7 +178,7 @@ public class SignalPDU extends PDU
 	//----------------------------------------------------------
 	public static SignalPDU read( PDUHeader header, DISInputStream dis ) throws IOException
 	{
-		EntityIdentifier identifier = EntityIdentifier.read( dis );
+		EntityIdentifier entityIdentifier = EntityIdentifier.read( dis );
 		int radioID = dis.readUI16();
 		EncodingScheme encodingScheme = EncodingScheme.read( dis );
 		int tdlType = dis.readUI16();
@@ -189,7 +195,14 @@ public class SignalPDU extends PDU
 		byte[] data = new byte[lengthBytes];
 		dis.readFully( data );
 		
-		return new SignalPDU( header, identifier, radioID, encodingScheme, 
-		                      tdlType, sampleRate, dataLength, samples, data );
+		return new SignalPDU( header,
+		                      entityIdentifier,
+		                      radioID,
+		                      encodingScheme, 
+		                      tdlType,
+		                      sampleRate, 
+		                      dataLength,
+		                      samples,
+		                      data );
 	}
 }

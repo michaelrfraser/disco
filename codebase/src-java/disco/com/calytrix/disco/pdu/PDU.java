@@ -57,7 +57,7 @@ public abstract class PDU
 	 */
 	public final short getPDUType()
 	{
-		if ( header == null )
+		if( header == null )
 			throw new IllegalStateException( "The PDU instance does not contain a header" );
 		
 		short type = header.getPDUType();

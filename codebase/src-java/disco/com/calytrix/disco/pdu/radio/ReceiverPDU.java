@@ -19,7 +19,7 @@ import com.calytrix.disco.pdu.field.PDUType;
 import com.calytrix.disco.pdu.record.PDUHeader;
 
 /**
- * This class represents an Receiver PDU.
+ * This class represents a Receiver PDU.
  * <p/>
  * PDUs of this type contain information about...
  * 
@@ -42,7 +42,7 @@ public class ReceiverPDU extends PDU
 	{
 		super( header );
 		
-		if ( header.getPDUType() != PDUType.RECEIVER )
+		if( header.getPDUType() != PDUType.RECEIVER )
 	    	throw new IllegalStateException( "Invalid PDUType in Header" );
 	}
 

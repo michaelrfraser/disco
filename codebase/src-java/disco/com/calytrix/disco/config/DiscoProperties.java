@@ -183,8 +183,7 @@ public class DiscoProperties
 	 */
 	public NetworkInterface getNetworkInterface()
 	{
-		String ifaceName = properties.getProperty( PROP_NETWORK_IFACE,
-		                                           PROP_NETWORK_IFACE_DEFAULT );
+		String ifaceName = properties.getProperty( PROP_NETWORK_IFACE, PROP_NETWORK_IFACE_DEFAULT );
 		
 		try
 		{

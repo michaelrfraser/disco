@@ -42,7 +42,7 @@ public class SetDataPDU extends PDU
 	{
 		super( header );
 		
-		if ( header.getPDUType() != PDUType.SET_DATA )
+		if( header.getPDUType() != PDUType.SET_DATA )
 	    	throw new IllegalStateException( "Invalid PDUType in Header" );
 	}
 

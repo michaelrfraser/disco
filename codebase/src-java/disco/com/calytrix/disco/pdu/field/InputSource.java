@@ -76,7 +76,7 @@ public class InputSource
 	{
 		String description = "Other";
 		
-		switch ( value )
+		switch( value )
 		{
 			case PILOT:
 				description = "Pilot";

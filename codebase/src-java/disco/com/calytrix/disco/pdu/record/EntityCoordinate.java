@@ -61,24 +61,21 @@ public class EntityCoordinate
 	@Override
 	public boolean equals( Object other )
 	{
-		boolean equal = false;
-		
-		if ( other == this )
-		{
+		if( other == this )
 			return true;
-		}
-		else
+		
+		if( other instanceof EntityCoordinate )
 		{
-			if ( other instanceof EntityCoordinate )
+			EntityCoordinate asEntityCoordinate = (EntityCoordinate)other;
+			if( FloatingPointUtils.floatEqual(asEntityCoordinate.x,this.x) &&
+				FloatingPointUtils.floatEqual(asEntityCoordinate.y,this.y) &&
+				FloatingPointUtils.floatEqual(asEntityCoordinate.z,this.z) )
 			{
-				EntityCoordinate asEntityCoordinate = (EntityCoordinate)other;
-				equal = FloatingPointUtils.floatEqual( asEntityCoordinate.x, this.x ) &&
-					FloatingPointUtils.floatEqual( asEntityCoordinate.y, this.y ) &&
-					FloatingPointUtils.floatEqual( asEntityCoordinate.z, this.z );
+				return true;
 			}
 		}
 		
-		return equal;
+		return false;
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////

@@ -71,7 +71,7 @@ public class EncodingClass
 	{
 		String description = "Encoded Voice";
 		
-		switch ( value )
+		switch( value )
 		{
 			case RAW_BINARY_DATA:
 				description = "Raw Binary Data";

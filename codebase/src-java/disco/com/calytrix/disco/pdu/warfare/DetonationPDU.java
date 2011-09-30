@@ -42,7 +42,7 @@ public class DetonationPDU extends PDU
 	{
 		super( header );
 		
-		if ( header.getPDUType() != PDUType.DETONATION )
+		if( header.getPDUType() != PDUType.DETONATION )
 	    	throw new IllegalStateException( "Invalid PDUType in Header" );
 	}
 

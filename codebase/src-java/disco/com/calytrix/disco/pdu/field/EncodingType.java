@@ -73,7 +73,7 @@ public class EncodingType
 	{
 		String description = "8-bit mu-law";
 		
-		switch ( value )
+		switch( value )
 		{
 			case CVSD:
 				description = "CVSD";

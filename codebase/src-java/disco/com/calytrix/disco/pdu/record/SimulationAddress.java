@@ -53,24 +53,20 @@ public class SimulationAddress
 	@Override
 	public boolean equals( Object other )
 	{
-		boolean equal = false;
-		
-		if ( other == this )
+		if( other == this )
+			return true;
+
+		if ( other instanceof SimulationAddress )
 		{
-			equal = true;
-		}
-		else
-		{
-			if ( other instanceof SimulationAddress )
+			SimulationAddress asSimulationAddress = (SimulationAddress)other;
+			if( asSimulationAddress.applicationIdentifier == this.applicationIdentifier &&
+				asSimulationAddress.siteIdentifier == this.siteIdentifier )
 			{
-				SimulationAddress asSimulationAddress = (SimulationAddress)other;
-				equal = asSimulationAddress.applicationIdentifier == this.applicationIdentifier &&
-					asSimulationAddress.siteIdentifier == this.siteIdentifier;
-					
+				return true;
 			}
 		}
 		
-		return equal;
+		return false;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////

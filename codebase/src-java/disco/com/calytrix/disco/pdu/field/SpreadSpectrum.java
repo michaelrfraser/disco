@@ -92,16 +92,16 @@ public class SpreadSpectrum
 	{
 		String description = "";
 		
-		if ( (value & FREQUENCY_HOPPING) != 0 )
+		if( (value & FREQUENCY_HOPPING) != 0 )
 			description += "Frequency Hopping,";
 		
-		if ( (value & PSEUDO_NOISE) != 0 )
+		if( (value & PSEUDO_NOISE) != 0 )
 			description += "Pseudo-noise,";
 		
-		if ( (value & TIME_HOPPING) != 0 )
+		if( (value & TIME_HOPPING) != 0 )
 			description += "Time Hopping,";
 		
-		if ( description.isEmpty() )
+		if( description.isEmpty() )
 			description = "None";
 		
 		return description;

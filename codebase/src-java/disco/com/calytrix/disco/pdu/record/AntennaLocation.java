@@ -56,7 +56,8 @@ public class AntennaLocation
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
-	public AntennaLocation( WorldCoordinate antennaLocation, EntityCoordinate relativeAntennaLocation )
+	public AntennaLocation( WorldCoordinate antennaLocation,
+	                        EntityCoordinate relativeAntennaLocation )
 	{
 		this.antennaLocation = antennaLocation;
 		this.relativeAntennaLocation = relativeAntennaLocation;
@@ -71,23 +72,20 @@ public class AntennaLocation
 	@Override
 	public boolean equals( Object other )
 	{
-		boolean equal = false;
+		if( this == other )
+			return true;
 		
-		if ( other == this )
+		if( other instanceof AntennaLocation )
 		{
-			equal = true;
-		}
-		else
-		{
-			if ( other instanceof AntennaLocation )
+			AntennaLocation asAntennaLocation = (AntennaLocation)other;
+			if( asAntennaLocation.antennaLocation.equals(this.antennaLocation) &&
+				asAntennaLocation.relativeAntennaLocation.equals(this.relativeAntennaLocation) )
 			{
-				AntennaLocation asAntennaLocation = (AntennaLocation)other;
-				equal = asAntennaLocation.antennaLocation.equals( this.antennaLocation ) &&
-					asAntennaLocation.relativeAntennaLocation.equals( this.relativeAntennaLocation );
+				return true;
 			}
 		}
 		
-		return equal;
+		return false;
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////
