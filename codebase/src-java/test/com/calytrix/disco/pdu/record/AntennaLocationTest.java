@@ -38,12 +38,12 @@ public class AntennaLocationTest extends AbstractTest
 	//----------------------------------------------------------
 	public static final int ANTENNA_LOCATION_SIZE = 36;
 	
-	public static final double APERY = 1.20205690315959;
-	public static final double BRUN = 1.90216058;
-	public static final double CATALAN = 0.915965594177219015;
-	public static final float FEIGENBAUM = 2.5029078750f;
-	public static final float GAUSS = 2.5029078750f;
-	public static final float LAPLACE = 0.6627434193f;
+	public static final double APERY       = 1.20205690315959;
+	public static final double BRUN        = 1.90216058;
+	public static final double CATALAN     = 0.915965594177219015;
+	public static final float FEIGENBAUM   = 2.5029078750f;
+	public static final float GAUSS        = 2.5029078750f;
+	public static final float LAPLACE      = 0.6627434193f;
 	
 	//----------------------------------------------------------
 	//                   INSTANCE VARIABLES

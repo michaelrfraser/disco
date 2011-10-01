@@ -33,7 +33,7 @@ public class DISOutputStream extends DataOutputStream
 	//----------------------------------------------------------
 	public DISOutputStream( OutputStream out )
     {
-	    super( out );
+		super( out );
     }
 	
 	//----------------------------------------------------------

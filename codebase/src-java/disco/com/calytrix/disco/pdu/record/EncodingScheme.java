@@ -117,9 +117,7 @@ public class EncodingScheme
 	 * Reads an instance of this record from the provided DISInputStream
 	 * 
 	 * @param dis The DISInputStream to read the record from
-	 * 
 	 * @return The EncodingScheme deserialised from the provided input stream
-	 * 
 	 * @throws IOException Thrown if an error occurred reading the record from
 	 * the stream
 	 */
@@ -128,7 +126,7 @@ public class EncodingScheme
 		int ch1 = dis.read();
 		int ch2 = dis.read();
 		
-		if ( (ch1 | ch2) < 0 )
+		if ( (ch1|ch2) < 0 )
 			throw new EOFException();
 		
 		byte encodingClass = (byte)((ch1 & 0xC0) >> 6);
