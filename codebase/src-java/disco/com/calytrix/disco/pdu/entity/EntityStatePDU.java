@@ -14,9 +14,22 @@
  */
 package com.calytrix.disco.pdu.entity;
 
+import java.io.IOException;
+
+import com.calytrix.disco.network.DISInputStream;
 import com.calytrix.disco.pdu.PDU;
 import com.calytrix.disco.pdu.field.PDUType;
+import com.calytrix.disco.pdu.record.ArticulationParameter;
+import com.calytrix.disco.pdu.record.DeadReckoningParameter;
+import com.calytrix.disco.pdu.record.EntityAppearance;
+import com.calytrix.disco.pdu.record.EntityCapabilities;
+import com.calytrix.disco.pdu.record.EntityIdentifier;
+import com.calytrix.disco.pdu.record.EntityMarking;
+import com.calytrix.disco.pdu.record.EntityType;
+import com.calytrix.disco.pdu.record.EulerAngles;
 import com.calytrix.disco.pdu.record.PDUHeader;
+import com.calytrix.disco.pdu.record.Vector;
+import com.calytrix.disco.pdu.record.WorldCoordinate;
 
 /**
  * This class represents an EntityState PDU.
@@ -35,23 +48,227 @@ public class EntityStatePDU extends PDU
 	//----------------------------------------------------------
 	//                   INSTANCE VARIABLES
 	//----------------------------------------------------------
-
+	private PDUHeader pduHeader;
+	private EntityIdentifier entityID;
+	private short forceID;
+	private short numberOfArticulationParameters;
+	private EntityType entityType;
+	private EntityType alternativeEntityType;
+	private Vector entityLinearVelocity;
+	private WorldCoordinate entityLocation;
+	private EulerAngles entityOrientation;
+	private EntityAppearance entityAppearance;
+	private DeadReckoningParameter deadReckoningParameters;
+	private EntityMarking entityMarking;
+	private EntityCapabilities entityCapabilities;
+	private ArticulationParameter[] articulationParameter;
+	
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
-	public EntityStatePDU( PDUHeader header )
+	public EntityStatePDU( PDUHeader pduHeader, EntityIdentifier entityID, short forceID,
+	                       short numberOfArticulationParameters, EntityType entityType,
+	                       EntityType alternativeEntityType, Vector entityLinearVelocity,
+	                       WorldCoordinate entityLocation, EulerAngles entityOrientation,
+	                       EntityAppearance entityAppearance, 
+	                       DeadReckoningParameter deadReckoningParameter, EntityMarking entityMarking,
+	                       EntityCapabilities entityCapabilities,
+	                       ArticulationParameter[] articulationParameter )
 	{
-		super( header );
+		super( pduHeader );
 		
-		if ( header.getPDUType() != PDUType.ENTITY_STATE )
+		if ( pduHeader.getPDUType() != PDUType.ENTITY_STATE )
 	    	throw new IllegalStateException( "Invalid PDUType in Header" );
+		
+		this.pduHeader = pduHeader;
+		this.entityID = entityID;
+		this.forceID = forceID;
+		this.numberOfArticulationParameters = numberOfArticulationParameters;
+		this.entityType = entityType;
+		this.alternativeEntityType = alternativeEntityType;
+		this.entityLinearVelocity = entityLinearVelocity;
+		this.entityLocation = entityLocation;
+		this.entityOrientation = entityOrientation;
+		this.entityAppearance = entityAppearance;
+		this.deadReckoningParameters = deadReckoningParameter;
+		this.entityMarking = entityMarking;
+		this.entityCapabilities = entityCapabilities;
+		setArticulationParameter( articulationParameter );
 	}
 
 	//----------------------------------------------------------
 	//                    INSTANCE METHODS
 	//----------------------------------------------------------
+	public PDUHeader getPduHeader()
+    {
+    	return pduHeader;
+    }
+
+	public void setPduHeader( PDUHeader pduHeader )
+    {
+    	this.pduHeader = pduHeader;
+    }
+
+	public EntityIdentifier getEntityID()
+    {
+    	return entityID;
+    }
+
+	public void setEntityID( EntityIdentifier entityID )
+    {
+    	this.entityID = entityID;
+    }
+
+	public short getForceID()
+    {
+    	return forceID;
+    }
+
+	public void setForceID( short forceID )
+    {
+    	this.forceID = forceID;
+    }
+
+	public short getNumberOfArticulationParameters()
+    {
+    	return numberOfArticulationParameters;
+    }
+
+	public void setNumberOfArticulationParameters( short numberOfArticulationParameters )
+    {
+    	this.numberOfArticulationParameters = numberOfArticulationParameters;
+    }
+
+	public EntityType getEntityType()
+    {
+    	return entityType;
+    }
+
+	public void setEntityType( EntityType entityType )
+    {
+    	this.entityType = entityType;
+    }
+
+	public EntityType getAlternativeEntityType()
+    {
+    	return alternativeEntityType;
+    }
+
+	public void setAlternativeEntityType( EntityType alternativeEntityType )
+    {
+    	this.alternativeEntityType = alternativeEntityType;
+    }
+
+	public Vector getEntityLinearVelocity()
+    {
+    	return entityLinearVelocity;
+    }
+
+	public void setEntityLinearVelocity( Vector entityLinearVelocity )
+    {
+    	this.entityLinearVelocity = entityLinearVelocity;
+    }
+
+	public WorldCoordinate getEntityLocation()
+    {
+    	return entityLocation;
+    }
+
+	public void setEntityLocation( WorldCoordinate entityLocation )
+    {
+    	this.entityLocation = entityLocation;
+    }
+
+	public EulerAngles getEntityOrientation()
+    {
+    	return entityOrientation;
+    }
+
+	public void setEntityOrientation( EulerAngles entityOrientation )
+    {
+    	this.entityOrientation = entityOrientation;
+    }
+
+	public EntityAppearance getEntityAppearance()
+    {
+    	return entityAppearance;
+    }
+
+	public void setEntityAppearance( EntityAppearance entityAppearance )
+    {
+    	this.entityAppearance = entityAppearance;
+    }
+
+	public DeadReckoningParameter getDeadReckoningParameters()
+    {
+    	return deadReckoningParameters;
+    }
+
+	public void setDeadReckoningParameters( DeadReckoningParameter deadReckoningParameters )
+    {
+    	this.deadReckoningParameters = deadReckoningParameters;
+    }
+
+	public EntityMarking getEntityMarking()
+    {
+    	return entityMarking;
+    }
+
+	public void setEntityMarking( EntityMarking entityMarking )
+    {
+    	this.entityMarking = entityMarking;
+    }
+
+	public EntityCapabilities getEntityCapabilities()
+    {
+    	return entityCapabilities;
+    }
+
+	public void setEntityCapabilities( EntityCapabilities entityCapabilities )
+    {
+    	this.entityCapabilities = entityCapabilities;
+    }
+	
+	public ArticulationParameter[] getArticulationParameter()
+    {
+    	return articulationParameter;
+    }
+
+	public void setArticulationParameter( ArticulationParameter[] articulationParameter )
+    {
+		if ( articulationParameter.length != numberOfArticulationParameters )
+			throw new IllegalStateException( "Articulation Parameters mismatch" );
+		
+    	this.articulationParameter = articulationParameter;
+    }
 
 	//----------------------------------------------------------
 	//                     STATIC METHODS
 	//----------------------------------------------------------
+	public static EntityStatePDU read( PDUHeader header, DISInputStream dis ) throws IOException
+	{
+		EntityIdentifier entityID = EntityIdentifier.read( dis );
+		short forceID = dis.readUI8();
+		short numberOfArticulationParameters = dis.readUI8();
+		EntityType entityType = EntityType.read( dis );
+		EntityType alternativeEntityType = EntityType.read( dis );
+		Vector entityLinearVelocity = Vector.read( dis );
+		WorldCoordinate entityLocation = WorldCoordinate.read( dis );
+		EulerAngles entityOrientation = EulerAngles.read( dis );
+		EntityAppearance entityAppearance = EntityAppearance.read( dis );
+		DeadReckoningParameter deadReckoningParameters = DeadReckoningParameter.read( dis );
+		EntityMarking entityMarking = EntityMarking.read( dis );
+		EntityCapabilities entityCapabilities = EntityCapabilities.read( dis );
+		ArticulationParameter[] articulationParameters = new ArticulationParameter[numberOfArticulationParameters];
+		for( int i = 0; i < numberOfArticulationParameters; i++ )
+		{
+			articulationParameters[i] = ArticulationParameter.read( dis );
+		}
+		
+		return new EntityStatePDU( header, entityID, forceID, numberOfArticulationParameters,
+		                           entityType, alternativeEntityType, entityLinearVelocity,
+		                           entityLocation, entityOrientation, entityAppearance,
+		                           deadReckoningParameters, entityMarking, entityCapabilities,
+		                           articulationParameters);
+	}
 }

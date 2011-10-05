@@ -18,6 +18,7 @@ import java.io.IOException;
 
 import com.calytrix.disco.DiscoException;
 import com.calytrix.disco.pdu.PDU;
+import com.calytrix.disco.pdu.entity.EntityStatePDU;
 import com.calytrix.disco.pdu.field.PDUType;
 import com.calytrix.disco.pdu.radio.SignalPDU;
 import com.calytrix.disco.pdu.radio.TransmitterPDU;
@@ -71,6 +72,9 @@ public class PDUCodec
 				
 			case PDUType.SIGNAL:
 				result = SignalPDU.read( header, dis );
+				break;
+			case PDUType.ENTITY_STATE:
+				result = EntityStatePDU.read( header, dis );
 				break;
 		}
 				
