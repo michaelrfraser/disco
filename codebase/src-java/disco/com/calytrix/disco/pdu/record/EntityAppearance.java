@@ -104,7 +104,7 @@ public class EntityAppearance
 	 * 
 	 * @param dis The DISInputStream to read the record from.
 	 * 
-	 * @return The AntennaLocation deserialised from the provided input stream.
+	 * @return The EntityAppearance deserialised from the provided input stream.
 	 * 
 	 * @throws IOException Thrown if an error occurred reading the record from
 	 * the stream.
