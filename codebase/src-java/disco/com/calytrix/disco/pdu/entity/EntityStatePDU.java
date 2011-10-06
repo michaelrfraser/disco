@@ -45,7 +45,6 @@ public class EntityStatePDU extends PDU
 	//                    STATIC VARIABLES
 	//----------------------------------------------------------
 	public static final int ENTITY_STATE_BASE_SIZE = 1152;
-	public static final int ARTICULATION_PARAMETER_SIZE = 160;
 
 	//----------------------------------------------------------
 	//                   INSTANCE VARIABLES
@@ -229,7 +228,7 @@ public class EntityStatePDU extends PDU
 		
 		PDUHeader header = getHeader();
 		header.setLength( ENTITY_STATE_BASE_SIZE +
-		                  (articulationParameter.length * ARTICULATION_PARAMETER_SIZE) );
+		                  (articulationParameter.length * ArticulationParameter.ARTICULATION_PARAMETER_SIZE) );
     }
 
 	//----------------------------------------------------------

@@ -36,6 +36,7 @@ public class ArticulationParameter
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
 	//----------------------------------------------------------
+	public static final int ARTICULATION_PARAMETER_SIZE = 160;
 
 	//----------------------------------------------------------
 	//                   INSTANCE VARIABLES
