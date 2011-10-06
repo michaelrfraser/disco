@@ -190,7 +190,6 @@ public class FirePDU extends PDU
 	//----------------------------------------------------------
 	public static FirePDU read( PDUHeader header, DISInputStream dis ) throws IOException
 	{
-		PDUHeader pduHeader = PDUHeader.read( dis );
 		EntityIdentifier firingEntityID = EntityIdentifier.read( dis );
 		EntityIdentifier targetEntityID = EntityIdentifier.read( dis );
 		EntityIdentifier munitionID = EntityIdentifier.read( dis );
@@ -201,7 +200,7 @@ public class FirePDU extends PDU
 		Vector velocity = Vector.read( dis );
 		long range = dis.readUI32();		
 	
-		return new FirePDU( pduHeader, firingEntityID, targetEntityID, munitionID, eventID,
+		return new FirePDU( header, firingEntityID, targetEntityID, munitionID, eventID,
 		                    fireMissionIndex, locationInWorld, burstDescriptor, velocity, range );
 	}
 }

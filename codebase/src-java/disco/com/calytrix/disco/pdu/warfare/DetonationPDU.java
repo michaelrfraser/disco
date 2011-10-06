@@ -211,7 +211,6 @@ public class DetonationPDU extends PDU
 	//----------------------------------------------------------
 	public static DetonationPDU read( PDUHeader header, DISInputStream dis ) throws IOException
 	{
-		PDUHeader pduHeader = PDUHeader.read( dis );
 		EntityIdentifier firingEntityID = EntityIdentifier.read( dis );
 		EntityIdentifier targetEntityID = EntityIdentifier.read( dis );
 		EntityIdentifier munitionID = EntityIdentifier.read( dis );
@@ -229,7 +228,7 @@ public class DetonationPDU extends PDU
 			articulationParameters[i] = ArticulationParameter.read( dis );
 		}
 		
-		return new DetonationPDU( pduHeader, firingEntityID, targetEntityID, munitionID, eventID,
+		return new DetonationPDU( header, firingEntityID, targetEntityID, munitionID, eventID,
 		                          velocity, locationInWorld, burstDescriptor,
 		                          locationInEntityCoordinates, detonationResult,
 		                          articulationParameters );
