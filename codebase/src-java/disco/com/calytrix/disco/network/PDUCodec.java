@@ -24,6 +24,7 @@ import com.calytrix.disco.pdu.radio.SignalPDU;
 import com.calytrix.disco.pdu.radio.TransmitterPDU;
 import com.calytrix.disco.pdu.record.PDUHeader;
 import com.calytrix.disco.pdu.warfare.DetonationPDU;
+import com.calytrix.disco.pdu.warfare.FirePDU;
 
 public class PDUCodec
 {
@@ -79,6 +80,9 @@ public class PDUCodec
 				break;
 			case PDUType.DETONATION:
 				result = DetonationPDU.read( header, dis );
+				break;
+			case PDUType.FIRE:
+				result = FirePDU.read( header, dis );
 				break;
 		}
 				
