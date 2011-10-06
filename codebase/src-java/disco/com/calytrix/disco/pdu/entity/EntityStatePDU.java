@@ -44,6 +44,8 @@ public class EntityStatePDU extends PDU
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
 	//----------------------------------------------------------
+	public static final int ENTITY_STATE_BASE_SIZE = 1152;
+	public static final int ARTICULATION_PARAMETER_SIZE = 160;
 
 	//----------------------------------------------------------
 	//                   INSTANCE VARIABLES
@@ -51,7 +53,6 @@ public class EntityStatePDU extends PDU
 	private PDUHeader pduHeader;
 	private EntityIdentifier entityID;
 	private short forceID;
-	private short numberOfArticulationParameters;
 	private EntityType entityType;
 	private EntityType alternativeEntityType;
 	private Vector entityLinearVelocity;
@@ -67,12 +68,11 @@ public class EntityStatePDU extends PDU
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
 	public EntityStatePDU( PDUHeader pduHeader, EntityIdentifier entityID, short forceID,
-	                       short numberOfArticulationParameters, EntityType entityType,
-	                       EntityType alternativeEntityType, Vector entityLinearVelocity,
-	                       WorldCoordinate entityLocation, EulerAngles entityOrientation,
-	                       EntityAppearance entityAppearance, 
-	                       DeadReckoningParameter deadReckoningParameter, EntityMarking entityMarking,
-	                       EntityCapabilities entityCapabilities,
+	                       EntityType entityType, EntityType alternativeEntityType,
+	                       Vector entityLinearVelocity, WorldCoordinate entityLocation,
+	                       EulerAngles entityOrientation, EntityAppearance entityAppearance,
+	                       DeadReckoningParameter deadReckoningParameter,
+	                       EntityMarking entityMarking, EntityCapabilities entityCapabilities,
 	                       ArticulationParameter[] articulationParameter )
 	{
 		super( pduHeader );
@@ -83,7 +83,6 @@ public class EntityStatePDU extends PDU
 		this.pduHeader = pduHeader;
 		this.entityID = entityID;
 		this.forceID = forceID;
-		this.numberOfArticulationParameters = numberOfArticulationParameters;
 		this.entityType = entityType;
 		this.alternativeEntityType = alternativeEntityType;
 		this.entityLinearVelocity = entityLinearVelocity;
@@ -127,16 +126,6 @@ public class EntityStatePDU extends PDU
 	public void setForceID( short forceID )
     {
     	this.forceID = forceID;
-    }
-
-	public short getNumberOfArticulationParameters()
-    {
-    	return numberOfArticulationParameters;
-    }
-
-	public void setNumberOfArticulationParameters( short numberOfArticulationParameters )
-    {
-    	this.numberOfArticulationParameters = numberOfArticulationParameters;
     }
 
 	public EntityType getEntityType()
@@ -235,11 +224,12 @@ public class EntityStatePDU extends PDU
     }
 
 	public void setArticulationParameter( ArticulationParameter[] articulationParameter )
-    {
-		if ( articulationParameter.length != numberOfArticulationParameters )
-			throw new IllegalStateException( "Articulation Parameters mismatch" );
+    {		
+		this.articulationParameter = articulationParameter;
 		
-    	this.articulationParameter = articulationParameter;
+		PDUHeader header = getHeader();
+		header.setLength( ENTITY_STATE_BASE_SIZE +
+		                  (articulationParameter.length * ARTICULATION_PARAMETER_SIZE) );
     }
 
 	//----------------------------------------------------------
@@ -265,10 +255,9 @@ public class EntityStatePDU extends PDU
 			articulationParameters[i] = ArticulationParameter.read( dis );
 		}
 		
-		return new EntityStatePDU( header, entityID, forceID, numberOfArticulationParameters,
-		                           entityType, alternativeEntityType, entityLinearVelocity,
-		                           entityLocation, entityOrientation, entityAppearance,
-		                           deadReckoningParameters, entityMarking, entityCapabilities,
-		                           articulationParameters);
+		return new EntityStatePDU( header, entityID, forceID, entityType, alternativeEntityType,
+		                           entityLinearVelocity, entityLocation, entityOrientation,
+		                           entityAppearance, deadReckoningParameters, entityMarking,
+		                           entityCapabilities, articulationParameters );
 	}
 }
