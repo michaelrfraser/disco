@@ -165,7 +165,7 @@ public class Fuse
 	 */
 	public static String getDescription( int value )
 	{
-		String description = "Mechanical_Tail";
+		String description = "Mechanical, Tail";
 		switch( value )
 		{
 			case MECHANICAL_NOSE:

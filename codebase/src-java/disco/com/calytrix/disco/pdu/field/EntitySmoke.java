@@ -76,7 +76,7 @@ public class EntitySmoke
 	 */
 	public static String getDescription( int value )
 	{
-		String description = "Entity_is_emitting_engine_smoke_and_smoke_plume_is_rising_from_the_entity";
+		String description = "Entity is emitting engine smoke and smoke plume is rising from the entity";
 		switch( value )
 		{
 			case ENTITY_IS_EMITTING_ENGINE_SMOKE:

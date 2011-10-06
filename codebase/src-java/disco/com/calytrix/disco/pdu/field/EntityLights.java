@@ -79,9 +79,13 @@ public class EntityLights
 	 */
 	public static String getDescription( int value )
 	{
-		String description = "Fromation lights are on";
+		String description = "";
 		switch( value )
 		{
+			case FROMATION_LIGHTS_ARE_ON:
+				description = "Fromation lights are on";
+				break;
+				
 			case NAVIGATION_LIGHTS_ARE_ON:
 				description = "Navigation lights are on";
 				break;

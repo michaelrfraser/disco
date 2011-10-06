@@ -81,9 +81,13 @@ public class EntityHatchState
 	 */
 	public static String getDescription( int value )
 	{
-		String description = "Primary hatch is open and person is visible";
+		String description = "";
 		switch( value )
 		{
+			case PRIMARY_HATCH_IS_OPEN_AND_PERSON_IS_VISIBLE:
+				description = "Primary hatch is open and person is visible";
+				break;
+				
 			case PRIMARY_HATCH_IS_OPEN:
 				description = "Primary hatch is open";
 				break;

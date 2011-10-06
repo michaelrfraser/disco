@@ -72,7 +72,7 @@ public class EntityFlamingEffect
 	 */
 	public static String getDescription( int value )
 	{
-		String description = "Flames_present";
+		String description = "Flames present";
 		switch( value )
 		{
 			case NONE:

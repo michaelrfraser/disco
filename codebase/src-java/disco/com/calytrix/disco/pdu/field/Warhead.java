@@ -143,7 +143,7 @@ public class Warhead
 	 */
 	public static String getDescription( int value )
 	{
-		String description = "Biological_Toxin";
+		String description = "Biological, Toxin";
 		switch( value )
 		{
 			case BIOLOGICAL_GENETICALLY_MODIFIED_MICROORGANISMS:

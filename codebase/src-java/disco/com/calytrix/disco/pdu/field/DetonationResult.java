@@ -96,7 +96,7 @@ public class DetonationResult
 	 */
 	public static String getDescription( int value )
 	{
-		String description = "HE_hit_large";
+		String description = "HE hit, large";
 		switch( value )
 		{
 			case HE_HIT_MEDIUM:
