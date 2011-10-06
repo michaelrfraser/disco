@@ -225,7 +225,7 @@ public class EntityAppearanceGeneral
 		byte entitySmoke = (byte)((ch1 & 0x06) >> 1);
 		byte entityTrailingEffect = (byte)(((ch1 & 0x01) << 1) | ((ch2 & 0x80) >> 7));
 		byte entityHatchState = (byte)((ch2 & 0x70) >> 4);
-		byte entityLights = (byte)((ch2 & 0x07) >> 1);
+		byte entityLights = (byte)((ch2 & 0x0E) >> 1);
 		byte entityFlamingEffect = (byte)((ch2 & 0x01) >> 0);
 		
 		return new EntityAppearanceGeneral( entityPaintScheme, entityMobilityKill, entityFirePower,
