@@ -71,10 +71,14 @@ public class CryptoSystem
 	 */
 	public static String getDescription( int value )
 	{
-		String description = "Other";
+		String description = "Undefined";
 		
 		switch( value )
 		{
+			case OTHER:
+				description = "Other";
+				break;
+				
 			case KY_28:
 				description = "KY-28";
 				break;

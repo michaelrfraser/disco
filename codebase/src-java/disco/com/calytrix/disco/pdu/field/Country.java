@@ -377,10 +377,14 @@ public class Country
 	 */
 	public static String getDescription( int value )
 	{
-		String description = "India";
+		String description = "Undefined";
 		
 		switch( value )
 		{
+			case INDIA:
+				description = "India";
+				break;
+				
 			case ICELAND:
 				description = "Iceland";
 				break;

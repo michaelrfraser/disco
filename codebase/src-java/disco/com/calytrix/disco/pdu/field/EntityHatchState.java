@@ -81,7 +81,7 @@ public class EntityHatchState
 	 */
 	public static String getDescription( int value )
 	{
-		String description = "";
+		String description = "Undefined";
 		switch( value )
 		{
 			case PRIMARY_HATCH_IS_OPEN_AND_PERSON_IS_VISIBLE:

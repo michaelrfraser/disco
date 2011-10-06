@@ -63,9 +63,12 @@ public class ParameterTypeDesignator
 	 */
 	public static String getDescription( int value )
 	{
-		String description = "Attached Part";
+		String description = "Undefined";
 		switch( value )
 		{
+			case ATTACHED_PART:
+				description = "Attached Part";
+				break;
 			case ARTICULATED_PART:
 				description = "Articulated Part";
 				break;

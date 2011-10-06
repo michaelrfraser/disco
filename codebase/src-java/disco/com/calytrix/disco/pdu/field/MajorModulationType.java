@@ -72,10 +72,13 @@ public class MajorModulationType
 	 */
 	public static String getDescription( int value )
 	{
-		String description = "Other";
+		String description = "Undefined";
 		
 		switch( value )
 		{
+			case OTHER:
+				description = "Other";
+				break;
 			case AMPLITUDE:
 				description = "Amplitude";
 				break;

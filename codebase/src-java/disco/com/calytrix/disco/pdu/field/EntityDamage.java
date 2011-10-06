@@ -74,9 +74,13 @@ public class EntityDamage
 	 */
 	public static String getDescription( int value )
 	{
-		String description = "Destroyed";
+		String description = "Undefined";
 		switch( value )
 		{
+			case DESTROYED:
+				description = "Destroyed";
+				break;
+				
 			case MODERATE_DAMAGE:
 				description = "Moderate Damage";
 				break;

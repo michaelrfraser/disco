@@ -79,6 +79,9 @@ public class EntityTrailingEffect
 		String description = "Large";
 		switch( value )
 		{
+			case LARGE:
+				description = "Large";
+				break;
 			case MEDIUM:
 				description = "Medium";
 				break;

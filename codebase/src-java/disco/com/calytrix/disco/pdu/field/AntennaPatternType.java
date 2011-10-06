@@ -69,10 +69,14 @@ public class AntennaPatternType
 	 */
 	public static String getDescription( int value )
 	{
-		String description = "Omni-directional";
+		String description = "Undefined";
 		
 		switch( value )
 		{
+			case OMNI_DIRECTIONAL:
+				description = "Omni-directional";
+				break;
+				
 			case BEAM:
 				description = "Beam";
 				break;

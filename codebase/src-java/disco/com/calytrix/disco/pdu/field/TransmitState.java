@@ -72,10 +72,13 @@ public class TransmitState
 	 */
 	public static String getDescription( short value )
 	{
-		String description = "Off";
+		String description = "Undefined";
 		
 		switch( value )
 		{
+			case OFF:
+				description = "Off";
+				break;
 			case ON_BUT_NOT_TRANSMITTING:
 				description = "On but not transmitting";
 				break;

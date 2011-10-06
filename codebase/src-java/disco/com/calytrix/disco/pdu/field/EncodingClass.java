@@ -76,6 +76,10 @@ public class EncodingClass
 		
 		switch( value )
 		{
+			case ENCODED_VOICE:
+				description = "Encoded Voice";
+				break;
+				
 			case RAW_BINARY_DATA:
 				description = "Raw Binary Data";
 				break;

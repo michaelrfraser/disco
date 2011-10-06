@@ -75,6 +75,10 @@ public class EncodingType
 		
 		switch( value )
 		{
+			case MULAW_8:
+				description = "8-bit mu-law";
+				break;
+				
 			case CVSD:
 				description = "CVSD";
 				break;

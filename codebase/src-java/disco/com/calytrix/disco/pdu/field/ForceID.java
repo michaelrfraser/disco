@@ -74,10 +74,14 @@ public class ForceID
 	 */
 	public static String getDescription( int value )
 	{
-		String description = "Other";
+		String description = "Undefined";
 		
 		switch( value )
 		{
+			case OTHER:
+				description = "Other";
+				break;
+				
 			case FRIENDLY:
 				description = "Friendly";
 				break;

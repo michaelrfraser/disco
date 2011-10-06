@@ -146,6 +146,10 @@ public class Warhead
 		String description = "Biological, Toxin";
 		switch( value )
 		{
+			case BIOLOGICAL_TOXIN:
+				description = "Biological, Toxin";
+				break;
+				
 			case BIOLOGICAL_GENETICALLY_MODIFIED_MICROORGANISMS:
 				description = "Biological, Genetically Modified Micro-organisms";
 				break;

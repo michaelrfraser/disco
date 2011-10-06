@@ -65,9 +65,13 @@ public class EntityMarkingCharacterSet
 	 */
 	public static String getDescription( int value )
 	{
-		String description = "Digit Chevron";
+		String description = "Undefined";
 		switch( value )
 		{
+			case DIGIT_CHEVRON:
+				description = "Digit Chevron";
+				break;
+				
 			case ARMY_MARKING:
 				description = "Army Marking (CCTT)";
 				break;

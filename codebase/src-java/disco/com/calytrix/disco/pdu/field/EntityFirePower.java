@@ -72,9 +72,13 @@ public class EntityFirePower
 	 */
 	public static String getDescription( int value )
 	{
-		String description = "Firepower kill";
+		String description = "Undefined";
 		switch( value )
 		{
+			case FIREPOWER_KILL:
+				description = "Firepower kill";
+				break;
+				
 			case NO_FIREPOWER_KILL:
 				description = "No Fire-power kill";
 				break;

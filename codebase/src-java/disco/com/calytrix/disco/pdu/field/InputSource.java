@@ -74,10 +74,13 @@ public class InputSource
 	 */
 	public static String getDescription( short value )
 	{
-		String description = "Other";
+		String description = "Undefined";
 		
 		switch( value )
 		{
+			case OTHER: 
+				description = "Other";
+				break;
 			case PILOT:
 				description = "Pilot";
 				break;

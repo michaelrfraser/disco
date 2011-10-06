@@ -72,10 +72,13 @@ public class EntityPaintScheme
 	 */
 	public static String getDescription( int value )
 	{
-		String description = "Camouflage";
+		String description = "Undefined";
 		switch( value )
 		{		
-				case UNIFORM_COLOR:
+			case CAMOUFLAGE:
+				description = "Camouflage";
+				break;
+			case UNIFORM_COLOR:
 				description = "Uniform Color";
 				break;
 		}

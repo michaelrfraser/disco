@@ -72,9 +72,13 @@ public class EntityFlamingEffect
 	 */
 	public static String getDescription( int value )
 	{
-		String description = "Flames present";
+		String description = "Undefined";
 		switch( value )
 		{
+			case FLAMES_PRESENT:
+				description = "Flames present";
+				break;
+				
 			case NONE:
 				description = "None";
 				break;

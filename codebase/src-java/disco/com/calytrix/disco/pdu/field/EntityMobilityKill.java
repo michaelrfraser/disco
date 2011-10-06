@@ -72,9 +72,12 @@ public class EntityMobilityKill
 	 */
 	public static String getDescription( int value )
 	{
-		String description = "Mobility Kill";
+		String description = "Undefined";
 		switch( value )
 		{
+			case MOBILITY_KILL:
+    			description = "Mobility Kill";
+    			break;
 			case NO_MOBILITY_KILL:
 				description = "No Mobility Kill";
 				break;

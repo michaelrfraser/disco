@@ -168,6 +168,10 @@ public class PDUType
 		
 		switch ( value )
 		{
+			case OTHER:
+				description = "Other";
+				break;
+			
 			case ENTITY_STATE:
 				description = "Entity State";
 				break;

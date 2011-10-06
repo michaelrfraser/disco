@@ -82,9 +82,13 @@ public class DeadReckoningAlgorithm
 	 */
 	public static String getDescription( int value )
 	{
-		String description = "DRM_F_V_B";
+		String description = "Undefined";
 		switch( value )
 		{		
+			case DRM_F_V_B:
+				description = "DRM_F_V_B";
+				break;
+				
 			case DRM_R_V_B:
 				description = "DRM(R, V, B)";
 				break;

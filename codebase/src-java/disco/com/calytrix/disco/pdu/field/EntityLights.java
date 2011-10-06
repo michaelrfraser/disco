@@ -79,7 +79,7 @@ public class EntityLights
 	 */
 	public static String getDescription( int value )
 	{
-		String description = "";
+		String description = "Undefined";
 		switch( value )
 		{
 			case FROMATION_LIGHTS_ARE_ON:
