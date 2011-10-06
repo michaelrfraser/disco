@@ -15,6 +15,7 @@
 package com.calytrix.disco.pdu.warfare;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import com.calytrix.disco.network.DISInputStream;
 import com.calytrix.disco.pdu.PDU;
@@ -55,7 +56,7 @@ public class DetonationPDU extends PDU
 	private BurstDescriptor burstDescriptor;
 	private EntityCoordinate locationInEntityCoordinates;
 	private short detonationResult;
-	private ArticulationParameter[] articulationParameter;
+	private ArrayList<ArticulationParameter> articulationParameter;
 	
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
@@ -65,7 +66,7 @@ public class DetonationPDU extends PDU
 	                      EventIdentifier eventID, Vector velocity,
 	                      WorldCoordinate locationInWorld, BurstDescriptor burstDescriptor,
 	                      EntityCoordinate locationInEntityCoordinates,
-	                      short detonationResult, ArticulationParameter[] articulationParameter )
+	                      short detonationResult, ArrayList<ArticulationParameter> articulationParameter )
 	{
 		super( header );
 		
@@ -193,17 +194,17 @@ public class DetonationPDU extends PDU
     	this.detonationResult = detonationResult;
     }
 
-	public ArticulationParameter[] getArticulationParameter()
+	public ArrayList<ArticulationParameter> getArticulationParameter()
     {
     	return articulationParameter;
     }
 
-	public void setArticulationParameter( ArticulationParameter[] articulationParameter )
+	public void setArticulationParameter( ArrayList<ArticulationParameter> articulationParameter )
     {
     	this.articulationParameter = articulationParameter;
     	PDUHeader header = getHeader();
 		header.setLength( DETONATION_BASE_SIZE +
-		                  (articulationParameter.length * ArticulationParameter.ARTICULATION_PARAMETER_SIZE) );
+		                  (articulationParameter.size() * ArticulationParameter.ARTICULATION_PARAMETER_SIZE) );
     }
 
 	//----------------------------------------------------------
@@ -222,10 +223,10 @@ public class DetonationPDU extends PDU
 		short detonationResult = dis.readUI8();
 		short numberOfArticulationParameters = dis.readUI8();
 		dis.skip16(); // Skip over padding
-		ArticulationParameter[] articulationParameters = new ArticulationParameter[numberOfArticulationParameters];
+		ArrayList<ArticulationParameter> articulationParameters = new ArrayList<ArticulationParameter>(numberOfArticulationParameters);
 		for( int i = 0; i < numberOfArticulationParameters; i++ )
 		{
-			articulationParameters[i] = ArticulationParameter.read( dis );
+			articulationParameters.add( ArticulationParameter.read( dis ) );
 		}
 		
 		return new DetonationPDU( header, firingEntityID, targetEntityID, munitionID, eventID,

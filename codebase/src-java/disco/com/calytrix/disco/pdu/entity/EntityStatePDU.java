@@ -15,6 +15,7 @@
 package com.calytrix.disco.pdu.entity;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import com.calytrix.disco.network.DISInputStream;
 import com.calytrix.disco.pdu.PDU;
@@ -61,7 +62,7 @@ public class EntityStatePDU extends PDU
 	private DeadReckoningParameter deadReckoningParameters;
 	private EntityMarking entityMarking;
 	private EntityCapabilities entityCapabilities;
-	private ArticulationParameter[] articulationParameter;
+	private ArrayList<ArticulationParameter> articulationParameter;
 	
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
@@ -72,7 +73,7 @@ public class EntityStatePDU extends PDU
 	                       EulerAngles entityOrientation, EntityAppearance entityAppearance,
 	                       DeadReckoningParameter deadReckoningParameter,
 	                       EntityMarking entityMarking, EntityCapabilities entityCapabilities,
-	                       ArticulationParameter[] articulationParameter )
+	                       ArrayList<ArticulationParameter> articulationParameter )
 	{
 		super( pduHeader );
 		
@@ -217,18 +218,18 @@ public class EntityStatePDU extends PDU
     	this.entityCapabilities = entityCapabilities;
     }
 	
-	public ArticulationParameter[] getArticulationParameter()
+	public ArrayList<ArticulationParameter> getArticulationParameter()
     {
     	return articulationParameter;
     }
 
-	public void setArticulationParameter( ArticulationParameter[] articulationParameter )
+	public void setArticulationParameter( ArrayList<ArticulationParameter> articulationParameter )
     {		
 		this.articulationParameter = articulationParameter;
 		
 		PDUHeader header = getHeader();
 		header.setLength( ENTITY_STATE_BASE_SIZE +
-		                  (articulationParameter.length * ArticulationParameter.ARTICULATION_PARAMETER_SIZE) );
+		                  (articulationParameter.size() * ArticulationParameter.ARTICULATION_PARAMETER_SIZE) );
     }
 
 	//----------------------------------------------------------
@@ -248,10 +249,10 @@ public class EntityStatePDU extends PDU
 		DeadReckoningParameter deadReckoningParameters = DeadReckoningParameter.read( dis );
 		EntityMarking entityMarking = EntityMarking.read( dis );
 		EntityCapabilities entityCapabilities = EntityCapabilities.read( dis );
-		ArticulationParameter[] articulationParameters = new ArticulationParameter[numberOfArticulationParameters];
+		ArrayList<ArticulationParameter> articulationParameters = new ArrayList<ArticulationParameter>(numberOfArticulationParameters);
 		for( int i = 0; i < numberOfArticulationParameters; i++ )
 		{
-			articulationParameters[i] = ArticulationParameter.read( dis );
+			articulationParameters.add( ArticulationParameter.read( dis ) );
 		}
 		
 		return new EntityStatePDU( header, entityID, forceID, entityType, alternativeEntityType,
