@@ -52,7 +52,7 @@ public class FirePDU extends PDU
 	private WorldCoordinate locationInWorld;
 	private BurstDescriptor burstDescriptor;
 	private Vector velocity;
-	private long range;
+	private float range;
 
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
@@ -61,7 +61,7 @@ public class FirePDU extends PDU
 	                EntityIdentifier targetEntityID, EntityIdentifier munitionID,
 	                EventIdentifier eventID, long fireMissionIndex,
 	                WorldCoordinate locationInWorld, BurstDescriptor burstDescriptor,
-	                Vector velocity, long range )
+	                Vector velocity, float range )
 	{
 		super( header );
 		
@@ -175,12 +175,12 @@ public class FirePDU extends PDU
     	this.velocity = velocity;
     }
 
-	public long getRange()
+	public float getRange()
     {
     	return range;
     }
 
-	public void setRange( long range )
+	public void setRange( float range )
     {
     	this.range = range;
     }
@@ -198,7 +198,7 @@ public class FirePDU extends PDU
 		WorldCoordinate locationInWorld = WorldCoordinate.read( dis );
 		BurstDescriptor burstDescriptor = BurstDescriptor.read( dis );
 		Vector velocity = Vector.read( dis );
-		long range = dis.readUI32();		
+		float range = dis.readFloat();		
 	
 		return new FirePDU( header, firingEntityID, targetEntityID, munitionID, eventID,
 		                    fireMissionIndex, locationInWorld, burstDescriptor, velocity, range );
