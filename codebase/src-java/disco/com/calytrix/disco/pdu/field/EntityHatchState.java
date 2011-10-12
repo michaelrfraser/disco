@@ -64,10 +64,12 @@ public class EntityHatchState
 	 */
 	public static int[] getValues()
 	{
-		int[] values =
-		    { NOT_APPLICABLE, PRIMARY_HATCH_IS_CLOSED, PRIMARY_HATCH_IS_POPPED,
-		     PRIMARY_HATCH_IS_POPPED_AND_A_PERSON_IS_VISIBLE_UNDER_HATCH, PRIMARY_HATCH_IS_OPEN,
-		     PRIMARY_HATCH_IS_OPEN_AND_PERSON_IS_VISIBLE };
+		int[] values = { NOT_APPLICABLE,
+		                 PRIMARY_HATCH_IS_CLOSED,
+		                 PRIMARY_HATCH_IS_POPPED,
+		                 PRIMARY_HATCH_IS_POPPED_AND_A_PERSON_IS_VISIBLE_UNDER_HATCH,
+		                 PRIMARY_HATCH_IS_OPEN,
+		                 PRIMARY_HATCH_IS_OPEN_AND_PERSON_IS_VISIBLE };
 		return values;
 	}
 

@@ -38,16 +38,16 @@ public class EntityMarking
 	//----------------------------------------------------------
 	//                   INSTANCE VARIABLES
 	//----------------------------------------------------------
-	private short entityMarkingCharacterSet;
-	private EntityMarkingString entityMarkingString;
+	private short markingCharset;
+	private EntityMarkingString markingString;
 
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
-	public EntityMarking( short entityMarkingCharacterSet, EntityMarkingString entityMarkingString )
+	public EntityMarking( short markingCharset, EntityMarkingString markingString )
 	{
-		this.entityMarkingCharacterSet = entityMarkingCharacterSet;
-		this.entityMarkingString = entityMarkingString;
+		this.markingCharset = markingCharset;
+		this.markingString = markingString;
 	}
 
 	//----------------------------------------------------------
@@ -59,23 +59,20 @@ public class EntityMarking
 	@Override
 	public boolean equals( Object other )
 	{
-		boolean equal = false;
+		if( this == other )
+			return true;
 		
-		if ( other == this )
+		if( other instanceof EntityMarking )
 		{
-			equal = true;
-		}
-		else
-		{
-			if ( other instanceof EntityMarking )
+			EntityMarking otherMarking = (EntityMarking)other;
+			if( otherMarking.markingCharset == this.markingCharset &&
+			    otherMarking.markingString.equals(this.markingString) )
 			{
-				EntityMarking asEntityMarking = (EntityMarking)other;
-				equal = asEntityMarking.entityMarkingCharacterSet == this.entityMarkingCharacterSet
-					&& asEntityMarking.entityMarkingString.equals( this.entityMarkingString );
+				return true;
 			}
 		}
 		
-		return equal;
+		return false;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////
@@ -83,22 +80,22 @@ public class EntityMarking
 	////////////////////////////////////////////////////////////////////////////////////////////
 	public short getEntityMarkingCharacterSet()
     {
-    	return entityMarkingCharacterSet;
+    	return markingCharset;
     }
 
 	public void setEntityMarkingCharacterSet( short entityMarkingCharacterSet )
     {
-    	this.entityMarkingCharacterSet = entityMarkingCharacterSet;
+    	this.markingCharset = entityMarkingCharacterSet;
     }
 
 	public EntityMarkingString getEntityMarkingString()
     {
-    	return entityMarkingString;
+    	return markingString;
     }
 
 	public void setEntityMarkingString( EntityMarkingString entityMarkingString )
     {
-    	this.entityMarkingString = entityMarkingString;
+    	this.markingString = entityMarkingString;
     }
 
 	//----------------------------------------------------------

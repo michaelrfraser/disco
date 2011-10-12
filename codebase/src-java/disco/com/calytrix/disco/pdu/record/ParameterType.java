@@ -59,23 +59,20 @@ public class ParameterType
 	@Override
 	public boolean equals( Object other )
 	{
-		boolean equal = false;
+		if( this == other )
+			return true;
 		
-		if ( other == this )
+		if( other instanceof ParameterType )
 		{
-			equal = true;
-		}
-		else
-		{
-			if ( other instanceof ParameterType )
+			ParameterType otherParameter = (ParameterType)other;
+			if( otherParameter.attachedParts == this.attachedParts &&
+				otherParameter.articulatedParts == this.articulatedParts )
 			{
-				ParameterType asParameterType = (ParameterType)other;
-				equal = asParameterType.attachedParts == this.attachedParts
-					&& asParameterType.articulatedParts == this.articulatedParts;
+				return true;
 			}
 		}
-		
-		return equal;
+
+		return false;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////

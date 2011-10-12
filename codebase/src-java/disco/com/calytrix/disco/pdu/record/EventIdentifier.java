@@ -56,23 +56,20 @@ public class EventIdentifier
 	@Override
 	public boolean equals( Object other )
 	{
-		boolean equal = false;
-		
-		if ( other == this )
+		if( this == other )
+			return true;
+
+		if( other instanceof EventIdentifier )
 		{
-			equal = true;
-		}
-		else
-		{
-			if ( other instanceof EventIdentifier )
+			EventIdentifier otherEvent = (EventIdentifier)other;
+			if( otherEvent.simulationAddress.equals(this.simulationAddress) &&
+			    otherEvent.eventID == this.eventID )
 			{
-				EventIdentifier asEventIdentifier = (EventIdentifier)other;
-				equal = asEventIdentifier.simulationAddress.equals( this.simulationAddress )
-					&& asEventIdentifier.eventID == this.eventID;
+				return true;
 			}
 		}
-		
-		return equal;
+
+		return false;
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////

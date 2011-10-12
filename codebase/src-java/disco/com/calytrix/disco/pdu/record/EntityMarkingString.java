@@ -51,10 +51,17 @@ public class EntityMarkingString
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
-	public EntityMarkingString( short firstCharacter, short secondCharacter, short thirdCharacter,
-	                            short fourthCharacter, short fifthCharacter, short sixthCharacter,
-	                            short seventhCharacter, short eighthCharacter, short ninthCharacter,
-	                            short tenthCharacter, short eleventhChracter )
+	public EntityMarkingString( short firstCharacter,
+	                            short secondCharacter,
+	                            short thirdCharacter,
+	                            short fourthCharacter,
+	                            short fifthCharacter,
+	                            short sixthCharacter,
+	                            short seventhCharacter,
+	                            short eighthCharacter,
+	                            short ninthCharacter,
+	                            short tenthCharacter,
+	                            short eleventhChracter )
 	{
 		this.firstCharacter = firstCharacter;
 		this.secondCharacter = secondCharacter;
@@ -78,32 +85,29 @@ public class EntityMarkingString
 	@Override
 	public boolean equals( Object other )
 	{
-		boolean equal = false;
+		if( this == other )
+			return true;
 		
-		if ( other == this )
+		if( other instanceof EntityMarkingString )
 		{
-			equal = true;
-		}
-		else
-		{
-			if ( other instanceof EntityMarkingString )
+			EntityMarkingString otherString = (EntityMarkingString)other;
+			if( otherString.firstCharacter == this.firstCharacter &&
+				otherString.secondCharacter == this.secondCharacter &&
+				otherString.thirdCharacter == this.thirdCharacter &&
+				otherString.fourthCharacter == this.fourthCharacter &&
+				otherString.fifthCharacter == this.fifthCharacter &&
+				otherString.sixthCharacter == this.sixthCharacter &&
+				otherString.seventhCharacter == this.seventhCharacter &&
+				otherString.eighthCharacter == this.eighthCharacter &&
+				otherString.ninthCharacter == this.ninthCharacter &&
+				otherString.tenthCharacter == this.tenthCharacter &&
+				otherString.eleventhCharacter == this.eleventhCharacter )
 			{
-				EntityMarkingString asEntityMarkingString = (EntityMarkingString)other;
-				equal = asEntityMarkingString.firstCharacter == this.firstCharacter
-					&& asEntityMarkingString.secondCharacter == this.secondCharacter
-					&& asEntityMarkingString.thirdCharacter == this.thirdCharacter
-					&& asEntityMarkingString.fourthCharacter == this.fourthCharacter
-					&& asEntityMarkingString.fifthCharacter == this.fifthCharacter
-					&& asEntityMarkingString.sixthCharacter == this.sixthCharacter
-					&& asEntityMarkingString.seventhCharacter == this.seventhCharacter
-					&& asEntityMarkingString.eighthCharacter == this.eighthCharacter
-					&& asEntityMarkingString.ninthCharacter == this.ninthCharacter
-					&& asEntityMarkingString.tenthCharacter == this.tenthCharacter
-					&& asEntityMarkingString.eleventhCharacter == this.eleventhCharacter;
+				return true;
 			}
 		}
 		
-		return equal;
+		return false;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////
@@ -246,9 +250,16 @@ public class EntityMarkingString
 		short tenthCharacter = dis.readUI8();
 		short eleventhCharacter = dis.readUI8();
 		
-		return new EntityMarkingString( firstCharacter, secondCharacter, thirdCharacter,
-		                                fourthCharacter, fifthCharacter, sixthCharacter,
-		                                seventhCharacter, eighthCharacter, ninthCharacter,
-		                                tenthCharacter, eleventhCharacter );
+		return new EntityMarkingString( firstCharacter,
+		                                secondCharacter,
+		                                thirdCharacter,
+		                                fourthCharacter,
+		                                fifthCharacter,
+		                                sixthCharacter,
+		                                seventhCharacter,
+		                                eighthCharacter,
+		                                ninthCharacter,
+		                                tenthCharacter,
+		                                eleventhCharacter );
 	}
 }

@@ -48,8 +48,11 @@ public class EntityCapabilities
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
-	public EntityCapabilities( byte ammunitionSupply, byte fuelSupply, byte recovery,
-	                           byte repair, byte[] unused )
+	public EntityCapabilities( byte ammunitionSupply,
+	                           byte fuelSupply,
+	                           byte recovery,
+	                           byte repair,
+	                           byte[] unused )
 	{
 		this.ammunitionSupply = ammunitionSupply;
 		this.fuelSupply = fuelSupply;
@@ -67,26 +70,23 @@ public class EntityCapabilities
 	@Override
 	public boolean equals( Object other )
 	{
-		boolean equal = false;
+		if( this == other )
+			return true;
 		
-		if ( other == this )
+		if( other instanceof EntityCapabilities )
 		{
-			equal = true;
-		}
-		else
-		{
-			if ( other instanceof EntityCapabilities )
+			EntityCapabilities otherCapabilities = (EntityCapabilities)other;
+			if( otherCapabilities.ammunitionSupply == this.ammunitionSupply &&
+			    otherCapabilities.fuelSupply == this.fuelSupply &&
+			    otherCapabilities.recovery == this.recovery &&
+			    otherCapabilities.repair == this.repair &&
+			    otherCapabilities.unused == this.unused )
 			{
-				EntityCapabilities asEntityCapabilities = (EntityCapabilities)other;
-				equal = asEntityCapabilities.ammunitionSupply == this.ammunitionSupply
-					&& asEntityCapabilities.fuelSupply == this.fuelSupply
-					&& asEntityCapabilities.recovery == this.recovery
-					&& asEntityCapabilities.repair == this.repair
-					&& asEntityCapabilities.unused == this.unused;
+				return true;
 			}
 		}
 		
-		return equal;
+		return false;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////

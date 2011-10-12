@@ -23,7 +23,7 @@ import com.calytrix.disco.pdu.record.BurstDescriptor;
 import com.calytrix.disco.pdu.record.EntityIdentifier;
 import com.calytrix.disco.pdu.record.EventIdentifier;
 import com.calytrix.disco.pdu.record.PDUHeader;
-import com.calytrix.disco.pdu.record.Vector;
+import com.calytrix.disco.pdu.record.VectorRecord;
 import com.calytrix.disco.pdu.record.WorldCoordinate;
 
 /**
@@ -51,17 +51,22 @@ public class FirePDU extends PDU
 	private long fireMissionIndex;
 	private WorldCoordinate locationInWorld;
 	private BurstDescriptor burstDescriptor;
-	private Vector velocity;
+	private VectorRecord velocity;
 	private long range;
 
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
-	public FirePDU( PDUHeader header, EntityIdentifier firingEntityID,
-	                EntityIdentifier targetEntityID, EntityIdentifier munitionID,
-	                EventIdentifier eventID, long fireMissionIndex,
-	                WorldCoordinate locationInWorld, BurstDescriptor burstDescriptor,
-	                Vector velocity, long range )
+	public FirePDU( PDUHeader header, 
+	                EntityIdentifier firingEntityID,
+	                EntityIdentifier targetEntityID,
+	                EntityIdentifier munitionID,
+	                EventIdentifier eventID,
+	                long fireMissionIndex,
+	                WorldCoordinate locationInWorld,
+	                BurstDescriptor burstDescriptor,
+	                VectorRecord velocity,
+	                long range )
 	{
 		super( header );
 		
@@ -165,12 +170,12 @@ public class FirePDU extends PDU
     	this.burstDescriptor = burstDescriptor;
     }
 
-	public Vector getVelocity()
+	public VectorRecord getVelocity()
     {
     	return velocity;
     }
 
-	public void setVelocity( Vector velocity )
+	public void setVelocity( VectorRecord velocity )
     {
     	this.velocity = velocity;
     }
@@ -197,10 +202,18 @@ public class FirePDU extends PDU
 		long fireMissionIndex = dis.readUI32();
 		WorldCoordinate locationInWorld = WorldCoordinate.read( dis );
 		BurstDescriptor burstDescriptor = BurstDescriptor.read( dis );
-		Vector velocity = Vector.read( dis );
+		VectorRecord velocity = VectorRecord.read( dis );
 		long range = dis.readUI32();		
 	
-		return new FirePDU( header, firingEntityID, targetEntityID, munitionID, eventID,
-		                    fireMissionIndex, locationInWorld, burstDescriptor, velocity, range );
+		return new FirePDU( header,
+		                    firingEntityID,
+		                    targetEntityID,
+		                    munitionID,
+		                    eventID,
+		                    fireMissionIndex,
+		                    locationInWorld,
+		                    burstDescriptor,
+		                    velocity,
+		                    range );
 	}
 }

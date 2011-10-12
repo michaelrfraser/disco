@@ -66,8 +66,16 @@ public class EntityKind
 	 */
 	public static int[] getValues()
 	{
-		int[] values = { OTHER, PLATFORM, MUNITION, LIFEFORM, ENVIRONMENTAL, CULTURAL_FEATURE, 
-		                 SUPPLY, RADIO, EXPENDABLE, SENSOR_EMITTER };
+		int[] values = { OTHER,
+		                 PLATFORM,
+		                 MUNITION,
+		                 LIFEFORM,
+		                 ENVIRONMENTAL,
+		                 CULTURAL_FEATURE, 
+		                 SUPPLY,
+		                 RADIO,
+		                 EXPENDABLE,
+		                 SENSOR_EMITTER };
 		return values;
 	}
 	

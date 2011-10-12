@@ -42,7 +42,7 @@ public class DeadReckoningParameter
 	//----------------------------------------------------------
 	private short deadReckoningAlgorithm;
 	private byte[] deadReckoningOtherParamaters;
-	private Vector entityLinearAcceleration;
+	private VectorRecord entityLinearAcceleration;
 	private AngularVelocityVector entityAngularVelocity;
 
 	//----------------------------------------------------------
@@ -50,8 +50,8 @@ public class DeadReckoningParameter
 	//----------------------------------------------------------
 	public DeadReckoningParameter( short deadReckoningAlgorithm,
 	                               byte[] deadReckoningOtherParamaters,
-	                               Vector entityLinearAcceleration,
-	                               AngularVelocityVector entityAngularVelocity)
+	                               VectorRecord entityLinearAcceleration,
+	                               AngularVelocityVector entityAngularVelocity )
 	{
 		this.deadReckoningAlgorithm = deadReckoningAlgorithm;
 		setDeadReckoningOtherParamaters(deadReckoningOtherParamaters);
@@ -68,25 +68,22 @@ public class DeadReckoningParameter
 	@Override
 	public boolean equals( Object other )
 	{
-		boolean equal = false;
-		
-		if ( other == this )
+		if( this == other )
+			return true;
+
+		if( other instanceof DeadReckoningParameter )
 		{
-			equal = true;
-		}
-		else
-		{
-			if ( other instanceof DeadReckoningParameter )
+			DeadReckoningParameter otherParam = (DeadReckoningParameter)other;
+			if( otherParam.deadReckoningAlgorithm == this.deadReckoningAlgorithm && 
+			    otherParam.deadReckoningOtherParamaters == this.deadReckoningOtherParamaters &&
+			    otherParam.entityLinearAcceleration.equals(this.entityLinearAcceleration) &&
+			    otherParam.entityAngularVelocity.equals(this.entityAngularVelocity) )
 			{
-				DeadReckoningParameter asDeadReckoningParameter = (DeadReckoningParameter)other;
-				equal = asDeadReckoningParameter.deadReckoningAlgorithm == this.deadReckoningAlgorithm 
-					&& asDeadReckoningParameter.deadReckoningOtherParamaters == this.deadReckoningOtherParamaters
-					&& asDeadReckoningParameter.entityLinearAcceleration.equals( this.entityLinearAcceleration )
-					&& asDeadReckoningParameter.entityAngularVelocity.equals( this.entityAngularVelocity );
+				return true;
 			}
 		}
 		
-		return equal;
+		return false;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////
@@ -102,12 +99,12 @@ public class DeadReckoningParameter
     	this.deadReckoningAlgorithm = deadReckoningAlgorithm;
     }
 
-	public Vector getEntityLinearAcceleration()
+	public VectorRecord getEntityLinearAcceleration()
     {
     	return entityLinearAcceleration;
     }
 
-	public void setEntityLinearAcceleration( Vector entityLinearAcceleration )
+	public void setEntityLinearAcceleration( VectorRecord entityLinearAcceleration )
     {
     	this.entityLinearAcceleration = entityLinearAcceleration;
     }
@@ -129,9 +126,12 @@ public class DeadReckoningParameter
 
 	public void setDeadReckoningOtherParamaters( byte[] deadReckoningOtherParamaters )
     {
-		if ( deadReckoningOtherParamaters.length != OTHER_PARAMETERS_ARRAY_SIZE )
-			throw new IllegalStateException( "Dead Reckoning Other Parameters BLOB must be aligned to 120bit boundary" );
-		
+		if( deadReckoningOtherParamaters.length != OTHER_PARAMETERS_ARRAY_SIZE )
+		{
+			throw new IllegalStateException( "Dead Reckoning Other Parameters BLOB must be "+
+		                                     "aligned to 120bit boundary" );
+		}
+
     	this.deadReckoningOtherParamaters = deadReckoningOtherParamaters;
     }
 
@@ -151,11 +151,14 @@ public class DeadReckoningParameter
 	public static DeadReckoningParameter read( DISInputStream dis ) throws IOException
 	{
 		short deadReckoningAlgorithm = dis.readUI8();
-		byte[] deadReckoningOtherParamaters = new byte [OTHER_PARAMETERS_ARRAY_SIZE];
+		byte[] deadReckoningOtherParamaters = new byte[OTHER_PARAMETERS_ARRAY_SIZE];
 		dis.readFully( deadReckoningOtherParamaters );
-		Vector entityLinearAcceleration = Vector.read( dis );
-		AngularVelocityVector entityAngularVelocity = AngularVelocityVector.read( dis );
+		VectorRecord entityLinearAcceleration = VectorRecord.read( dis );
+		AngularVelocityVector entityAngularVelocity = AngularVelocityVector.read(dis);
 		
-		return new DeadReckoningParameter( deadReckoningAlgorithm, deadReckoningOtherParamaters, entityLinearAcceleration, entityAngularVelocity );
+		return new DeadReckoningParameter( deadReckoningAlgorithm,
+		                                   deadReckoningOtherParamaters,
+		                                   entityLinearAcceleration,
+		                                   entityAngularVelocity );
 	}
 }

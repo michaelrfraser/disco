@@ -29,9 +29,9 @@ public class EntitySmoke
 	//                    STATIC VARIABLES
 	//----------------------------------------------------------
 	public static final int NOT_SMOKING = 0;
-	public static final int SMOKE_PLUME_IS_RISING_FROM_THE_ENTITY = 1;
-	public static final int ENTITY_IS_EMITTING_ENGINE_SMOKE = 2;
-	public static final int ENTITY_IS_EMITTING_ENGINE_SMOKE_AND_SMOKE_PLUME_IS_RISING_FROM_THE_ENTITY = 3;
+	public static final int SMOKE_PLUME = 1;
+	public static final int ENGINE_SMOKE = 2;
+	public static final int ENGINE_SMOKE_AND_SMOKE_PLUME = 3;
 
 	//----------------------------------------------------------
 	//                   INSTANCE VARIABLES
@@ -61,8 +61,7 @@ public class EntitySmoke
 	public static int[] getValues()
 	{
 		int[] values =
-		    { NOT_SMOKING, SMOKE_PLUME_IS_RISING_FROM_THE_ENTITY, ENTITY_IS_EMITTING_ENGINE_SMOKE,
-		     ENTITY_IS_EMITTING_ENGINE_SMOKE_AND_SMOKE_PLUME_IS_RISING_FROM_THE_ENTITY };
+		    { NOT_SMOKING, SMOKE_PLUME, ENGINE_SMOKE, ENGINE_SMOKE_AND_SMOKE_PLUME };
 		return values;
 	}
 
@@ -79,14 +78,14 @@ public class EntitySmoke
 		String description = "Undefined";
 		switch( value )
 		{
-			case ENTITY_IS_EMITTING_ENGINE_SMOKE_AND_SMOKE_PLUME_IS_RISING_FROM_THE_ENTITY:
-				description = "Entity is emitting engine smoke and smoke plume is rising from the entity";
+			case ENGINE_SMOKE_AND_SMOKE_PLUME:
+				description = "Entity emitting engine smoke and smoke plume is rising from the entity";
 				break;
-			case ENTITY_IS_EMITTING_ENGINE_SMOKE:
+			case ENGINE_SMOKE:
 				description = "Entity is emitting engine smoke";
 				break;
 
-			case SMOKE_PLUME_IS_RISING_FROM_THE_ENTITY:
+			case SMOKE_PLUME:
 				description = "Smoke plume is rising from the entity";
 				break;
 

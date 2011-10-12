@@ -70,8 +70,7 @@ public class PDUCodec
 		{
 			case PDUType.TRANSMITTER:
 				result = TransmitterPDU.read( header, dis );
-				break;
-				
+				break;				
 			case PDUType.SIGNAL:
 				result = SignalPDU.read( header, dis );
 				break;

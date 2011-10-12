@@ -60,24 +60,21 @@ public class EntityAppearanceEnvironmental
 	@Override
 	public boolean equals( Object other )
 	{
-		boolean equal = false;
+		if( other == this )
+			return true;
 		
-		if ( other == this )
+		if( other instanceof EntityAppearanceEnvironmental )
 		{
-			equal = true;
-		}
-		else
-		{
-			if ( other instanceof EntityAppearanceEnvironmental )
+			EntityAppearanceEnvironmental otherAppearance = (EntityAppearanceEnvironmental)other;
+			if( otherAppearance.density == this.density &&
+			    otherAppearance.unused == this.unused &&
+			    otherAppearance.environmentalSpecific == this.environmentalSpecific )
 			{
-				EntityAppearanceEnvironmental asEntityAppearanceEnvironmental = (EntityAppearanceEnvironmental)other;
-				equal = asEntityAppearanceEnvironmental.density == this.density
-					&& asEntityAppearanceEnvironmental.unused == this.unused
-					&& asEntityAppearanceEnvironmental.environmentalSpecific == this.environmentalSpecific;
+				return true;
 			}
 		}
 		
-		return equal;
+		return false;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////

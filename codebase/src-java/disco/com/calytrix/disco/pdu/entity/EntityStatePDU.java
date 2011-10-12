@@ -29,7 +29,7 @@ import com.calytrix.disco.pdu.record.EntityMarking;
 import com.calytrix.disco.pdu.record.EntityType;
 import com.calytrix.disco.pdu.record.EulerAngles;
 import com.calytrix.disco.pdu.record.PDUHeader;
-import com.calytrix.disco.pdu.record.Vector;
+import com.calytrix.disco.pdu.record.VectorRecord;
 import com.calytrix.disco.pdu.record.WorldCoordinate;
 
 /**
@@ -55,7 +55,7 @@ public class EntityStatePDU extends PDU
 	private short forceID;
 	private EntityType entityType;
 	private EntityType alternativeEntityType;
-	private Vector entityLinearVelocity;
+	private VectorRecord entityLinearVelocity;
 	private WorldCoordinate entityLocation;
 	private EulerAngles entityOrientation;
 	private EntityAppearance entityAppearance;
@@ -67,12 +67,18 @@ public class EntityStatePDU extends PDU
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
-	public EntityStatePDU( PDUHeader pduHeader, EntityIdentifier entityID, short forceID,
-	                       EntityType entityType, EntityType alternativeEntityType,
-	                       Vector entityLinearVelocity, WorldCoordinate entityLocation,
-	                       EulerAngles entityOrientation, EntityAppearance entityAppearance,
+	public EntityStatePDU( PDUHeader pduHeader,
+	                       EntityIdentifier entityID,
+	                       short forceID,
+	                       EntityType entityType,
+	                       EntityType alternativeEntityType,
+	                       VectorRecord entityLinearVelocity,
+	                       WorldCoordinate entityLocation,
+	                       EulerAngles entityOrientation,
+	                       EntityAppearance entityAppearance,
 	                       DeadReckoningParameter deadReckoningParameter,
-	                       EntityMarking entityMarking, EntityCapabilities entityCapabilities,
+	                       EntityMarking entityMarking,
+	                       EntityCapabilities entityCapabilities,
 	                       ArrayList<ArticulationParameter> articulationParameter )
 	{
 		super( pduHeader );
@@ -148,12 +154,12 @@ public class EntityStatePDU extends PDU
     	this.alternativeEntityType = alternativeEntityType;
     }
 
-	public Vector getEntityLinearVelocity()
+	public VectorRecord getEntityLinearVelocity()
     {
     	return entityLinearVelocity;
     }
 
-	public void setEntityLinearVelocity( Vector entityLinearVelocity )
+	public void setEntityLinearVelocity( VectorRecord entityLinearVelocity )
     {
     	this.entityLinearVelocity = entityLinearVelocity;
     }
@@ -242,22 +248,32 @@ public class EntityStatePDU extends PDU
 		short numberOfArticulationParameters = dis.readUI8();
 		EntityType entityType = EntityType.read( dis );
 		EntityType alternativeEntityType = EntityType.read( dis );
-		Vector entityLinearVelocity = Vector.read( dis );
+		VectorRecord entityLinearVelocity = VectorRecord.read( dis );
 		WorldCoordinate entityLocation = WorldCoordinate.read( dis );
 		EulerAngles entityOrientation = EulerAngles.read( dis );
 		EntityAppearance entityAppearance = EntityAppearance.read( dis );
 		DeadReckoningParameter deadReckoningParameters = DeadReckoningParameter.read( dis );
 		EntityMarking entityMarking = EntityMarking.read( dis );
 		EntityCapabilities entityCapabilities = EntityCapabilities.read( dis );
-		ArrayList<ArticulationParameter> articulationParameters = new ArrayList<ArticulationParameter>(numberOfArticulationParameters);
+		ArrayList<ArticulationParameter> articulationParameters =
+				new ArrayList<ArticulationParameter>(numberOfArticulationParameters);
 		for( int i = 0; i < numberOfArticulationParameters; i++ )
 		{
-			articulationParameters.add( ArticulationParameter.read( dis ) );
+			articulationParameters.add( ArticulationParameter.read(dis) );
 		}
 		
-		return new EntityStatePDU( header, entityID, forceID, entityType, alternativeEntityType,
-		                           entityLinearVelocity, entityLocation, entityOrientation,
-		                           entityAppearance, deadReckoningParameters, entityMarking,
-		                           entityCapabilities, articulationParameters );
+		return new EntityStatePDU( header,
+		                           entityID,
+		                           forceID,
+		                           entityType,
+		                           alternativeEntityType,
+		                           entityLinearVelocity,
+		                           entityLocation,
+		                           entityOrientation,
+		                           entityAppearance,
+		                           deadReckoningParameters,
+		                           entityMarking,
+		                           entityCapabilities,
+		                           articulationParameters );
 	}
 }

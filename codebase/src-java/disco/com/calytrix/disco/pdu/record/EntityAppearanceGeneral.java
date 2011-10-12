@@ -51,10 +51,14 @@ public class EntityAppearanceGeneral
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
-	public EntityAppearanceGeneral( byte entityPaintScheme, byte entityMobilityKill,
-	                                byte entityFirePower, byte entityDamage,
-	                                byte entitySmoke, byte entityTrailingEffect,
-	                                byte entityHatchState, byte entityLights,
+	public EntityAppearanceGeneral( byte entityPaintScheme,
+	                                byte entityMobilityKill,
+	                                byte entityFirePower,
+	                                byte entityDamage,
+	                                byte entitySmoke,
+	                                byte entityTrailingEffect,
+	                                byte entityHatchState,
+	                                byte entityLights,
 	                                byte entityFlamingEffects )
 	{
 		this.entityPaintScheme = entityPaintScheme;
@@ -78,30 +82,27 @@ public class EntityAppearanceGeneral
 	@Override
 	public boolean equals( Object other )
 	{
-		boolean equal = false;
+		if( other == this )
+			return true;
 		
-		if ( other == this )
+		if( other instanceof EntityAppearanceGeneral )
 		{
-			equal = true;
-		}
-		else
-		{
-			if ( other instanceof EntityAppearanceGeneral )
+			EntityAppearanceGeneral otherAppearance = (EntityAppearanceGeneral)other;
+			if( otherAppearance.entityPaintScheme == this.entityPaintScheme &&
+			    otherAppearance.entityMobilityKill == this.entityMobilityKill &&
+			    otherAppearance.entityFirePower == this.entityFirePower &&
+			    otherAppearance.entityDamage == this.entityDamage &&
+			    otherAppearance.entitySmoke == this.entitySmoke &&
+			    otherAppearance.entityTrailingEffect == this.entityTrailingEffect &&
+			    otherAppearance.entityHatchState == this.entityHatchState &&
+			    otherAppearance.entityLights == this.entityLights &&
+			    otherAppearance.entityFlamingEffect == this.entityFlamingEffect )
 			{
-				EntityAppearanceGeneral asEntityAppearanceGeneral = (EntityAppearanceGeneral)other;
-				equal = asEntityAppearanceGeneral.entityPaintScheme == this.entityPaintScheme
-					&& asEntityAppearanceGeneral.entityMobilityKill == this.entityMobilityKill
-					&& asEntityAppearanceGeneral.entityFirePower == this.entityFirePower
-					&& asEntityAppearanceGeneral.entityDamage == this.entityDamage
-					&& asEntityAppearanceGeneral.entitySmoke == this.entitySmoke
-					&& asEntityAppearanceGeneral.entityTrailingEffect == this.entityTrailingEffect
-					&& asEntityAppearanceGeneral.entityHatchState == this.entityHatchState
-					&& asEntityAppearanceGeneral.entityLights == this.entityLights
-					&& asEntityAppearanceGeneral.entityFlamingEffect == this.entityFlamingEffect;
+				return true;
 			}
 		}
 		
-		return equal;
+		return false;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////
@@ -228,8 +229,14 @@ public class EntityAppearanceGeneral
 		byte entityLights = (byte)((ch2 & 0x0E) >> 1);
 		byte entityFlamingEffect = (byte)((ch2 & 0x01) >> 0);
 		
-		return new EntityAppearanceGeneral( entityPaintScheme, entityMobilityKill, entityFirePower,
-		                                    entityDamage, entitySmoke, entityTrailingEffect,
-		                                    entityHatchState, entityLights, entityFlamingEffect );
+		return new EntityAppearanceGeneral( entityPaintScheme,
+		                                    entityMobilityKill,
+		                                    entityFirePower,
+		                                    entityDamage,
+		                                    entitySmoke,
+		                                    entityTrailingEffect,
+		                                    entityHatchState,
+		                                    entityLights,
+		                                    entityFlamingEffect );
 	}
 }

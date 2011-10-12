@@ -77,29 +77,26 @@ public class EntityAppearanceSpecificVariant
 	@Override
 	public boolean equals( Object other )
 	{
-		boolean equal = false;
-		
-		if ( other == this )
+		if( this == other )
+			return true;
+
+		if( other instanceof EntityAppearanceSpecificVariant )
 		{
-			equal = true;
-		}
-		else
-		{
-			if ( other instanceof EntityAppearanceSpecificVariant )
+			EntityAppearanceSpecificVariant otherAppearance = (EntityAppearanceSpecificVariant)other;
+			if( otherAppearance.landPlatforms == this.landPlatforms &&
+			    otherAppearance.airPlatforms == this.airPlatforms &&
+			    otherAppearance.surfacePlatforms == this.surfacePlatforms &&
+			    otherAppearance.subsurfacePlatforms == this.subsurfacePlatforms &&
+			    otherAppearance.spacePlatforms == this.spacePlatforms &&
+			    otherAppearance.guidedMunitions == this.guidedMunitions &&
+			    otherAppearance.lifeforms == this.lifeforms &&
+			    otherAppearance.environmentals == this.environmentals )
 			{
-				EntityAppearanceSpecificVariant asEntityAppearanceSpecificVariant = (EntityAppearanceSpecificVariant)other;
-				equal = asEntityAppearanceSpecificVariant.landPlatforms == this.landPlatforms
-					&& asEntityAppearanceSpecificVariant.airPlatforms == this.airPlatforms
-					&& asEntityAppearanceSpecificVariant.surfacePlatforms == this.surfacePlatforms
-					&& asEntityAppearanceSpecificVariant.subsurfacePlatforms == this.subsurfacePlatforms
-					&& asEntityAppearanceSpecificVariant.spacePlatforms == this.spacePlatforms
-					&& asEntityAppearanceSpecificVariant.guidedMunitions == this.guidedMunitions
-					&& asEntityAppearanceSpecificVariant.lifeforms == this.lifeforms
-					&& asEntityAppearanceSpecificVariant.environmentals == this.environmentals;
+				return true;
 			}
 		}
 		
-		return equal;
+		return false;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////
@@ -201,17 +198,22 @@ public class EntityAppearanceSpecificVariant
 	 */
 	public static EntityAppearanceSpecificVariant read( DISInputStream dis ) throws IOException
 	{
-		EntityAppearanceLandPlatform landPlatforms = EntityAppearanceLandPlatform.read( dis );
-		EntityAppearanceAirPlatform airPlatforms = EntityAppearanceAirPlatform.read( dis );
-		EntityAppearanceGenericPlatform surfacePlatforms = EntityAppearanceGenericPlatform.read( dis );
-		EntityAppearanceGenericPlatform subsurfacePlatforms = EntityAppearanceGenericPlatform.read( dis );
-		EntityAppearanceGenericPlatform spacePlatforms = EntityAppearanceGenericPlatform.read( dis );
-		EntityAppearanceGuidedMunitions guidedMunitions = EntityAppearanceGuidedMunitions.read( dis );
-		EntityAppearanceLifeform lifeforms = EntityAppearanceLifeform.read( dis );
-		EntityAppearanceEnvironmental environmentals = EntityAppearanceEnvironmental.read( dis );
+		EntityAppearanceLandPlatform landPlatforms = EntityAppearanceLandPlatform.read(dis);
+		EntityAppearanceAirPlatform airPlatforms = EntityAppearanceAirPlatform.read(dis);
+		EntityAppearanceGenericPlatform surfacePlatforms = EntityAppearanceGenericPlatform.read(dis);
+		EntityAppearanceGenericPlatform subsurfacePlatforms = EntityAppearanceGenericPlatform.read(dis);
+		EntityAppearanceGenericPlatform spacePlatforms = EntityAppearanceGenericPlatform.read(dis);
+		EntityAppearanceGuidedMunitions guidedMunitions = EntityAppearanceGuidedMunitions.read(dis);
+		EntityAppearanceLifeform lifeforms = EntityAppearanceLifeform.read(dis);
+		EntityAppearanceEnvironmental environmentals = EntityAppearanceEnvironmental.read(dis);
 		
-		return new EntityAppearanceSpecificVariant( landPlatforms, airPlatforms, surfacePlatforms, 
-		                                     subsurfacePlatforms, spacePlatforms, guidedMunitions, 
-		                                     lifeforms, environmentals );
+		return new EntityAppearanceSpecificVariant( landPlatforms,
+		                                            airPlatforms,
+		                                            surfacePlatforms, 
+		                                            subsurfacePlatforms,
+		                                            spacePlatforms,
+		                                            guidedMunitions, 
+		                                            lifeforms,
+		                                            environmentals );
 	}
 }

@@ -54,23 +54,20 @@ public class EntityAppearance
 	@Override
 	public boolean equals( Object other )
 	{
-		boolean equal = false;
+		if( this == other )
+			return true;
 		
-		if ( other == this )
+		if( other instanceof EntityAppearance )
 		{
-			equal = true;
-		}
-		else
-		{
-			if ( other instanceof EntityAppearance )
+			EntityAppearance otherAppearance = (EntityAppearance)other;
+			if( otherAppearance.generalAppearance.equals(this.generalAppearance) &&
+				otherAppearance.specificAppearanceVariant.equals(this.specificAppearanceVariant) )
 			{
-				EntityAppearance asEntityAppearance = (EntityAppearance)other;
-				equal = asEntityAppearance.generalAppearance.equals( this.generalAppearance )
-					&& asEntityAppearance.specificAppearanceVariant.equals( this.specificAppearanceVariant );
+				return true;
 			}
 		}
 		
-		return equal;
+		return false;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////

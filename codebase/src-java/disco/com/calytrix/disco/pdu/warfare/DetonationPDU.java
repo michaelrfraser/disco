@@ -26,7 +26,7 @@ import com.calytrix.disco.pdu.record.EntityCoordinate;
 import com.calytrix.disco.pdu.record.EntityIdentifier;
 import com.calytrix.disco.pdu.record.EventIdentifier;
 import com.calytrix.disco.pdu.record.PDUHeader;
-import com.calytrix.disco.pdu.record.Vector;
+import com.calytrix.disco.pdu.record.VectorRecord;
 import com.calytrix.disco.pdu.record.WorldCoordinate;
 
 /**
@@ -51,7 +51,7 @@ public class DetonationPDU extends PDU
 	private EntityIdentifier targetEntityID;
 	private EntityIdentifier munitionID;
 	private EventIdentifier eventID;
-	private Vector velocity;
+	private VectorRecord velocity;
 	private WorldCoordinate locationInWorld;
 	private BurstDescriptor burstDescriptor;
 	private EntityCoordinate locationInEntityCoordinates;
@@ -61,12 +61,17 @@ public class DetonationPDU extends PDU
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
-	public DetonationPDU( PDUHeader header, EntityIdentifier firingEntityID,
-	                      EntityIdentifier targetEntityID, EntityIdentifier munitionID,
-	                      EventIdentifier eventID, Vector velocity,
-	                      WorldCoordinate locationInWorld, BurstDescriptor burstDescriptor,
+	public DetonationPDU( PDUHeader header,
+	                      EntityIdentifier firingEntityID,
+	                      EntityIdentifier targetEntityID,
+	                      EntityIdentifier munitionID,
+	                      EventIdentifier eventID,
+	                      VectorRecord velocity,
+	                      WorldCoordinate locationInWorld,
+	                      BurstDescriptor burstDescriptor,
 	                      EntityCoordinate locationInEntityCoordinates,
-	                      short detonationResult, ArrayList<ArticulationParameter> articulationParameter )
+	                      short detonationResult,
+	                      ArrayList<ArticulationParameter> articulationParameter )
 	{
 		super( header );
 		
@@ -144,12 +149,12 @@ public class DetonationPDU extends PDU
     	this.eventID = eventID;
     }
 
-	public Vector getVelocity()
+	public VectorRecord getVelocity()
     {
     	return velocity;
     }
 
-	public void setVelocity( Vector velocity )
+	public void setVelocity( VectorRecord velocity )
     {
     	this.velocity = velocity;
     }
@@ -216,7 +221,7 @@ public class DetonationPDU extends PDU
 		EntityIdentifier targetEntityID = EntityIdentifier.read( dis );
 		EntityIdentifier munitionID = EntityIdentifier.read( dis );
 		EventIdentifier eventID = EventIdentifier.read( dis );
-		Vector velocity = Vector.read( dis );
+		VectorRecord velocity = VectorRecord.read( dis );
 		WorldCoordinate locationInWorld = WorldCoordinate.read( dis );
 		BurstDescriptor burstDescriptor = BurstDescriptor.read( dis );
 		EntityCoordinate locationInEntityCoordinates = EntityCoordinate.read( dis );
@@ -229,9 +234,16 @@ public class DetonationPDU extends PDU
 			articulationParameters.add( ArticulationParameter.read( dis ) );
 		}
 		
-		return new DetonationPDU( header, firingEntityID, targetEntityID, munitionID, eventID,
-		                          velocity, locationInWorld, burstDescriptor,
-		                          locationInEntityCoordinates, detonationResult,
+		return new DetonationPDU( header,
+		                          firingEntityID,
+		                          targetEntityID,
+		                          munitionID,
+		                          eventID,
+		                          velocity,
+		                          locationInWorld,
+		                          burstDescriptor,
+		                          locationInEntityCoordinates, 
+		                          detonationResult,
 		                          articulationParameters );
 	}
 }

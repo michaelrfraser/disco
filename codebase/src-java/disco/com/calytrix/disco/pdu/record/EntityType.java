@@ -50,8 +50,13 @@ public class EntityType
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
-	public EntityType( short entityKind, short domain, int country, 
-	                   short category, short subcategory, short specific, short extra )
+	public EntityType( short entityKind,
+	                   short domain,
+	                   int country, 
+	                   short category,
+	                   short subcategory,
+	                   short specific,
+	                   short extra )
 	{
 		this.entityKind = entityKind;
 		this.domain = domain;
@@ -71,28 +76,25 @@ public class EntityType
 	@Override
 	public boolean equals( Object other )
 	{
-		boolean equal = false;
+		if( this == other )
+			return true;
 		
-		if ( other == this )
+		if( other instanceof EntityType )
 		{
-			equal = true;
-		}
-		else
-		{
-			if ( other instanceof EntityType )
+			EntityType otherType = (EntityType)other;
+			if( otherType.entityKind == entityKind &&
+				otherType.domain == domain &&
+				otherType.country == country &&
+				otherType.category == category &&
+				otherType.subcategory == subcategory &&
+				otherType.specific == specific &&
+				otherType.extra == extra )
 			{
-				EntityType asEntityType = (EntityType)other;
-				equal = asEntityType.entityKind == entityKind 
-					&& asEntityType.domain == domain
-					&& asEntityType.country == country
-					&& asEntityType.category == category
-					&& asEntityType.subcategory == subcategory
-					&& asEntityType.specific == specific
-					&& asEntityType.extra == extra;
+				return false;
 			}
 		}
-		
-		return equal;
+
+		return false;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////

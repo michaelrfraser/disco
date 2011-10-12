@@ -62,24 +62,21 @@ public class EulerAngles
 	@Override
 	public boolean equals( Object other )
 	{
-		boolean equal = false;
-		
-		if ( other == this )
+		if( this == other )
+			return true;
+
+		if( other instanceof EulerAngles )
 		{
-			equal = true;
-		}
-		else
-		{
-			if ( other instanceof EulerAngles )
+			EulerAngles otherAngle = (EulerAngles)other;
+			if( FloatingPointUtils.floatEqual(otherAngle.psi,this.psi) &&
+				FloatingPointUtils.floatEqual(otherAngle.theta,this.theta) &&
+				FloatingPointUtils.floatEqual(otherAngle.phi,this.phi) )
 			{
-				EulerAngles asEulerAngles = (EulerAngles)other;
-				equal = FloatingPointUtils.floatEqual( asEulerAngles.psi, this.psi )
-					&& FloatingPointUtils.floatEqual( asEulerAngles.theta, this.theta )
-					&& FloatingPointUtils.floatEqual( asEulerAngles.phi, this.phi );
+				return true;
 			}
 		}
-		
-		return equal;
+
+		return false;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////

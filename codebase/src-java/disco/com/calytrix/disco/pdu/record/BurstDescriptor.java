@@ -60,26 +60,23 @@ public class BurstDescriptor
 	@Override
 	public boolean equals( Object other )
 	{
-		boolean equal = false;
+		if( this == other )
+			return true;
 		
-		if ( other == this )
+		if ( other instanceof BurstDescriptor )
 		{
-			equal = true;
-		}
-		else
-		{
-			if ( other instanceof BurstDescriptor )
+			BurstDescriptor asBurstDescriptor = (BurstDescriptor)other;
+			if( asBurstDescriptor.munition.equals(this.munition) && 
+			    asBurstDescriptor.warhead == this.warhead &&
+			    asBurstDescriptor.fuse == this.fuse &&
+			    asBurstDescriptor.quantity == this.quantity &&
+			    asBurstDescriptor.rate == this.rate )
 			{
-				BurstDescriptor asBurstDescriptor = (BurstDescriptor)other;
-				equal = asBurstDescriptor.munition.equals( this.munition) 
-					&& asBurstDescriptor.warhead == this.warhead
-					&& asBurstDescriptor.fuse == this.fuse
-					&& asBurstDescriptor.quantity == this.quantity
-					&& asBurstDescriptor.rate == this.rate;
+				return true;
 			}
 		}
 		
-		return equal;
+		return false;
 	}
 	
     ////////////////////////////////////////////////////////////////////////////////////////////

@@ -52,9 +52,16 @@ public class EntityAppearanceLandPlatform
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
 	
-	public EntityAppearanceLandPlatform( byte launcher, byte camouflageType, byte concealed,
-	                                     byte unused, byte frozenStatus, byte powerPlantStatus,
-	                                     byte state, byte tent, byte ramp, byte entitySpecific )
+	public EntityAppearanceLandPlatform( byte launcher,
+	                                     byte camouflageType,
+	                                     byte concealed,
+	                                     byte unused,
+	                                     byte frozenStatus,
+	                                     byte powerPlantStatus,
+	                                     byte state,
+	                                     byte tent,
+	                                     byte ramp,
+	                                     byte entitySpecific )
 	{
 		this.launcher = launcher;
 		this.camouflageType = camouflageType;
@@ -77,31 +84,28 @@ public class EntityAppearanceLandPlatform
 	@Override
 	public boolean equals( Object other )
 	{
-		boolean equal = false;
-		
-		if ( other == this )
+		if( this == other )
+			return true;
+
+		if( other instanceof EntityAppearanceLandPlatform )
 		{
-			equal = true;
-		}
-		else
-		{
-			if ( other instanceof EntityAppearanceLandPlatform )
+			EntityAppearanceLandPlatform otherAppearance = (EntityAppearanceLandPlatform)other;
+			if( otherAppearance.launcher == this.launcher &&
+			    otherAppearance.camouflageType == this.camouflageType &&
+			    otherAppearance.concealed == this.concealed &&
+			    otherAppearance.unused == this.unused &&
+			    otherAppearance.frozenStatus == this.frozenStatus &&
+			    otherAppearance.powerPlantStatus == this.powerPlantStatus &&
+			    otherAppearance.state == this.state &&
+			    otherAppearance.tent == this.tent &&
+			    otherAppearance.ramp == this.ramp &&
+			    otherAppearance.entitySpecific == this.entitySpecific )
 			{
-				EntityAppearanceLandPlatform asEntityAppearanceLandPlatform = (EntityAppearanceLandPlatform)other;
-				equal = asEntityAppearanceLandPlatform.launcher == this.launcher
-					&& asEntityAppearanceLandPlatform.camouflageType == this.camouflageType
-					&& asEntityAppearanceLandPlatform.concealed == this.concealed
-					&& asEntityAppearanceLandPlatform.unused == this.unused
-					&& asEntityAppearanceLandPlatform.frozenStatus == this.frozenStatus
-					&& asEntityAppearanceLandPlatform.powerPlantStatus == this.powerPlantStatus
-					&& asEntityAppearanceLandPlatform.state == this.state
-					&& asEntityAppearanceLandPlatform.tent == this.tent
-					&& asEntityAppearanceLandPlatform.ramp == this.ramp
-					&& asEntityAppearanceLandPlatform.entitySpecific == this.entitySpecific;
+				return true;
 			}
 		}
 		
-		return equal;
+		return false;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////
@@ -239,8 +243,15 @@ public class EntityAppearanceLandPlatform
 		byte ramp = (byte)((ch2 & 0x40) >> 6);
 		byte entitySpecific = (byte)((ch2 & 0x3F) >> 0);
 
-		return new EntityAppearanceLandPlatform( launcher, camouflageType, concealed, unused,
-		                                         frozenStatus, powerPlantStatus, state, tent, ramp,
+		return new EntityAppearanceLandPlatform( launcher,
+		                                         camouflageType,
+		                                         concealed,
+		                                         unused,
+		                                         frozenStatus,
+		                                         powerPlantStatus,
+		                                         state,
+		                                         tent,
+		                                         ramp,
 		                                         entitySpecific );
 	}
 }

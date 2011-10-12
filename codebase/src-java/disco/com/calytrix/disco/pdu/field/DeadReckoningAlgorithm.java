@@ -30,14 +30,14 @@ public class DeadReckoningAlgorithm
 	//----------------------------------------------------------
 	public static final int OTHER = 0;
 	public static final int STATIC = 1;
-	public static final int DRM_F_P_W = 2;
-	public static final int DRM_R_P_W = 3;
-	public static final int DRM_R_V_W = 4;
-	public static final int DRM_F_V_W = 5;
-	public static final int DRM_F_P_B = 6;
-	public static final int DRM_R_P_B = 7;
-	public static final int DRM_R_V_B = 8;
-	public static final int DRM_F_V_B = 9;
+	public static final int FPW = 2;
+	public static final int RPW = 3;
+	public static final int RVW = 4;
+	public static final int FVW = 5;
+	public static final int FPB = 6;
+	public static final int RPB = 7;
+	public static final int RVB = 8;
+	public static final int FVB = 9;
 
 	//----------------------------------------------------------
 	//                   INSTANCE VARIABLES
@@ -66,9 +66,16 @@ public class DeadReckoningAlgorithm
 	 */
 	public static int[] getValues()
 	{
-		int[] values =
-		    { OTHER, STATIC, DRM_F_P_W, DRM_R_P_W, DRM_R_V_W, DRM_F_V_W, DRM_F_P_B, DRM_R_P_B,
-		     DRM_R_V_B, DRM_F_V_B };
+		int[] values = { OTHER,
+		                 STATIC,
+		                 FPW,
+		                 RPW,
+		                 RVW,
+		                 FVW,
+		                 FPB,
+		                 RPB,
+		                 RVB,
+		                 FVB };
 		return values;
 	}
 	
@@ -85,40 +92,40 @@ public class DeadReckoningAlgorithm
 		String description = "Undefined";
 		switch( value )
 		{		
-			case DRM_F_V_B:
-				description = "DRM_F_V_B";
+			case FVB:
+				description = "FVB";
 				break;
 				
-			case DRM_R_V_B:
-				description = "DRM(R, V, B)";
+			case RVB:
+				description = "RVB";
 				break;
 
-			case DRM_R_P_B:
-				description = "DRM(R, P, B)";
+			case RPB:
+				description = "RPB";
 				break;
 
-			case DRM_F_P_B:
-				description = "DRM(F, P, B)";
+			case FPB:
+				description = "FPB";
 				break;
 
-			case DRM_F_V_W:
-				description = "DRM(F, V, W)";
+			case FVW:
+				description = "FVW";
 				break;
 
-			case DRM_R_V_W:
-				description = "DRM(R, V, W)";
+			case RVW:
+				description = "RVW";
 				break;
 
-			case DRM_R_P_W:
-				description = "DRM(R, P, W)";
+			case RPW:
+				description = "RPW";
 				break;
 
-			case DRM_F_P_W:
-				description = "DRM(F, P, W)";
+			case FPW:
+				description = "FPW";
 				break;
 
 			case STATIC:
-				description = "Static (Entity does not move.)";
+				description = "Static";
 				break;
 
 			case OTHER:

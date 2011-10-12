@@ -50,8 +50,13 @@ public class EntityAppearanceLifeform
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
-	public EntityAppearanceLifeform( byte lifeformState, byte unused, byte frozenStatus,
-	                                 byte unused2, byte activityState, byte weapon1, byte weapon2,
+	public EntityAppearanceLifeform( byte lifeformState,
+	                                 byte unused,
+	                                 byte frozenStatus,
+	                                 byte unused2,
+	                                 byte activityState,
+	                                 byte weapon1,
+	                                 byte weapon2,
 	                                 byte entitySpecific )
 	{
 		this.lifeformState = lifeformState;
@@ -73,29 +78,26 @@ public class EntityAppearanceLifeform
 	@Override
 	public boolean equals( Object other )
 	{
-		boolean equal = false;
+		if( this == other )
+			return true;
 		
-		if ( other == this )
+		if( other instanceof EntityAppearanceLifeform )
 		{
-			equal = true;
-		}
-		else
-		{
-			if ( other instanceof EntityAppearanceLifeform )
+			EntityAppearanceLifeform otherAppearance = (EntityAppearanceLifeform)other;
+			if( otherAppearance.lifeformState == this.lifeformState &&
+				otherAppearance.unused == this.unused &&
+				otherAppearance.frozenStatus == this.frozenStatus &&
+				otherAppearance.unused2 == this.unused2 &&
+				otherAppearance.activityState == this.activityState &&
+				otherAppearance.weapon1 == this.weapon1 &&
+				otherAppearance.weapon2 == this.weapon2 &&
+				otherAppearance.entitySpecific == this.entitySpecific )
 			{
-				EntityAppearanceLifeform asEntityAppearanceLifeform = (EntityAppearanceLifeform)other;
-				equal = asEntityAppearanceLifeform.lifeformState == this.lifeformState
-					&& asEntityAppearanceLifeform.unused == this.unused
-					&& asEntityAppearanceLifeform.frozenStatus == this.frozenStatus
-					&& asEntityAppearanceLifeform.unused2 == this.unused2
-					&& asEntityAppearanceLifeform.activityState == this.activityState
-					&& asEntityAppearanceLifeform.weapon1 == this.weapon1
-					&& asEntityAppearanceLifeform.weapon2 == this.weapon2
-					&& asEntityAppearanceLifeform.entitySpecific == this.entitySpecific;
+				return true;
 			}
 		}
 		
-		return equal;
+		return false;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////
@@ -211,7 +213,13 @@ public class EntityAppearanceLifeform
 		byte weapon2 = (byte)((ch2 & 0x30) >> 4);
 		byte entitySpecific = (byte)((ch2 & 0x0F) >> 0);
 
-		return new EntityAppearanceLifeform( lifeformState, unused, frozenStatus, unused2,
-		                                     activityState, weapon1, weapon2, entitySpecific );
+		return new EntityAppearanceLifeform( lifeformState,
+		                                     unused,
+		                                     frozenStatus,
+		                                     unused2,
+		                                     activityState,
+		                                     weapon1,
+		                                     weapon2,
+		                                     entitySpecific );
 	}
 }

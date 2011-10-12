@@ -67,27 +67,24 @@ public class EntityAppearanceAirPlatform
 	@Override
 	public boolean equals( Object other )
 	{
-		boolean equal = false;
-		
-		if ( other == this )
+		if( this == other )
+			return true;
+
+		if( other instanceof EntityAppearanceAirPlatform )
 		{
-			equal = true;
-		}
-		else
-		{
-			if ( other instanceof EntityAppearanceAirPlatform )
+			EntityAppearanceAirPlatform otherApperance = (EntityAppearanceAirPlatform)other;
+			if( otherApperance.afterburner == this.afterburner && 
+			    otherApperance.unused == this.unused &&
+			    otherApperance.frozenStatus == this.frozenStatus &&
+			    otherApperance.powerPlantStatus == this.powerPlantStatus &&
+			    otherApperance.state == this.state &&
+			    otherApperance.entitySpecific == this.entitySpecific )
 			{
-				EntityAppearanceAirPlatform asEntityAppearanceAirPlatform = (EntityAppearanceAirPlatform)other;
-				equal = asEntityAppearanceAirPlatform.afterburner == this.afterburner
-					&& asEntityAppearanceAirPlatform.unused == this.unused
-					&& asEntityAppearanceAirPlatform.frozenStatus == this.frozenStatus
-					&& asEntityAppearanceAirPlatform.powerPlantStatus == this.powerPlantStatus
-					&& asEntityAppearanceAirPlatform.state == this.state
-					&& asEntityAppearanceAirPlatform.entitySpecific == this.entitySpecific;
+				return true;
 			}
 		}
 		
-		return equal;
+		return false;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////

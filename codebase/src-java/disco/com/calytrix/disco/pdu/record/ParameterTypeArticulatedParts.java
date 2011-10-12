@@ -58,23 +58,17 @@ public class ParameterTypeArticulatedParts
 	@Override
 	public boolean equals( Object other )
 	{
-		boolean equal = false;
+		if( this == other )
+			return true;
 		
-		if ( other == this )
+		if( other instanceof ParameterTypeArticulatedParts )
 		{
-			equal = true;
+			ParameterTypeArticulatedParts otherParts = (ParameterTypeArticulatedParts)other;
+			if( otherParts.lowBits == this.lowBits && otherParts.highBits == this.highBits )
+				return true;
 		}
-		else
-		{
-			if ( other instanceof ParameterTypeArticulatedParts )
-			{
-				ParameterTypeArticulatedParts asParameterTypeArticulatedParts = (ParameterTypeArticulatedParts)other;
-				equal = asParameterTypeArticulatedParts.lowBits == this.lowBits
-					&& asParameterTypeArticulatedParts.highBits == this.highBits;
-			}
-		}
-		
-		return equal;
+
+		return false;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////

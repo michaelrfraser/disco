@@ -29,7 +29,7 @@ import com.calytrix.disco.util.FloatingPointUtils;
  * 
  * 
  */
-public class Vector
+public class VectorRecord
 {
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
@@ -45,8 +45,9 @@ public class Vector
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
-	public Vector( float firstVectorComponent, float secondVectorComponent,
-	                       float thirdVectorComponent )
+	public VectorRecord( float firstVectorComponent,
+	                     float secondVectorComponent,
+	                     float thirdVectorComponent )
 	{
 		this.firstVectorComponent = firstVectorComponent;
 		this.secondVectorComponent = secondVectorComponent;
@@ -62,24 +63,21 @@ public class Vector
 	@Override
 	public boolean equals( Object other )
 	{
-		boolean equal = false;
+		if( this == other )
+			return true;
 		
-		if ( other == this )
+		if( other instanceof VectorRecord )
 		{
-			equal = true;
-		}
-		else
-		{
-			if ( other instanceof Vector )
+			VectorRecord otherVector = (VectorRecord)other;
+			if( FloatingPointUtils.floatEqual(otherVector.firstVectorComponent,this.firstVectorComponent) &&
+			    FloatingPointUtils.floatEqual(otherVector.secondVectorComponent,this.secondVectorComponent) &&
+			    FloatingPointUtils.floatEqual(otherVector.thirdVectorComponent,this.thirdVectorComponent) )
 			{
-				Vector asVector = (Vector)other;
-				equal = FloatingPointUtils.floatEqual( asVector.firstVectorComponent, this.firstVectorComponent )
-					&& FloatingPointUtils.floatEqual( asVector.secondVectorComponent, this.secondVectorComponent )
-					&& FloatingPointUtils.floatEqual( asVector.thirdVectorComponent, this.thirdVectorComponent );
+				return true;
 			}
 		}
 		
-		return equal;
+		return false;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////
@@ -128,12 +126,12 @@ public class Vector
 	 * @throws IOException Thrown if an error occurred reading the record from
 	 * the stream.
 	 */
-    public static Vector read( DISInputStream dis ) throws IOException
+    public static VectorRecord read( DISInputStream dis ) throws IOException
 	{
 		float firstVectorComponent = dis.readFloat();
-		float SecondVectorComponent = dis.readFloat();
-		float ThirdVectorComponent = dis.readFloat();
+		float secondVectorComponent = dis.readFloat();
+		float thirdVectorComponent = dis.readFloat();
 		
-		return new Vector( firstVectorComponent, SecondVectorComponent, ThirdVectorComponent );
+		return new VectorRecord( firstVectorComponent, secondVectorComponent, thirdVectorComponent );
 	}
 }

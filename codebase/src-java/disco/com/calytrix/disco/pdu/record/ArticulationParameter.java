@@ -50,8 +50,10 @@ public class ArticulationParameter
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
-	public ArticulationParameter( short parameterTypeDesignator, short parameterChangeIndicator,
-	                              int articulationAttachmentID, ParameterType parameterTypeVariant,
+	public ArticulationParameter( short parameterTypeDesignator,
+	                              short parameterChangeIndicator,
+	                              int articulationAttachmentID,
+	                              ParameterType parameterTypeVariant,
 	                              BigInteger articulationParamterValue )
 	{
 		this.parameterTypeDesignator = parameterTypeDesignator;
@@ -70,26 +72,23 @@ public class ArticulationParameter
 	@Override
 	public boolean equals( Object other )
 	{
-		boolean equal = false;
-		
-		if ( other == this )
+		if( this == other )
+			return true;
+
+		if( other instanceof ArticulationParameter )
 		{
-			equal = true;
-		}
-		else
-		{
-			if ( other instanceof ArticulationParameter )
+			ArticulationParameter otherParam = (ArticulationParameter)other;
+			if( otherParam.parameterTypeDesignator == this.parameterTypeDesignator && 
+			    otherParam.parameterChangeIndicator == this.parameterChangeIndicator &&
+			    otherParam.articulationAttachmentID == this.articulationAttachmentID &
+			    otherParam.parameterTypeVariant.equals(this.parameterTypeVariant) &&
+			    otherParam.articulationParamterValue.equals(this.articulationParamterValue) )
 			{
-				ArticulationParameter asArticulationParameter = (ArticulationParameter)other;
-				equal = asArticulationParameter.parameterTypeDesignator == this.parameterTypeDesignator 
-					&& asArticulationParameter.parameterChangeIndicator == this.parameterChangeIndicator
-					&& asArticulationParameter.articulationAttachmentID == this.articulationAttachmentID
-					&& asArticulationParameter.parameterTypeVariant.equals( this.parameterTypeVariant )
-					&& asArticulationParameter.articulationParamterValue.equals( this.articulationParamterValue );
+				return true;
 			}
 		}
 		
-		return equal;
+		return false;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////
@@ -159,16 +158,17 @@ public class ArticulationParameter
 	 * the stream.
 	 */
 	public static ArticulationParameter read( DISInputStream dis ) throws IOException
-	{
-		
+	{	
 		short parameterTypeDesignator = dis.readUI8();
 		short parameterChangeIndicator = dis.readUI8();
 		int articulationAttachmentID = dis.readUI16();
 		ParameterType parameterTypeVariant = ParameterType.read( dis );
 		BigInteger articulationParamterValue = dis.readUI64();
 		
-		return new ArticulationParameter( parameterTypeDesignator, parameterChangeIndicator, 
-		                                  articulationAttachmentID, parameterTypeVariant,
+		return new ArticulationParameter( parameterTypeDesignator,
+		                                  parameterChangeIndicator, 
+		                                  articulationAttachmentID,
+		                                  parameterTypeVariant,
 		                                  articulationParamterValue );
 	}
 }

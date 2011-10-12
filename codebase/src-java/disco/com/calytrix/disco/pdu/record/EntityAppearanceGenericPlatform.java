@@ -47,8 +47,11 @@ public class EntityAppearanceGenericPlatform
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
-	public EntityAppearanceGenericPlatform( byte unused, byte frozenStatus, byte powerPlantStatus,
-	                                        byte state, short entitySpecific )
+	public EntityAppearanceGenericPlatform( byte unused,
+	                                        byte frozenStatus,
+	                                        byte powerPlantStatus,
+	                                        byte state, 
+	                                       short entitySpecific )
 	{
 		this.unused = unused;
 		this.frozenStatus = frozenStatus;
@@ -66,26 +69,23 @@ public class EntityAppearanceGenericPlatform
 	@Override
 	public boolean equals( Object other )
 	{
-		boolean equal = false;
+		if( this == other )
+			return true;
 		
-		if ( other == this )
+		if( other instanceof EntityAppearanceGenericPlatform )
 		{
-			equal = true;
-		}
-		else
-		{
-			if ( other instanceof EntityAppearanceGenericPlatform )
+			EntityAppearanceGenericPlatform otherAppearance = (EntityAppearanceGenericPlatform)other;
+			if( otherAppearance.unused == this.unused &&
+			    otherAppearance.frozenStatus == this.frozenStatus &&
+			    otherAppearance.powerPlantStatus == this.powerPlantStatus &&
+			    otherAppearance.state == this.state &&
+			    otherAppearance.entitySpecific == this.entitySpecific )
 			{
-				EntityAppearanceGenericPlatform asEntityAppearanceGenericPlatform = (EntityAppearanceGenericPlatform)other;
-				equal = asEntityAppearanceGenericPlatform.unused == this.unused
-					&& asEntityAppearanceGenericPlatform.frozenStatus == this.frozenStatus
-					&& asEntityAppearanceGenericPlatform.powerPlantStatus == this.powerPlantStatus
-					&& asEntityAppearanceGenericPlatform.state == this.state
-					&& asEntityAppearanceGenericPlatform.entitySpecific == this.entitySpecific;
+				return true;
 			}
 		}
 		
-		return equal;
+		return false;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////
@@ -167,7 +167,10 @@ public class EntityAppearanceGenericPlatform
 		byte state = (byte)((ch1 & 0x01) >> 0);
 		short entitySpecific = dis.readUI8();
 
-		return new EntityAppearanceGenericPlatform( unused, frozenStatus, powerPlantStatus,
-		                                        state, entitySpecific );
+		return new EntityAppearanceGenericPlatform( unused,
+		                                            frozenStatus,
+		                                            powerPlantStatus,
+		                                            state,
+		                                            entitySpecific );
 	}
 }

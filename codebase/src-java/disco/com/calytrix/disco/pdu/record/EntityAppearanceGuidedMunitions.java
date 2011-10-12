@@ -47,8 +47,12 @@ public class EntityAppearanceGuidedMunitions
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
-	public EntityAppearanceGuidedMunitions( byte launchFlash, byte unused, byte frozenStatus,
-	                                        byte unused2, byte state, short entitySpecific )
+	public EntityAppearanceGuidedMunitions( byte launchFlash,
+	                                        byte unused,
+	                                        byte frozenStatus,
+	                                        byte unused2,
+	                                        byte state,
+	                                        short entitySpecific )
 	{
 		this.launchFlash = launchFlash;
 		this.unused = unused;
@@ -67,27 +71,24 @@ public class EntityAppearanceGuidedMunitions
 	@Override
 	public boolean equals( Object other )
 	{
-		boolean equal = false;
+		if( this == other )
+			return true;
 		
-		if ( other == this )
+		if( other instanceof EntityAppearanceGuidedMunitions )
 		{
-			equal = true;
-		}
-		else
-		{
-			if ( other instanceof EntityAppearanceGuidedMunitions )
+			EntityAppearanceGuidedMunitions otherApperance = (EntityAppearanceGuidedMunitions)other;
+			if( otherApperance.launchFlash == this.launchFlash &&
+			    otherApperance.unused == this.unused && 
+			    otherApperance.frozenStatus == this.frozenStatus && 
+			    otherApperance.unused2 == this.unused2 && 
+			    otherApperance.state == this.state && 
+			    otherApperance.entitySpecific == this.entitySpecific )
 			{
-				EntityAppearanceGuidedMunitions asEntityAppearanceGuidedMunitions = (EntityAppearanceGuidedMunitions)other;
-				equal = asEntityAppearanceGuidedMunitions.launchFlash == this.launchFlash
-					&& asEntityAppearanceGuidedMunitions.unused == this.unused
-					&& asEntityAppearanceGuidedMunitions.frozenStatus == this.frozenStatus
-					&& asEntityAppearanceGuidedMunitions.unused2 == this.unused2
-					&& asEntityAppearanceGuidedMunitions.state == this.state
-					&& asEntityAppearanceGuidedMunitions.entitySpecific == this.entitySpecific;
+				return true;
 			}
 		}
 		
-		return equal;
+		return false;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////
@@ -180,7 +181,11 @@ public class EntityAppearanceGuidedMunitions
 		byte state = (byte)((ch1 & 0x01) >> 0);
 		short entitySpecific = dis.readUI8();
 
-		return new EntityAppearanceGuidedMunitions( launchFlash, unused, frozenStatus, unused2,
-		                                        state, entitySpecific );
+		return new EntityAppearanceGuidedMunitions( launchFlash,
+		                                            unused,
+		                                            frozenStatus,
+		                                            unused2,
+		                                            state,
+		                                            entitySpecific );
 	}
 }

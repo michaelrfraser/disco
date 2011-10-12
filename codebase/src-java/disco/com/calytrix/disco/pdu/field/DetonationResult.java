@@ -75,14 +75,32 @@ public class DetonationResult
 	 */
 	public static int[] getValues()
 	{
-		int[] values =
-		    { OTHER, ENTITY_IMPACT, ARMORPIERCING_HIT, DIRT_BLAST_SMALL, DIRT_BLAST_MEDIUM,
-		     DIRT_BLAST_LARGE, WATER_BLAST_SMALL, WATER_BLAST_MEDIUM, WATER_BLAST_LARGE, AIR_HIT,
-		     BUILDING_HIT_SMALL, BUILDING_HIT_MEDIUM, ENTITY_PROXIMATE_DETONATION,
-		     BUILDING_HIT_LARGE, MINECLEARING_LINE_CHARGE, ENVIRONMENT_OBJECT_IMPACT,
-		     ENVIRONMENT_OBJECT_PROXIMATE_DETONATION, WATER_IMPACT, AIR_BURST, GROUND_IMPACT,
-		     GROUND_PROXIMATE_DETONATION, DETONATION, NONE, HE_HIT_SMALL, HE_HIT_MEDIUM,
-		     HE_HIT_LARGE };
+		int[] values = { OTHER,
+		                 ENTITY_IMPACT,
+		                 ARMORPIERCING_HIT,
+		                 DIRT_BLAST_SMALL,
+		                 DIRT_BLAST_MEDIUM,
+		                 DIRT_BLAST_LARGE,
+		                 WATER_BLAST_SMALL,
+		                 WATER_BLAST_MEDIUM,
+		                 WATER_BLAST_LARGE,
+		                 AIR_HIT,
+		                 BUILDING_HIT_SMALL,
+		                 BUILDING_HIT_MEDIUM,
+		                 ENTITY_PROXIMATE_DETONATION,
+		                 BUILDING_HIT_LARGE,
+		                 MINECLEARING_LINE_CHARGE,
+		                 ENVIRONMENT_OBJECT_IMPACT,
+		                 ENVIRONMENT_OBJECT_PROXIMATE_DETONATION,
+		                 WATER_IMPACT,
+		                 AIR_BURST,
+		                 GROUND_IMPACT,
+		                 GROUND_PROXIMATE_DETONATION,
+		                 DETONATION,
+		                 NONE,
+		                 HE_HIT_SMALL,
+		                 HE_HIT_MEDIUM,
+		                 HE_HIT_LARGE };
 		return values;
 	}
 	
