@@ -1,7 +1,7 @@
 /*
  *   Copyright 2011 Calytrix Technologies
  *
- *   This file is part of cuttlefish.
+ *   This file is part of Calytrix Disco.
  *
  *   NOTICE:  All information contained herein is, and remains
  *            the property of Calytrix Technologies Pty Ltd.
