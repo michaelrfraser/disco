@@ -17,13 +17,19 @@ package com.calytrix.disco.pdu.record;
 import java.io.IOException;
 
 import com.calytrix.disco.network.DISInputStream;
+import com.calytrix.disco.network.DISOutputStream;
+import com.calytrix.disco.pdu.IPDUComponent;
+import com.calytrix.disco.pdu.field.Country;
+import com.calytrix.disco.pdu.field.Domain;
+import com.calytrix.disco.pdu.field.EntityKind;
+import com.calytrix.disco.util.DISSizes;
 
 /**
  * The type of radio in a DIS exercise shall be specified by a Radio Entity Type 
  * Record. This record shall specify the kind of entity, the domain, the country 
  * of design, and specific information about the radio.
  */
-public class RadioEntityType
+public class RadioEntityType implements IPDUComponent, Cloneable
 {
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
@@ -42,6 +48,11 @@ public class RadioEntityType
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
+	public RadioEntityType()
+	{
+		this( (short)0, (short)0, 0, (short)0, (short)0, 0 );
+	}
+	
 	public RadioEntityType( short entityKind,
 	                        short domain,
 	                        int country, 
@@ -69,7 +80,7 @@ public class RadioEntityType
 		if( other == this )
 			return true;
 		
-		if ( other instanceof RadioEntityType )
+		if( other instanceof RadioEntityType )
 		{
 			RadioEntityType asRadioEntityType = (RadioEntityType)other;
 			if( asRadioEntityType.entityKind == this.entityKind &&
@@ -84,6 +95,64 @@ public class RadioEntityType
 		}
 		
 		return false;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public RadioEntityType clone()
+	{
+		return new RadioEntityType( entityKind, 
+		                            domain, 
+		                            country, 
+		                            category, 
+		                            nomenclatureVersion, 
+		                            nomenclature );
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public void read( DISInputStream dis ) throws IOException
+    {
+		entityKind = dis.readUI8();
+		domain = dis.readUI8();
+		country = dis.readUI16();
+        category = dis.readUI8();
+        nomenclatureVersion = dis.readUI8();
+        nomenclature = dis.readUI16();
+    }
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public void write( DISOutputStream dos ) throws IOException
+    {
+		dos.writeUI8( entityKind );
+		dos.writeUI8( domain );
+		dos.writeUI16( country );
+		dos.writeUI8( category );
+		dos.writeUI8( nomenclatureVersion );
+		dos.writeUI16( nomenclature );
+    }
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public int getByteLength()
+	{
+		int size = EntityKind.BYTE_LENGTH;
+		size += Domain.BYTE_LENGTH;
+		size += Country.BYTE_LENGTH;
+		size += DISSizes.UI8_SIZE;		// Category
+		size += DISSizes.UI8_SIZE;		// Nomenclature Version
+		size += DISSizes.UI16_SIZE;		// Nomenclature
+		
+		return size;
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////
@@ -152,26 +221,4 @@ public class RadioEntityType
 	//----------------------------------------------------------
 	//                     STATIC METHODS
 	//----------------------------------------------------------
-	/**
-	 * Reads an instance of this record from the provided DISInputStream
-	 * 
-	 * @param dis The DISInputStream to read the record from
-	 * 
-	 * @return The RadioEntityType deserialised from the provided input stream
-	 * 
-	 * @throws IOException Thrown if an error occurred reading the record from
-	 * the stream
-	 */
-	public static RadioEntityType read( DISInputStream dis ) throws IOException
-	{
-		short entityKind = dis.readUI8();
-		short domain = dis.readUI8();
-		int country = dis.readUI16();
-        short category = dis.readUI8();
-        short nomenclatureVersion = dis.readUI8();
-        int nomenclature = dis.readUI16();
-        
-        return new RadioEntityType( entityKind, domain, country, category, 
-                                    nomenclatureVersion, nomenclature );
-	}
 }

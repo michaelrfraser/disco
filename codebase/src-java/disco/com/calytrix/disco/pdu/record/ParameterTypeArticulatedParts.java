@@ -23,12 +23,15 @@ package com.calytrix.disco.pdu.record;
 import java.io.IOException;
 
 import com.calytrix.disco.network.DISInputStream;
+import com.calytrix.disco.network.DISOutputStream;
+import com.calytrix.disco.pdu.IPDUComponent;
+import com.calytrix.disco.util.DISSizes;
 
 /**
  * This record represents one of the variants of the Parameter Type Variant, its values are used
  * only when the Parameter Type is Articulated Part (0) rather than Attached Part (1).
  */
-public class ParameterTypeArticulatedParts
+public class ParameterTypeArticulatedParts implements IPDUComponent, Cloneable
 {
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
@@ -43,6 +46,11 @@ public class ParameterTypeArticulatedParts
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
+	public ParameterTypeArticulatedParts()
+	{
+		this( 0, 0 );
+	}
+	
 	public ParameterTypeArticulatedParts( int lowBits, int highBits )
 	{
 		this.lowBits = lowBits;
@@ -71,6 +79,44 @@ public class ParameterTypeArticulatedParts
 		return false;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public ParameterTypeArticulatedParts clone()
+	{
+		return new ParameterTypeArticulatedParts( lowBits, highBits );
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public void read( DISInputStream dis ) throws IOException
+    {
+		lowBits = dis.readUI16();
+		highBits = dis.readUI16();
+    }
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public void write( DISOutputStream dos ) throws IOException
+    {
+		dos.writeUI16( lowBits );
+		dos.writeUI16( highBits );
+    }
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public int getByteLength()
+	{
+		return DISSizes.UI16_SIZE * 2;
+	}
+
 	////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////// Accessor and Mutator Methods ///////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////
@@ -97,21 +143,4 @@ public class ParameterTypeArticulatedParts
 	//----------------------------------------------------------
 	//                     STATIC METHODS
 	//----------------------------------------------------------
-	/**
-	 * Reads an instance of this record from the provided DISInputStream.
-	 * 
-	 * @param dis The DISInputStream to read the record from.
-	 * 
-	 * @return The ParameterTypeArticulatedParts deserialised from the provided input stream.
-	 * 
-	 * @throws IOException Thrown if an error occurred reading the record from
-	 * the stream.
-	 */
-	public static ParameterTypeArticulatedParts read( DISInputStream dis ) throws IOException
-	{
-		int lowBits = dis.readUI16();
-		int highBits = dis.readUI16();
-		
-		return new ParameterTypeArticulatedParts( lowBits, highBits );
-	}
 }

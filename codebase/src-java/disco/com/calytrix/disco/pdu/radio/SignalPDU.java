@@ -17,11 +17,12 @@ package com.calytrix.disco.pdu.radio;
 import java.io.IOException;
 
 import com.calytrix.disco.network.DISInputStream;
-import com.calytrix.disco.pdu.PDU;
+import com.calytrix.disco.network.DISOutputStream;
 import com.calytrix.disco.pdu.field.PDUType;
+import com.calytrix.disco.pdu.field.TDLType;
 import com.calytrix.disco.pdu.record.EncodingScheme;
-import com.calytrix.disco.pdu.record.EntityIdentifier;
 import com.calytrix.disco.pdu.record.PDUHeader;
+import com.calytrix.disco.util.DISSizes;
 
 /**
  * This class represents an Signal PDU.
@@ -30,18 +31,15 @@ import com.calytrix.disco.pdu.record.PDUHeader;
  * 
  * @see "IEEE Std 1278.1-1995 section 4.5.7.3"
  */
-public class SignalPDU extends PDU
+public class SignalPDU extends AbstractRadioPDU
 {
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
 	//----------------------------------------------------------
-	public static final int SIGNAL_BASE_SIZE = 32;
 	
 	//----------------------------------------------------------
 	//                   INSTANCE VARIABLES
 	//----------------------------------------------------------
-	private EntityIdentifier entityIdentifier;
-	private int radioID;
 	private EncodingScheme encodingScheme;
 	private int tdlType;
 	private long sampleRate;
@@ -52,54 +50,87 @@ public class SignalPDU extends PDU
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
-	public SignalPDU( PDUHeader header,
-	                  EntityIdentifier entityIdentifier,
-	                  int radioID, 
-	                  EncodingScheme encodingScheme,
-	                  int tdlType,
-	                  long sampleRate, 
-	                  int dataLength,
-	                  int samples,
-	                  byte[] data )
+	/**
+	 * Constructor for SignalPDU with provided PDUHeader
+	 * 
+	 * @param header The PDUHeader that this PDU will wrap 
+	 */
+	public SignalPDU( PDUHeader header )
 	{
 		super( header );
 		
 		if( header.getPDUType() != PDUType.SIGNAL )
 	    	throw new IllegalStateException( "Invalid PDUType in Header" );
 		
-	    this.entityIdentifier = entityIdentifier;
-	    this.radioID = radioID;
-	    this.encodingScheme = encodingScheme;
-	    this.tdlType = tdlType;
-	    this.sampleRate = sampleRate;
-	    this.samples = samples;
-	    
-	    setData( dataLength, data );
+		this.encodingScheme = new EncodingScheme();
+		this.tdlType = TDLType.OTHER;
+		this.sampleRate = 0;
+		this.samples = 0;
+		setData( new byte[0] );
 	}
-
+	
 	//----------------------------------------------------------
 	//                    INSTANCE METHODS
 	//----------------------------------------------------------
-	public EntityIdentifier getEntityIdentifier()
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void readContent( DISInputStream dis ) throws IOException
 	{
-		return entityIdentifier;
+		super.readContent( dis );
+
+		encodingScheme.read( dis );
+		tdlType = dis.readUI16();
+		sampleRate = dis.readUI32();
+		int dataLength = dis.readUI16();
+		samples = dis.readUI16();
+		
+		boolean lengthAligned = dataLength % 8 == 0;
+		
+		int lengthBytes = dataLength / 8;
+		if( !lengthAligned )
+			++lengthBytes;
+		
+		byte[] data = new byte[lengthBytes];
+		dis.readFully( data );
+		
+		setData( dataLength, data );
 	}
 	
-	public void setEntityIdentifier( EntityIdentifier identifier )
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void writeContent( DISOutputStream dos ) throws IOException
 	{
-		entityIdentifier = identifier;
+		super.writeContent( dos );
+		
+		encodingScheme.write( dos );
+		dos.writeUI16( tdlType );
+		dos.writeUI32( sampleRate );
+		dos.writeUI16( dataLength );
+		dos.writeUI16( samples );
+		dos.write( data );
 	}
 	
-	public int getRadioID()
+	@Override
+	public int getContentLength()
 	{
-		return radioID;
+		int size = super.getContentLength();
+		size += encodingScheme.getByteLength();
+		size += TDLType.BYTE_LENGTH;
+		size += DISSizes.UI32_SIZE;		// Sample Rate
+		size += DISSizes.UI16_SIZE;		// Data Length
+		size += DISSizes.UI16_SIZE;		// Samples
+		size += data.length;
+		
+		return size;
 	}
 	
-	public void setRadioID( int radioID )
-	{
-		this.radioID = radioID;
-	}
-	
+	////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////// Accessor and Mutator Methods ///////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////
 	public EncodingScheme getEncodingScheme()
 	{
 		return encodingScheme;
@@ -158,51 +189,20 @@ public class SignalPDU extends PDU
 		
 	public void setData( int dataLength, byte[] data )
 	{
+		// Ensure the length of the data section is aligned as per the spec
 		boolean lengthAligned = dataLength % 8 == 0;
 		int requiredBytes = dataLength / 8;
-		if ( !lengthAligned )
+		if( !lengthAligned )
 			++requiredBytes;
 		
-		if ( data.length != requiredBytes )
-			throw new IllegalStateException( "Data size mismatch" );
+		if( data.length != requiredBytes )
+			throw new IllegalArgumentException( "Data size mismatch" );
 		
 		this.dataLength = dataLength;
 		this.data = data;
-		
-		PDUHeader header = getHeader();
-		header.setLength( SIGNAL_BASE_SIZE + data.length );
 	}
 	
 	//----------------------------------------------------------
 	//                     STATIC METHODS
 	//----------------------------------------------------------
-	public static SignalPDU read( PDUHeader header, DISInputStream dis ) throws IOException
-	{
-		EntityIdentifier entityIdentifier = EntityIdentifier.read( dis );
-		int radioID = dis.readUI16();
-		EncodingScheme encodingScheme = EncodingScheme.read( dis );
-		int tdlType = dis.readUI16();
-		long sampleRate = dis.readUI32();
-		int dataLength = dis.readUI16();
-		int samples = dis.readUI16();
-		
-		boolean lengthAligned = dataLength % 8 == 0;
-		
-		int lengthBytes = dataLength / 8;
-		if ( !lengthAligned )
-			++lengthBytes;
-		
-		byte[] data = new byte[lengthBytes];
-		dis.readFully( data );
-		
-		return new SignalPDU( header,
-		                      entityIdentifier,
-		                      radioID,
-		                      encodingScheme, 
-		                      tdlType,
-		                      sampleRate, 
-		                      dataLength,
-		                      samples,
-		                      data );
-	}
 }

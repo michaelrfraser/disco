@@ -14,6 +14,8 @@
  */
 package com.calytrix.disco.pdu.field;
 
+import com.calytrix.disco.util.DISSizes;
+
 /**
  * The identification of whether the Parameter Type Record is for an articulated or attached part
  * shall be designated by this field.
@@ -23,8 +25,10 @@ public class ParameterTypeDesignator
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
 	//----------------------------------------------------------
-	public static final int ARTICULATED_PART = 0;
-	public static final int ATTACHED_PART = 1;
+	public static final int BYTE_LENGTH = DISSizes.UI8_SIZE;
+	
+	public static final short ARTICULATED_PART = 0;
+	public static final short ATTACHED_PART = 1;
 
 	//----------------------------------------------------------
 	//                   INSTANCE VARIABLES
@@ -44,12 +48,12 @@ public class ParameterTypeDesignator
 	/**
 	 * Returns the ordered set of values that this enumerated field can assume
 	 * 
-	 * @return An int[] containing the ordered set of values that this 
+	 * @return An short[] containing the ordered set of values that this 
 	 * enumeration field can assume
 	 */
-	public static int[] getValues()
+	public static short[] getValues()
 	{
-		int[] values = { ARTICULATED_PART, ATTACHED_PART };
+		short[] values = { ARTICULATED_PART, ATTACHED_PART };
 		return values;
 	}
 
@@ -61,7 +65,7 @@ public class ParameterTypeDesignator
 	 * @return A String representing the description of the specified field
 	 * value
 	 */
-	public static String getDescription( int value )
+	public static String getDescription( short value )
 	{
 		String description = "Undefined";
 		switch( value )

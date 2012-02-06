@@ -14,6 +14,8 @@
  */
 package com.calytrix.disco.pdu.field;
 
+import com.calytrix.disco.util.DISSizes;
+
 /**
  * This field shall identify the crypto equipment utilized if such equipment is 
  * used with the Transmitter PDU.<br/>
@@ -27,6 +29,8 @@ public class CryptoSystem
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
 	//----------------------------------------------------------
+	public static final int BYTE_LENGTH = DISSizes.UI16_SIZE;
+	
 	public static final int OTHER = 0;
 	public static final int KY_28 = 1;
 	public static final int KY_58 = 2;
@@ -96,7 +100,7 @@ public class CryptoSystem
 				break;
 				
 			case SINCGARS_ICOM:
-				description = "SIMCGARS ICOM";
+				description = "SINCGARS ICOM";
 				break;
 		}
 		

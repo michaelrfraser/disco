@@ -18,13 +18,12 @@
  *   specific language governing permissions and limitations
  *   under the License.
  */
-package com.calytrix.disco.event;
+package com.calytrix.disco.service;
 
 import com.calytrix.disco.pdu.PDU;
 
 /**
- * An interface through which notifications of PDUs being received off the 
- * network can be sent
+ * An interface through which notifications of PDUs being received can be sent
  */
 public interface IPDUListener
 {
@@ -36,10 +35,9 @@ public interface IPDUListener
 	//                    INSTANCE METHODS
 	//----------------------------------------------------------
 	/**
-	 * Notification that the the specified PDU has been received from the 
-	 * DIS network
+	 * Notification that the the specified PDU has been received
 	 *   
-	 * @param pdu The PDU that was received from the DIS network.
+	 * @param pdu The PDU that was received
 	 */
 	public void pduReceived( PDU pdu );
 }

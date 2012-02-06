@@ -18,6 +18,11 @@ import java.io.EOFException;
 import java.io.IOException;
 
 import com.calytrix.disco.network.DISInputStream;
+import com.calytrix.disco.network.DISOutputStream;
+import com.calytrix.disco.pdu.IPDUComponent;
+import com.calytrix.disco.pdu.field.EncodingClass;
+import com.calytrix.disco.pdu.field.EncodingType;
+import com.calytrix.disco.util.DISSizes;
 
 /**
  * This field shall specify the encoding used in the Data field of this PDU. 
@@ -40,7 +45,7 @@ import com.calytrix.disco.network.DISInputStream;
  * @see "IEEE Std 1278.1-1995 section 5.4.8.2(e)"
  * @see "Section 9 of EBV-DOC"
  */
-public class EncodingScheme
+public class EncodingScheme implements IPDUComponent, Cloneable
 {
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
@@ -55,6 +60,11 @@ public class EncodingScheme
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
+	public EncodingScheme()
+	{
+		this( EncodingClass.ENCODED_VOICE, EncodingType.MULAW_8 );
+	}
+	
 	public EncodingScheme( byte encodingClass, short encodingType )
 	{
 		this.encodingClass = encodingClass;
@@ -86,6 +96,55 @@ public class EncodingScheme
 		return false;
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public EncodingScheme clone()
+	{
+		return new EncodingScheme( encodingClass, encodingType );
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public void read( DISInputStream dis ) throws IOException
+    {
+		int ch1 = dis.read();
+		int ch2 = dis.read();
+		
+		if ( (ch1|ch2) < 0 )
+			throw new EOFException();
+		
+		// Encoding class is held in the top two bits, encoding type is the rest
+		encodingClass = (byte)((ch1 & 0xC0) >> 6);
+		encodingType = (short)(((ch1 & 0x3F) << 8) + ch2);
+    }
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public void write( DISOutputStream dos ) throws IOException
+    {
+		// Encoding class is held in the top two bits, encoding type is the rest
+	    int ch1 = ((encodingClass & 0x03) << 6) | ((encodingType & 0x3F00) >> 8);
+	    int ch2 = encodingType & 0xFF;
+	    
+	    dos.write( ch1 );
+	    dos.write( ch2 );
+    }
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public int getByteLength()
+	{
+		// Two bytes
+		return DISSizes.UI8_SIZE * 2;
+	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////// Accessor and Mutator Methods ///////////////////////////////
@@ -113,25 +172,4 @@ public class EncodingScheme
 	//----------------------------------------------------------
 	//                     STATIC METHODS
 	//----------------------------------------------------------
-	/**
-	 * Reads an instance of this record from the provided DISInputStream
-	 * 
-	 * @param dis The DISInputStream to read the record from
-	 * @return The EncodingScheme deserialised from the provided input stream
-	 * @throws IOException Thrown if an error occurred reading the record from
-	 * the stream
-	 */
-	public static EncodingScheme read( DISInputStream dis ) throws IOException
-	{
-		int ch1 = dis.read();
-		int ch2 = dis.read();
-		
-		if ( (ch1|ch2) < 0 )
-			throw new EOFException();
-		
-		byte encodingClass = (byte)((ch1 & 0xC0) >> 6);
-		short encodingType = (short)(((ch1 & 0x3F) << 8) + ch2);
-		
-		return new EncodingScheme( encodingClass, encodingType );
-	}
 }

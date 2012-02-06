@@ -16,13 +16,15 @@ package com.calytrix.disco.pdu.entity;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import com.calytrix.disco.network.DISInputStream;
+import com.calytrix.disco.network.DISOutputStream;
 import com.calytrix.disco.pdu.PDU;
+import com.calytrix.disco.pdu.field.ForceID;
 import com.calytrix.disco.pdu.field.PDUType;
 import com.calytrix.disco.pdu.record.ArticulationParameter;
 import com.calytrix.disco.pdu.record.DeadReckoningParameter;
-import com.calytrix.disco.pdu.record.EntityAppearance;
 import com.calytrix.disco.pdu.record.EntityCapabilities;
 import com.calytrix.disco.pdu.record.EntityIdentifier;
 import com.calytrix.disco.pdu.record.EntityMarking;
@@ -31,6 +33,7 @@ import com.calytrix.disco.pdu.record.EulerAngles;
 import com.calytrix.disco.pdu.record.PDUHeader;
 import com.calytrix.disco.pdu.record.VectorRecord;
 import com.calytrix.disco.pdu.record.WorldCoordinate;
+import com.calytrix.disco.util.DISSizes;
 
 /**
  * This class represents an EntityState PDU.
@@ -45,12 +48,10 @@ public class EntityStatePDU extends PDU
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
 	//----------------------------------------------------------
-	public static final int ENTITY_STATE_BASE_SIZE = 1152;
 
 	//----------------------------------------------------------
 	//                   INSTANCE VARIABLES
 	//----------------------------------------------------------
-	private PDUHeader pduHeader;
 	private EntityIdentifier entityID;
 	private short forceID;
 	private EntityType entityType;
@@ -58,62 +59,131 @@ public class EntityStatePDU extends PDU
 	private VectorRecord entityLinearVelocity;
 	private WorldCoordinate entityLocation;
 	private EulerAngles entityOrientation;
-	private EntityAppearance entityAppearance;
+	private int entityAppearance;
 	private DeadReckoningParameter deadReckoningParameters;
 	private EntityMarking entityMarking;
 	private EntityCapabilities entityCapabilities;
-	private ArrayList<ArticulationParameter> articulationParameter;
+	private List<ArticulationParameter> articulationParameters;
 	
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
-	public EntityStatePDU( PDUHeader pduHeader,
-	                       EntityIdentifier entityID,
-	                       short forceID,
-	                       EntityType entityType,
-	                       EntityType alternativeEntityType,
-	                       VectorRecord entityLinearVelocity,
-	                       WorldCoordinate entityLocation,
-	                       EulerAngles entityOrientation,
-	                       EntityAppearance entityAppearance,
-	                       DeadReckoningParameter deadReckoningParameter,
-	                       EntityMarking entityMarking,
-	                       EntityCapabilities entityCapabilities,
-	                       ArrayList<ArticulationParameter> articulationParameter )
+	/**
+	 * Constructor for EntityStatePDU with provided PDUHeader
+	 * 
+	 * @param pduHeader The PDUHeader that this PDU will wrap 
+	 */
+	public EntityStatePDU( PDUHeader pduHeader )
 	{
 		super( pduHeader );
 		
-		if ( pduHeader.getPDUType() != PDUType.ENTITY_STATE )
+		if( pduHeader.getPDUType() != PDUType.ENTITY_STATE )
 	    	throw new IllegalStateException( "Invalid PDUType in Header" );
 		
-		this.pduHeader = pduHeader;
-		this.entityID = entityID;
-		this.forceID = forceID;
-		this.entityType = entityType;
-		this.alternativeEntityType = alternativeEntityType;
-		this.entityLinearVelocity = entityLinearVelocity;
-		this.entityLocation = entityLocation;
-		this.entityOrientation = entityOrientation;
-		this.entityAppearance = entityAppearance;
-		this.deadReckoningParameters = deadReckoningParameter;
-		this.entityMarking = entityMarking;
-		this.entityCapabilities = entityCapabilities;
-		setArticulationParameter( articulationParameter );
+		this.entityID = new EntityIdentifier();
+		this.forceID = ForceID.OTHER;
+		this.entityType = new EntityType();
+		this.alternativeEntityType = new EntityType();
+		this.entityLinearVelocity = new VectorRecord();
+		this.entityLocation = new WorldCoordinate();
+		this.entityOrientation = new EulerAngles();
+		this.entityAppearance = 0;
+		this.deadReckoningParameters = new DeadReckoningParameter();
+		this.entityMarking = new EntityMarking();
+		this.entityCapabilities = new EntityCapabilities();
+		this.articulationParameters = new ArrayList<ArticulationParameter>();
 	}
 
 	//----------------------------------------------------------
 	//                    INSTANCE METHODS
 	//----------------------------------------------------------
-	public PDUHeader getPduHeader()
-    {
-    	return pduHeader;
-    }
-
-	public void setPduHeader( PDUHeader pduHeader )
-    {
-    	this.pduHeader = pduHeader;
-    }
-
+	/**
+	 * {@inheritDoc} 
+	 */
+	@Override
+	public void readContent( DISInputStream dis ) throws IOException
+	{
+		articulationParameters.clear();
+		
+		entityID.read( dis );
+		forceID = dis.readUI8();
+		short numberOfArticulationParameters = dis.readUI8();
+		entityType.read( dis );
+		alternativeEntityType.read( dis );
+		entityLinearVelocity.read( dis );
+		entityLocation.read( dis );
+		entityOrientation.read( dis );
+		entityAppearance = dis.readInt();
+		deadReckoningParameters.read( dis );
+		entityMarking.read( dis );
+		entityCapabilities.read( dis );
+		
+		articulationParameters.clear();
+		for( int i = 0; i < numberOfArticulationParameters; ++i )
+		{
+			ArticulationParameter articulationParameter = new ArticulationParameter();
+			articulationParameter.read( dis );
+			articulationParameters.add( articulationParameter );
+		}
+	}
+	
+	/**
+	 * {@inheritDoc} 
+	 */
+	@Override
+	public void writeContent( DISOutputStream dos ) throws IOException
+	{
+		entityID.write( dos );
+		dos.writeUI8( forceID );
+		
+		int articulationParamCount = articulationParameters.size();
+		if ( articulationParamCount > DISSizes.UI8_MAX_VALUE )
+		{
+			// TODO Warn about truncation
+		}
+		
+		short paramCountAsShort = (short)articulationParamCount;
+		dos.writeUI8( paramCountAsShort );
+		entityType.write( dos );
+		alternativeEntityType.write( dos );
+		entityLinearVelocity.write( dos );
+		entityLocation.write( dos );
+		entityOrientation.write( dos );
+		dos.writeInt( entityAppearance );
+		deadReckoningParameters.write( dos );
+		entityMarking.write( dos );
+		entityCapabilities.write( dos );
+		
+		for ( ArticulationParameter parameter : articulationParameters )
+			parameter.write( dos );
+	}
+	
+	/**
+	 * {@inheritDoc} 
+	 */
+	@Override
+	public int getContentLength()
+	{
+		int size = entityID.getByteLength();
+		size += ForceID.BYTE_LENGTH;
+		size += DISSizes.UI8_SIZE;				// ParamCount
+		size += entityType.getByteLength();
+		size += alternativeEntityType.getByteLength();
+		size += entityLinearVelocity.getByteLength();
+		size += entityLocation.getByteLength();
+		size += entityOrientation.getByteLength();
+		size += DISSizes.UI32_SIZE;				// Appearance
+		size += deadReckoningParameters.getByteLength();
+		size += entityMarking.getByteLength();
+		size += entityCapabilities.getByteLength();
+		size += DISSizes.getByteLengthOfCollection( articulationParameters );
+		
+		return size;
+	}
+	
+	////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////// Accessor and Mutator Methods ///////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////
 	public EntityIdentifier getEntityID()
     {
     	return entityID;
@@ -184,12 +254,12 @@ public class EntityStatePDU extends PDU
     	this.entityOrientation = entityOrientation;
     }
 
-	public EntityAppearance getEntityAppearance()
+	public int getEntityAppearance()
     {
     	return entityAppearance;
     }
 
-	public void setEntityAppearance( EntityAppearance entityAppearance )
+	public void setEntityAppearance( int entityAppearance )
     {
     	this.entityAppearance = entityAppearance;
     }
@@ -224,56 +294,21 @@ public class EntityStatePDU extends PDU
     	this.entityCapabilities = entityCapabilities;
     }
 	
-	public ArrayList<ArticulationParameter> getArticulationParameter()
+	public List<ArticulationParameter> getArticulationParameter()
     {
-    	return articulationParameter;
+    	return articulationParameters;
     }
 
-	public void setArticulationParameter( ArrayList<ArticulationParameter> articulationParameter )
-    {		
-		this.articulationParameter = articulationParameter;
-		
-		PDUHeader header = getHeader();
-		header.setLength( ENTITY_STATE_BASE_SIZE +
-		                  (articulationParameter.size() * ArticulationParameter.ARTICULATION_PARAMETER_SIZE) );
+	public void setArticulationParameter( List<ArticulationParameter> articulationParameter )
+    {
+		if( articulationParameter.size() > DISSizes.UI8_MAX_VALUE )
+			throw new IllegalArgumentException( "A maximum of " + DISSizes.UI8_MAX_VALUE + 
+			                                    " articulation parameters are supported by the DIS specification" );
+			
+		this.articulationParameters = articulationParameter;
     }
 
 	//----------------------------------------------------------
 	//                     STATIC METHODS
 	//----------------------------------------------------------
-	public static EntityStatePDU read( PDUHeader header, DISInputStream dis ) throws IOException
-	{
-		EntityIdentifier entityID = EntityIdentifier.read( dis );
-		short forceID = dis.readUI8();
-		short numberOfArticulationParameters = dis.readUI8();
-		EntityType entityType = EntityType.read( dis );
-		EntityType alternativeEntityType = EntityType.read( dis );
-		VectorRecord entityLinearVelocity = VectorRecord.read( dis );
-		WorldCoordinate entityLocation = WorldCoordinate.read( dis );
-		EulerAngles entityOrientation = EulerAngles.read( dis );
-		EntityAppearance entityAppearance = EntityAppearance.read( dis );
-		DeadReckoningParameter deadReckoningParameters = DeadReckoningParameter.read( dis );
-		EntityMarking entityMarking = EntityMarking.read( dis );
-		EntityCapabilities entityCapabilities = EntityCapabilities.read( dis );
-		ArrayList<ArticulationParameter> articulationParameters =
-				new ArrayList<ArticulationParameter>(numberOfArticulationParameters);
-		for( int i = 0; i < numberOfArticulationParameters; i++ )
-		{
-			articulationParameters.add( ArticulationParameter.read(dis) );
-		}
-		
-		return new EntityStatePDU( header,
-		                           entityID,
-		                           forceID,
-		                           entityType,
-		                           alternativeEntityType,
-		                           entityLinearVelocity,
-		                           entityLocation,
-		                           entityOrientation,
-		                           entityAppearance,
-		                           deadReckoningParameters,
-		                           entityMarking,
-		                           entityCapabilities,
-		                           articulationParameters );
-	}
 }

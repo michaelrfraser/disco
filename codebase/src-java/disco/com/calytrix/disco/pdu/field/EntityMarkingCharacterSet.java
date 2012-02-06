@@ -14,6 +14,8 @@
  */
 package com.calytrix.disco.pdu.field;
 
+import com.calytrix.disco.util.DISSizes;
+
 /**
  * This enumerated field represents the Character set used in representing the Entity Marking
  * Record.
@@ -23,10 +25,12 @@ public class EntityMarkingCharacterSet
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
 	//----------------------------------------------------------
-	public static final int UNUSED = 0;
-	public static final int ASCII = 1;
-	public static final int ARMY_MARKING = 2;
-	public static final int DIGIT_CHEVRON = 3;
+	public static final int BIT_LENGTH = DISSizes.UI8_SIZE;
+	
+	public static final short UNUSED = 0;
+	public static final short ASCII = 1;
+	public static final short ARMY_MARKING = 2;
+	public static final short DIGIT_CHEVRON = 3;
 
 	//----------------------------------------------------------
 	//                   INSTANCE VARIABLES
@@ -46,12 +50,12 @@ public class EntityMarkingCharacterSet
 	/**
 	 * Returns the ordered set of values that this enumerated field can assume
 	 * 
-	 * @return An int[] containing the ordered set of values that this 
+	 * @return An short[] containing the ordered set of values that this 
 	 * enumeration field can assume
 	 */
-	public static int[] getValues()
+	public static short[] getValues()
 	{
-		int[] values = { UNUSED, ASCII, ARMY_MARKING, DIGIT_CHEVRON };
+		short[] values = { UNUSED, ASCII, ARMY_MARKING, DIGIT_CHEVRON };
 		return values;
 	}
 	
@@ -63,7 +67,7 @@ public class EntityMarkingCharacterSet
 	 * @return A String representing the description of the specified field
 	 * value
 	 */
-	public static String getDescription( int value )
+	public static String getDescription( short value )
 	{
 		String description = "Undefined";
 		switch( value )

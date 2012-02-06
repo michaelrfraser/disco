@@ -14,6 +14,8 @@
  */
 package com.calytrix.disco.pdu.field;
 
+import com.calytrix.disco.util.DISSizes;
+
 /**
  * This field shall specify the interpretation of the modulation parameter 
  * field(s) in the Transmitter PDU.<br/>
@@ -27,6 +29,8 @@ public class System
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
 	//----------------------------------------------------------
+	public static final int BYTE_LENGTH = DISSizes.UI16_SIZE;
+	
 	public static final int OTHER = 0;
 	public static final int GENERIC = 1;
 	public static final int HQ = 2;
@@ -62,7 +66,12 @@ public class System
 	 */
 	public static int[] getValues()
 	{
-		int[] values = { OTHER, GENERIC, HQ, HQII, HQIIA, SINCGARS, 
+		int[] values = { OTHER, 
+		                 GENERIC, 
+		                 HQ, 
+		                 HQII, 
+		                 HQIIA, 
+		                 SINCGARS, 
 		                 CCTT_SINCGARS };
 		return values;
 	}

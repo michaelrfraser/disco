@@ -18,7 +18,6 @@ import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigInteger;
 
 /**
  * This class is responsible for reading types specified in the DIS 
@@ -40,7 +39,7 @@ public class DISInputStream extends DataInputStream
 	/**
 	 * Constructor for type DISInputStream with provided InputStream
 	 * 
-	 * @param in the InputStream to read DIS types from
+	 * @param inputStream the InputStream to read DIS types from
 	 */
 	public DISInputStream( InputStream inputStream )
     {
@@ -93,7 +92,7 @@ public class DISInputStream extends DataInputStream
 		int ch4 = in.read();
 		
 		// Check that we haven't gone beyond the stream bounds
-		if ( (ch1 | ch2 | ch3 | ch4) < 0 )
+		if( (ch1 | ch2 | ch3 | ch4) < 0 )
 			throw new EOFException();
 		
 		// Assemble the value and return
@@ -101,21 +100,33 @@ public class DISInputStream extends DataInputStream
 	}
 	
 	/**
-	 * Reads the next eight bytes from the stream as a 64-bit Unsigned Integer 
-	 * and returns the value as a BigInteger.
+	 * Reads the specified number of bytes from the stream as a String
 	 * 
-	 * @return A BigInteger representing the 64-bit Unsigned Integer value
+	 * @param len the number of bytes to read from the stream
+	 * 
+	 * @return A String representing the bytes read in String form 
 	 * 
 	 * @throws IOException thrown if the value could not be read from the stream
 	 */
-	public BigInteger readUI64() throws IOException
+	public String readString( int len ) throws IOException
 	{
-		// Read the next 8 bytes into a buffer
-		byte[] buffer = new byte[8];
+		byte[] buffer = new byte[len];
 		readFully( buffer );
 		
-		// Assemble the value and return
-		return new BigInteger( buffer );
+		return new String( buffer );
+	}
+	
+	/**
+	 * Skips the next specified number og bytes in the stream.
+	 *   
+	 * @throws IOException thrown if the stream does not contain enough bytes 
+	 * beyond the read marker to skip over
+	 */
+	private void checkedSkipBytes( int bytes ) throws IOException
+	{
+		int skipAmount = skipBytes( bytes );
+		if( skipAmount < bytes )
+			throw new EOFException();
 	}
 	
 	/**
@@ -127,9 +138,7 @@ public class DISInputStream extends DataInputStream
 	 */
 	public void skip16() throws IOException
 	{
-		int skipAmount = skipBytes( 2 );
-		if( skipAmount < 2 )
-			throw new EOFException();
+		checkedSkipBytes( 2 );
 	}
 	
 	/**
@@ -141,9 +150,19 @@ public class DISInputStream extends DataInputStream
 	 */
 	public void skip24() throws IOException
 	{
-		int skipAmount = skipBytes( 3 );
-		if( skipAmount < 3 )
-			throw new EOFException();
+		checkedSkipBytes( 3 );
+	}
+	
+	/**
+	 * Skips the next four bytes in the stream. This method is useful for 
+	 * skipping over 32 bit padding fields.
+	 *   
+	 * @throws IOException thrown if the stream does not contain enough bytes 
+	 * beyond the read marker to skip over
+	 */
+	public void skip32() throws IOException
+	{
+		checkedSkipBytes( 4 );
 	}
 	
 	//----------------------------------------------------------

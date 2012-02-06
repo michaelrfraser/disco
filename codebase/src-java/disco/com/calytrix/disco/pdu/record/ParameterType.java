@@ -23,13 +23,16 @@ package com.calytrix.disco.pdu.record;
 import java.io.IOException;
 
 import com.calytrix.disco.network.DISInputStream;
+import com.calytrix.disco.network.DISOutputStream;
+import com.calytrix.disco.pdu.IPDUComponent;
+import com.calytrix.disco.util.DISSizes;
 
 /**
  * Indicates the type of Parameter used in an Articulation Parameter Record. This Variant is
  * represented as either an Attached part or Articulated part depending upon the Parameter Type
  * Designator.
  */
-public class ParameterType
+public class ParameterType implements IPDUComponent, Cloneable
 {
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
@@ -44,6 +47,11 @@ public class ParameterType
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
+	public ParameterType()
+	{
+		this( 0, new ParameterTypeArticulatedParts() );
+	}
+	
 	public ParameterType( long attachedParts, ParameterTypeArticulatedParts articulatedParts )
 	{
 		this.attachedParts = attachedParts;
@@ -66,7 +74,7 @@ public class ParameterType
 		{
 			ParameterType otherParameter = (ParameterType)other;
 			if( otherParameter.attachedParts == this.attachedParts &&
-				otherParameter.articulatedParts == this.articulatedParts )
+				otherParameter.articulatedParts.equals(this.articulatedParts) )
 			{
 				return true;
 			}
@@ -75,6 +83,48 @@ public class ParameterType
 		return false;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public ParameterType clone()
+	{
+		ParameterTypeArticulatedParts clonedArticulatedParts = articulatedParts.clone();
+		return new ParameterType( attachedParts, clonedArticulatedParts );
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public void read( DISInputStream dis ) throws IOException
+    {
+		attachedParts = dis.readUI32();
+		articulatedParts.read( dis );
+    }
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public void write( DISOutputStream dos ) throws IOException
+    {
+		dos.writeUI32( attachedParts );
+		articulatedParts.write( dos );
+    }
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public int getByteLength()
+	{
+		int size = DISSizes.UI32_SIZE;
+		size += articulatedParts.getByteLength();
+		
+		return size;
+	}
+	
 	////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////// Accessor and Mutator Methods ///////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////
@@ -101,21 +151,4 @@ public class ParameterType
 	//----------------------------------------------------------
 	//                     STATIC METHODS
 	//----------------------------------------------------------
-	/**
-	 * Reads an instance of this record from the provided DISInputStream.
-	 * 
-	 * @param dis The DISInputStream to read the record from.
-	 * 
-	 * @return The ParameterType deserialised from the provided input stream.
-	 * 
-	 * @throws IOException Thrown if an error occurred reading the record from
-	 * the stream.
-	 */
-	public static ParameterType read( DISInputStream dis ) throws IOException
-	{
-		long attachedParts = dis.readUI32();
-		ParameterTypeArticulatedParts articulatedParts = ParameterTypeArticulatedParts.read( dis );
-		
-		return new ParameterType( attachedParts, articulatedParts );
-	}
 }

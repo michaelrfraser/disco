@@ -17,6 +17,11 @@ package com.calytrix.disco.pdu.record;
 import java.io.IOException;
 
 import com.calytrix.disco.network.DISInputStream;
+import com.calytrix.disco.network.DISOutputStream;
+import com.calytrix.disco.pdu.IPDUComponent;
+import com.calytrix.disco.pdu.field.Fuse;
+import com.calytrix.disco.pdu.field.Warhead;
+import com.calytrix.disco.util.DISSizes;
 
 /**
  * The firing of a round or a burst of ammunition shall be represented by a Burst Descriptor
@@ -24,7 +29,7 @@ import com.calytrix.disco.network.DISInputStream;
  * fuse, the number of rounds fired, and the rate at which the rounds are fired in rounds per
  * minute.
  */
-public class BurstDescriptor
+public class BurstDescriptor implements IPDUComponent, Cloneable
 {
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
@@ -42,6 +47,16 @@ public class BurstDescriptor
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
+	public BurstDescriptor()
+	{
+		this( new EntityType(),
+		      Warhead.OTHER,
+		      Fuse.OTHER,
+		      0,
+		      0 );
+		      
+	}
+	
 	public BurstDescriptor( EntityType munition, int warhead, int fuse, int quantity, int rate )
 	{
 		this.munition = munition;
@@ -77,6 +92,54 @@ public class BurstDescriptor
 		}
 		
 		return false;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public BurstDescriptor clone()
+	{
+		EntityType munitionClone = munition.clone();
+		return new BurstDescriptor( munitionClone, warhead, fuse, quantity, rate );
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public void read( DISInputStream dis ) throws IOException
+    {
+		munition.read( dis );
+		warhead = dis.readUI16();
+		fuse = dis.readUI16();
+		quantity = dis.readUI16();
+		rate = dis.readUI16();
+    }
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public void write( DISOutputStream dos ) throws IOException
+    {
+		munition.write( dos );
+		dos.writeUI16( warhead );
+		dos.writeUI16( fuse );
+		dos.writeUI16( quantity );
+		dos.writeUI16( rate);
+    }
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public int getByteLength()
+	{
+		int size = munition.getByteLength();
+		size += DISSizes.UI16_SIZE * 4;
+		
+		return size;
 	}
 	
     ////////////////////////////////////////////////////////////////////////////////////////////
@@ -135,24 +198,4 @@ public class BurstDescriptor
 	//----------------------------------------------------------
 	//                     STATIC METHODS
 	//----------------------------------------------------------
-	/**
-	 * Reads an instance of this record from the provided DISInputStream.
-	 * 
-	 * @param dis The DISInputStream to read the record from.
-	 * 
-	 * @return The BurstDescriptor deserialised from the provided input stream.
-	 * 
-	 * @throws IOException Thrown if an error occurred reading the record from
-	 * the stream.
-	 */
-	public static BurstDescriptor read( DISInputStream dis ) throws IOException
-	{
-		EntityType munition = EntityType.read( dis );
-		int warhead = dis.readUI16();
-		int fuse = dis.readUI16();
-		int quantity = dis.readUI16();
-		int rate = dis.readUI16();
-		
-		return new BurstDescriptor( munition, warhead, fuse, quantity, rate );
-	}
 }

@@ -14,18 +14,15 @@
  */
 package com.calytrix.disco.pdu.simmanagement;
 
-import com.calytrix.disco.pdu.PDU;
 import com.calytrix.disco.pdu.field.PDUType;
 import com.calytrix.disco.pdu.record.PDUHeader;
 
 /**
- * This class represents an Set Data PDU.
- * <p/>
- * PDUs of this type contain information about...
- * 
- * @see "IEEE Std 1278.1-1995 section 4.5.5.4.9"
+ * This class represents a SetData PDU. The SetData PDU is issued by a DIS node that wishes for 
+ * another DIS node to update the data it holds. Handling of a SetData PDUs is usually responded to
+ * by sending a corresponding DataPDU acknowledging that the requested data change has been made
  */
-public class SetDataPDU extends PDU
+public class SetDataPDU extends AbstractDataPDU
 {
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
@@ -38,6 +35,11 @@ public class SetDataPDU extends PDU
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
+	/**
+	 * Constructor for type SetDataPDU with specified PDUHeader
+	 * 
+	 * @param header The <code>PDUHeader</code> to base this PDU on
+	 */
 	public SetDataPDU( PDUHeader header )
 	{
 		super( header );
@@ -45,7 +47,7 @@ public class SetDataPDU extends PDU
 		if( header.getPDUType() != PDUType.SET_DATA )
 	    	throw new IllegalStateException( "Invalid PDUType in Header" );
 	}
-
+	
 	//----------------------------------------------------------
 	//                    INSTANCE METHODS
 	//----------------------------------------------------------

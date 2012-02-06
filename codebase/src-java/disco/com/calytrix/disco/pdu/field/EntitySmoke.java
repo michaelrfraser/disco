@@ -60,8 +60,10 @@ public class EntitySmoke
 	 */
 	public static int[] getValues()
 	{
-		int[] values =
-		    { NOT_SMOKING, SMOKE_PLUME, ENGINE_SMOKE, ENGINE_SMOKE_AND_SMOKE_PLUME };
+		int[] values = { NOT_SMOKING, 
+		                 SMOKE_PLUME, 
+		                 ENGINE_SMOKE, 
+		                 ENGINE_SMOKE_AND_SMOKE_PLUME };
 		return values;
 	}
 

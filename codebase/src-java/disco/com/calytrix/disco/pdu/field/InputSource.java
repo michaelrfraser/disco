@@ -14,6 +14,8 @@
  */
 package com.calytrix.disco.pdu.field;
 
+import com.calytrix.disco.util.DISSizes;
+
 /**
  * The type of radio in a DIS exercise shall be specified by a Radio Entity Type 
  * Record. This record shall specify the kind of entity, the domain, the country 
@@ -24,6 +26,8 @@ public class InputSource
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
 	//----------------------------------------------------------
+	public static final int BYTE_LENGTH = DISSizes.UI8_SIZE;
+	
 	public static final short OTHER = 0;
 	public static final short PILOT = 1;
 	public static final short COPILOT = 2;
@@ -58,8 +62,16 @@ public class InputSource
 	 */
 	public static short[] getValues()
 	{
-		short[] values = { OTHER, PILOT, COPILOT, FIRST_OFFICER, DRIVER, LOADER, 
-		                   GUNNER, COMMANDER, DIGITAL_DATA_DEVICE, INTERCOM };
+		short[] values = { OTHER, 
+		                   PILOT, 
+		                   COPILOT, 
+		                   FIRST_OFFICER, 
+		                   DRIVER, 
+		                   LOADER, 
+		                   GUNNER, 
+		                   COMMANDER, 
+		                   DIGITAL_DATA_DEVICE, 
+		                   INTERCOM };
 		
 		return values;
 	}

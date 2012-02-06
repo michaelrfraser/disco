@@ -21,8 +21,12 @@
 package com.calytrix.disco.pdu.record;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import com.calytrix.disco.network.DISInputStream;
+import com.calytrix.disco.network.DISOutputStream;
+import com.calytrix.disco.pdu.IPDUComponent;
+import com.calytrix.disco.pdu.field.DeadReckoningAlgorithm;
 
 /**
  * Used to provide the parameters for dead reckoning the position and orientation of the entity.
@@ -30,7 +34,7 @@ import com.calytrix.disco.network.DISInputStream;
  * a part of the dead reckoning parameters. 120 bits are reserved for other parameters that are
  * currently undefined.
  */
-public class DeadReckoningParameter
+public class DeadReckoningParameter implements IPDUComponent, Cloneable
 {
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
@@ -41,22 +45,31 @@ public class DeadReckoningParameter
 	//                   INSTANCE VARIABLES
 	//----------------------------------------------------------
 	private short deadReckoningAlgorithm;
-	private byte[] deadReckoningOtherParamaters;
+	private byte[] deadReckoningOtherParameters;
 	private VectorRecord entityLinearAcceleration;
 	private AngularVelocityVector entityAngularVelocity;
 
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
+	public DeadReckoningParameter()
+	{
+		this( DeadReckoningAlgorithm.OTHER, 
+		      new byte[OTHER_PARAMETERS_ARRAY_SIZE], 
+		      new VectorRecord(),
+		      new AngularVelocityVector() );
+	}
+	
 	public DeadReckoningParameter( short deadReckoningAlgorithm,
-	                               byte[] deadReckoningOtherParamaters,
+	                               byte[] deadReckoningOtherParameters,
 	                               VectorRecord entityLinearAcceleration,
 	                               AngularVelocityVector entityAngularVelocity )
 	{
 		this.deadReckoningAlgorithm = deadReckoningAlgorithm;
-		setDeadReckoningOtherParamaters(deadReckoningOtherParamaters);
 		this.entityLinearAcceleration = entityLinearAcceleration;
 		this.entityAngularVelocity = entityAngularVelocity;
+		
+		setDeadReckoningOtherParameters( deadReckoningOtherParameters );
 	}
 
 	//----------------------------------------------------------
@@ -73,11 +86,11 @@ public class DeadReckoningParameter
 
 		if( other instanceof DeadReckoningParameter )
 		{
-			DeadReckoningParameter otherParam = (DeadReckoningParameter)other;
-			if( otherParam.deadReckoningAlgorithm == this.deadReckoningAlgorithm && 
-			    otherParam.deadReckoningOtherParamaters == this.deadReckoningOtherParamaters &&
-			    otherParam.entityLinearAcceleration.equals(this.entityLinearAcceleration) &&
-			    otherParam.entityAngularVelocity.equals(this.entityAngularVelocity) )
+			DeadReckoningParameter asParam = (DeadReckoningParameter)other;
+			if( asParam.deadReckoningAlgorithm == this.deadReckoningAlgorithm && 
+				Arrays.equals(asParam.deadReckoningOtherParameters, this.deadReckoningOtherParameters) &&
+			    asParam.entityLinearAcceleration.equals(this.entityLinearAcceleration) &&
+			    asParam.entityAngularVelocity.equals(this.entityAngularVelocity) )
 			{
 				return true;
 			}
@@ -86,6 +99,60 @@ public class DeadReckoningParameter
 		return false;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public DeadReckoningParameter clone()
+	{
+		VectorRecord linearAccelerationClone = entityLinearAcceleration.clone();
+		AngularVelocityVector angularVelocityClone = entityAngularVelocity.clone();
+		byte[] otherParametersClone = Arrays.copyOf( deadReckoningOtherParameters, deadReckoningOtherParameters.length );
+		
+		return new DeadReckoningParameter( deadReckoningAlgorithm, 
+		                                   otherParametersClone, 
+		                                   linearAccelerationClone, 
+		                                   angularVelocityClone );
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public void read( DISInputStream dis ) throws IOException
+    {
+		deadReckoningAlgorithm = dis.readUI8();
+		dis.readFully( deadReckoningOtherParameters );
+		entityLinearAcceleration.read( dis );
+		entityAngularVelocity.read( dis );
+    }
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public void write( DISOutputStream dos ) throws IOException
+    {
+		dos.writeUI8( deadReckoningAlgorithm );
+		dos.write( deadReckoningOtherParameters );
+		entityLinearAcceleration.write( dos );
+		entityAngularVelocity.write( dos );
+    }
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public int getByteLength()
+	{
+		int size = DeadReckoningAlgorithm.BYTE_LENGTH;
+		size += OTHER_PARAMETERS_ARRAY_SIZE;
+		size += entityLinearAcceleration.getByteLength();
+		size += entityAngularVelocity.getByteLength();
+		
+		return size;
+	}
+	
 	////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////// Accessor and Mutator Methods ///////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////
@@ -121,44 +188,18 @@ public class DeadReckoningParameter
 	
 	public byte[] getDeadReckoningOtherParamaters()
     {
-    	return deadReckoningOtherParamaters;
+    	return deadReckoningOtherParameters;
     }
 
-	public void setDeadReckoningOtherParamaters( byte[] deadReckoningOtherParamaters )
+	public void setDeadReckoningOtherParameters( byte[] deadReckoningOtherParameters )
     {
-		if( deadReckoningOtherParamaters.length != OTHER_PARAMETERS_ARRAY_SIZE )
-		{
-			throw new IllegalStateException( "Dead Reckoning Other Parameters BLOB must be "+
-		                                     "aligned to 120bit boundary" );
-		}
+		if( deadReckoningOtherParameters.length != OTHER_PARAMETERS_ARRAY_SIZE )
+			throw new IllegalArgumentException( "Dead Reckoning Other Parameters BLOB must be 120-bits in size" );
 
-    	this.deadReckoningOtherParamaters = deadReckoningOtherParamaters;
+    	this.deadReckoningOtherParameters = deadReckoningOtherParameters;
     }
 
 	//----------------------------------------------------------
 	//                     STATIC METHODS
 	//----------------------------------------------------------
-	/**
-	 * Reads an instance of this record from the provided DISInputStream.
-	 * 
-	 * @param dis The DISInputStream to read the record from.
-	 * 
-	 * @return The DeadReckoningParameter deserialised from the provided input stream.
-	 * 
-	 * @throws IOException Thrown if an error occurred reading the record from
-	 * the stream.
-	 */
-	public static DeadReckoningParameter read( DISInputStream dis ) throws IOException
-	{
-		short deadReckoningAlgorithm = dis.readUI8();
-		byte[] deadReckoningOtherParamaters = new byte[OTHER_PARAMETERS_ARRAY_SIZE];
-		dis.readFully( deadReckoningOtherParamaters );
-		VectorRecord entityLinearAcceleration = VectorRecord.read( dis );
-		AngularVelocityVector entityAngularVelocity = AngularVelocityVector.read(dis);
-		
-		return new DeadReckoningParameter( deadReckoningAlgorithm,
-		                                   deadReckoningOtherParamaters,
-		                                   entityLinearAcceleration,
-		                                   entityAngularVelocity );
-	}
 }

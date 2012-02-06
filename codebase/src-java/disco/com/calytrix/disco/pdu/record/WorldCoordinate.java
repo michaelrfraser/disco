@@ -17,6 +17,9 @@ package com.calytrix.disco.pdu.record;
 import java.io.IOException;
 
 import com.calytrix.disco.network.DISInputStream;
+import com.calytrix.disco.network.DISOutputStream;
+import com.calytrix.disco.pdu.IPDUComponent;
+import com.calytrix.disco.util.DISSizes;
 import com.calytrix.disco.util.FloatingPointUtils;
 
 /**
@@ -33,7 +36,7 @@ import com.calytrix.disco.util.FloatingPointUtils;
  * 64-bit double precision floating point number shall represent the location 
  * for each coordinate.
  */
-public class WorldCoordinate
+public class WorldCoordinate implements IPDUComponent, Cloneable
 {
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
@@ -49,6 +52,11 @@ public class WorldCoordinate
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
+	public WorldCoordinate()
+	{
+		this( 0d, 0d, 0d );
+	}
+	
 	public WorldCoordinate( double x, double y, double z )
 	{
 		this.x = x;
@@ -68,7 +76,7 @@ public class WorldCoordinate
 		if( other == this )
 			return true;
 		
-		if ( other instanceof WorldCoordinate )
+		if( other instanceof WorldCoordinate )
 		{
 			WorldCoordinate asWorldCoordinate = (WorldCoordinate)other;
 			if( FloatingPointUtils.doubleEqual(asWorldCoordinate.x,this.x) &&
@@ -80,6 +88,46 @@ public class WorldCoordinate
 		}
 		
 		return false;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public WorldCoordinate clone()
+	{
+		return new WorldCoordinate( x, y, z );
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void read( DISInputStream dis ) throws IOException
+	{
+		x = dis.readDouble();
+		y = dis.readDouble();
+		z = dis.readDouble();
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void write( DISOutputStream dos ) throws IOException
+	{
+		dos.writeDouble( x );
+		dos.writeDouble( y );
+		dos.writeDouble( z );
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int getByteLength()
+	{
+		return DISSizes.FLOAT64_SIZE * 3;
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////
@@ -118,22 +166,4 @@ public class WorldCoordinate
 	//----------------------------------------------------------
 	//                     STATIC METHODS
 	//----------------------------------------------------------
-	/**
-	 * Reads an instance of this record from the provided DISInputStream
-	 * 
-	 * @param dis The DISInputStream to read the record from
-	 * 
-	 * @return The WorldCoordinate deserialised from the provided input stream
-	 * 
-	 * @throws IOException Thrown if an error occurred reading the record from
-	 * the stream
-	 */
-	public static WorldCoordinate read( DISInputStream dis ) throws IOException
-	{
-		double x = dis.readDouble();
-		double y = dis.readDouble();
-		double z = dis.readDouble();
-		
-		return new WorldCoordinate( x, y, z );
-	}
 }

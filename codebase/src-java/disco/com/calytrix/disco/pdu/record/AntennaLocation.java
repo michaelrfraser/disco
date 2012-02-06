@@ -17,6 +17,8 @@ package com.calytrix.disco.pdu.record;
 import java.io.IOException;
 
 import com.calytrix.disco.network.DISInputStream;
+import com.calytrix.disco.network.DISOutputStream;
+import com.calytrix.disco.pdu.IPDUComponent;
 
 /**
  * The location of a radio transmitter's antenna shall be represented using an 
@@ -41,7 +43,7 @@ import com.calytrix.disco.network.DISInputStream;
  * @see "IEEE Std 1278.1-1995 section 5.3.33"
  * @see "IEEE Std 1278.1-1995 section 5.3.32.1"
  */
-public class AntennaLocation
+public class AntennaLocation implements IPDUComponent, Cloneable
 {
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
@@ -56,6 +58,11 @@ public class AntennaLocation
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
+	public AntennaLocation()
+	{
+		this( new WorldCoordinate(), new EntityCoordinate() );
+	}
+	
 	public AntennaLocation( WorldCoordinate antennaLocation,
 	                        EntityCoordinate relativeAntennaLocation )
 	{
@@ -88,6 +95,50 @@ public class AntennaLocation
 		return false;
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public AntennaLocation clone()
+	{
+		WorldCoordinate antennaLocationClone = antennaLocation.clone();
+		EntityCoordinate relativeAntennaLocationClone = relativeAntennaLocation.clone();
+		
+		return new AntennaLocation( antennaLocationClone, relativeAntennaLocationClone );
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public void read( DISInputStream dis ) throws IOException
+    {
+		antennaLocation.read( dis );
+		relativeAntennaLocation.read( dis );
+    }
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public void write( DISOutputStream dos ) throws IOException
+    {
+		antennaLocation.write( dos );
+		relativeAntennaLocation.write( dos );
+    }
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public int getByteLength()
+	{
+		int size = antennaLocation.getByteLength();
+		size += relativeAntennaLocation.getByteLength();
+		
+		return size;
+	}
+	
 	////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////// Accessor and Mutator Methods ///////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////
@@ -114,21 +165,4 @@ public class AntennaLocation
 	//----------------------------------------------------------
 	//                     STATIC METHODS
 	//----------------------------------------------------------
-	/**
-	 * Reads an instance of this record from the provided DISInputStream
-	 * 
-	 * @param dis The DISInputStream to read the record from
-	 * 
-	 * @return The AntennaLocation deserialised from the provided input stream
-	 * 
-	 * @throws IOException Thrown if an error occurred reading the record from
-	 * the stream
-	 */
-	public static AntennaLocation read( DISInputStream dis ) throws IOException
-	{
-		WorldCoordinate antennaLocation = WorldCoordinate.read( dis );
-		EntityCoordinate relativeAntennaLocation = EntityCoordinate.read( dis );
-		
-		return new AntennaLocation( antennaLocation, relativeAntennaLocation );
-	}
 }

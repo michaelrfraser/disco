@@ -20,6 +20,8 @@
  */
 package com.calytrix.disco.pdu.field;
 
+import com.calytrix.disco.util.DISSizes;
+
 /**
  * This field shall specify the country to which the design of the entity is attributed. This
  * field shall be represented by a 16-bit enumeration.
@@ -31,6 +33,8 @@ public class Country
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
 	//----------------------------------------------------------
+	public static final int BYTE_LENGTH = DISSizes.UI16_SIZE;
+	
 	public static final int OTHER = 0;
 	public static final int AFGHANISTAN = 1;
 	public static final int ARGENTINA = 10;

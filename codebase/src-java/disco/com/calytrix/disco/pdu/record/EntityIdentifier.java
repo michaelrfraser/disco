@@ -17,17 +17,21 @@ package com.calytrix.disco.pdu.record;
 import java.io.IOException;
 
 import com.calytrix.disco.network.DISInputStream;
+import com.calytrix.disco.network.DISOutputStream;
+import com.calytrix.disco.pdu.IPDUComponent;
+import com.calytrix.disco.util.DISSizes;
 
 /**
  * Each Entity in a given exercise executing on a DIS application shall be 
  * assigned an Entity Identifier Record Unique to the exercise.
  */
-public class EntityIdentifier
+public class EntityIdentifier implements IPDUComponent, Cloneable
 {
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
 	//----------------------------------------------------------
-
+	public static final int ALL_ENTITIES = 0xFFFF;
+		
 	//----------------------------------------------------------
 	//                   INSTANCE VARIABLES
 	//----------------------------------------------------------
@@ -37,6 +41,11 @@ public class EntityIdentifier
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
+	public EntityIdentifier()
+	{
+		this( new SimulationAddress(), 0 );
+	}
+	
 	public EntityIdentifier( SimulationAddress simulationAddress, int entityIdentity )
 	{
 		this.simulationAddress = simulationAddress;
@@ -68,6 +77,48 @@ public class EntityIdentifier
 		return false;
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public EntityIdentifier clone()
+	{
+		SimulationAddress simulationAddressClone = simulationAddress.clone();
+		
+		return new EntityIdentifier( simulationAddressClone, entityIdentity );
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public void read( DISInputStream dis ) throws IOException
+    {
+		simulationAddress.read( dis );
+		entityIdentity = dis.readUI16();
+    }
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public void write( DISOutputStream dos ) throws IOException
+    {
+		simulationAddress.write( dos );
+		dos.writeUI16( entityIdentity );
+    }
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public int getByteLength()
+	{
+		int size = simulationAddress.getByteLength();
+		size += DISSizes.UI16_SIZE;
+		return size;
+	}
+	
 	////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////// Accessor and Mutator Methods ///////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////
@@ -94,21 +145,4 @@ public class EntityIdentifier
 	//----------------------------------------------------------
 	//                     STATIC METHODS
 	//----------------------------------------------------------
-	/**
-	 * Reads an instance of this record from the provided DISInputStream
-	 * 
-	 * @param dis The DISInputStream to read the record from
-	 * 
-	 * @return The AntennaLocation deserialised from the provided input stream
-	 * 
-	 * @throws IOException Thrown if an error occurred reading the record from
-	 * the stream
-	 */
-	public static EntityIdentifier read( DISInputStream dis ) throws IOException
-	{
-		SimulationAddress simulationAddress = SimulationAddress.read( dis );
-		int entityIdentity = dis.readUI16();
-		
-		return new EntityIdentifier( simulationAddress, entityIdentity );
-	}
 }

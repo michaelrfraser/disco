@@ -24,41 +24,47 @@ import java.io.EOFException;
 import java.io.IOException;
 
 import com.calytrix.disco.network.DISInputStream;
+import com.calytrix.disco.network.DISOutputStream;
+import com.calytrix.disco.pdu.IPDUComponent;
+import com.calytrix.disco.util.DISSizes;
 
 /**
  * A collection of boolean fields which describe the capabilities of the Entity.
- * 
  */
-public class EntityCapabilities
+public class EntityCapabilities implements IPDUComponent, Cloneable
 {
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
 	//----------------------------------------------------------
-	private static final int UNUSED_ARRAY_SIZE = 4;
 
 	//----------------------------------------------------------
 	//                   INSTANCE VARIABLES
 	//----------------------------------------------------------
-	private byte ammunitionSupply;
-	private byte fuelSupply;
-	private byte recovery;
-	private byte repair;
-	private byte[] unused;
+	private boolean ammunitionSupply;
+	private boolean fuelSupply;
+	private boolean recovery;
+	private boolean repair;
+	private boolean adsb;
 
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
-	public EntityCapabilities( byte ammunitionSupply,
-	                           byte fuelSupply,
-	                           byte recovery,
-	                           byte repair,
-	                           byte[] unused )
+	public EntityCapabilities()
+	{
+		this( false, false, false, false, false );
+	}
+	
+	public EntityCapabilities( boolean ammunitionSupply,
+	                           boolean fuelSupply,
+	                           boolean recovery,
+	                           boolean repair,
+	                           boolean adsb)
 	{
 		this.ammunitionSupply = ammunitionSupply;
 		this.fuelSupply = fuelSupply;
 		this.recovery = recovery;
 		this.repair = repair;
-		setUnused( unused );
+		this.adsb = adsb;
 	}
 	
 	//----------------------------------------------------------
@@ -80,7 +86,7 @@ public class EntityCapabilities
 			    otherCapabilities.fuelSupply == this.fuelSupply &&
 			    otherCapabilities.recovery == this.recovery &&
 			    otherCapabilities.repair == this.repair &&
-			    otherCapabilities.unused == this.unused )
+			    otherCapabilities.adsb == this.adsb )
 			{
 				return true;
 			}
@@ -88,96 +94,110 @@ public class EntityCapabilities
 		
 		return false;
 	}
+	
+	@Override
+	public EntityCapabilities clone()
+	{
+		return new EntityCapabilities( ammunitionSupply, fuelSupply, recovery, repair, adsb );
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public void read( DISInputStream dis ) throws IOException
+    {
+		int ch1 = dis.readInt();
+		
+		if( ch1 < 0 )
+			throw new EOFException();		
+		
+		ammunitionSupply = (ch1 & 0x01) != 0;
+		fuelSupply = (ch1 & 0x02) != 0;
+		recovery = (ch1 & 0x04) != 0;
+		repair = (ch1 & 0x08) != 0;
+		adsb = (ch1 & 0x10) != 0;
+    }
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public void write( DISOutputStream dos ) throws IOException
+    {
+		int ch1 = 0;
+		
+		if( ammunitionSupply )
+			ch1 |= 0x01;
+		
+		if( fuelSupply )
+			ch1 |= 0x02;
+		
+		if( recovery )
+			ch1 |= 0x04;
+		
+		if( repair )
+			ch1 |= 0x08;
+		
+		if ( adsb )
+			ch1 |= 0x10;
+		
+		dos.writeInt( ch1 );
+    }
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public int getByteLength()
+	{
+		return DISSizes.UI32_SIZE;
+	}
+	
 	////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////// Accessor and Mutator Methods ///////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////
-	public byte getAmmunitionSupply()
+	public boolean getAmmunitionSupply()
     {
     	return ammunitionSupply;
     }
 
-	public void setAmmunitionSupply( byte ammunitionSupply )
+	public void setAmmunitionSupply( boolean ammunitionSupply )
     {
     	this.ammunitionSupply = ammunitionSupply;
     }
 
-	public byte getFuelSupply()
+	public boolean getFuelSupply()
     {
     	return fuelSupply;
     }
 
-	public void setFuelSupply( byte fuelSupply )
+	public void setFuelSupply( boolean fuelSupply )
     {
     	this.fuelSupply = fuelSupply;
     }
 
-	public byte getRecovery()
+	public boolean getRecovery()
     {
     	return recovery;
     }
 
-	public void setRecovery( byte recovery )
+	public void setRecovery( boolean recovery )
     {
     	this.recovery = recovery;
     }
 
-	public byte getRepair()
+	public boolean getRepair()
     {
     	return repair;
     }
 
-	public void setRepair( byte repair )
+	public void setRepair( boolean repair )
     {
     	this.repair = repair;
-    }
-	
-	public byte[] getUnused()
-    {
-    	return unused;
-    }
-
-	public void setUnused( byte[] unused )
-    {
-		if ( unused.length != UNUSED_ARRAY_SIZE )
-			throw new IllegalStateException( "Unused BLOB must be aligned to 28bit boundary" );
-    	this.unused = unused;
     }
 	
 	//----------------------------------------------------------
 	//                     STATIC METHODS
 	//----------------------------------------------------------
-	/**
-	 * Reads an instance of this record from the provided DISInputStream.
-	 * 
-	 * @param dis The DISInputStream to read the record from.
-	 * 
-	 * @return The EntityCapabilities deserialised from the provided input stream.
-	 * 
-	 * @throws IOException Thrown if an error occurred reading the record from
-	 * the stream.
-	 */
-	public static EntityCapabilities read( DISInputStream dis ) throws IOException
-	{
-		int ch1 = dis.read();
-		
-		if( ch1 < 0 )
-			throw new EOFException();		
-		
-		byte ammunitionSupply = (byte)((ch1 & 0x80) >> 7);
-		byte fuelSupply = (byte)((ch1 & 0x40) >> 6);
-		byte recovery = (byte)((ch1 & 0x20) >> 5);
-		byte repair = (byte)((ch1 & 0x10) >> 4);
-		
-		byte[] unused = new byte[UNUSED_ARRAY_SIZE];
-		unused[0] = (byte)((ch1 & 0x0F) >> 0);
-		byte[] temp = new byte[UNUSED_ARRAY_SIZE - 1];
-		dis.readFully( temp );
-		for( int i = 0; i < UNUSED_ARRAY_SIZE - 1; i++ )
-		{
-			unused[i+1] = temp[i];
-		}
-		
-		return new EntityCapabilities( ammunitionSupply, fuelSupply, recovery, repair, unused );
-	}
 }

@@ -21,9 +21,13 @@
 package com.calytrix.disco.pdu.record;
 
 import java.io.IOException;
-import java.math.BigInteger;
 
 import com.calytrix.disco.network.DISInputStream;
+import com.calytrix.disco.network.DISOutputStream;
+import com.calytrix.disco.pdu.IPDUComponent;
+import com.calytrix.disco.pdu.field.ParameterTypeDesignator;
+import com.calytrix.disco.util.DISSizes;
+import com.calytrix.disco.util.DISUnsignedInt64;
 
 /**
  * The specification of articulation parameters for movable parts and attached parts of an entity
@@ -31,12 +35,11 @@ import com.calytrix.disco.network.DISInputStream;
  * not a change has occurred, the Part ID of the articulated part to which it is attached, and the
  * type and value of each parameter.
  */
-public class ArticulationParameter
+public class ArticulationParameter implements IPDUComponent, Cloneable
 {
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
 	//----------------------------------------------------------
-	public static final int ARTICULATION_PARAMETER_SIZE = 160;
 
 	//----------------------------------------------------------
 	//                   INSTANCE VARIABLES
@@ -45,22 +48,31 @@ public class ArticulationParameter
 	private short parameterChangeIndicator;
 	private int articulationAttachmentID;
 	private ParameterType parameterTypeVariant;
-	private BigInteger articulationParamterValue;
+	private DISUnsignedInt64 articulationParameterValue;
 
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
+	public ArticulationParameter()
+	{
+		this( ParameterTypeDesignator.ARTICULATED_PART, 
+		      (short)0, 
+		      0, 
+		      new ParameterType(),
+		      new DISUnsignedInt64() );
+	}
+	
 	public ArticulationParameter( short parameterTypeDesignator,
 	                              short parameterChangeIndicator,
 	                              int articulationAttachmentID,
 	                              ParameterType parameterTypeVariant,
-	                              BigInteger articulationParamterValue )
+	                              DISUnsignedInt64 articulationParameterValue )
 	{
 		this.parameterTypeDesignator = parameterTypeDesignator;
 		this.parameterChangeIndicator = parameterChangeIndicator;
 		this.articulationAttachmentID = articulationAttachmentID;
 		this.parameterTypeVariant = parameterTypeVariant;
-		this.articulationParamterValue = articulationParamterValue;
+		this.articulationParameterValue = articulationParameterValue;
 	}
 	
 	//----------------------------------------------------------
@@ -80,9 +92,9 @@ public class ArticulationParameter
 			ArticulationParameter otherParam = (ArticulationParameter)other;
 			if( otherParam.parameterTypeDesignator == this.parameterTypeDesignator && 
 			    otherParam.parameterChangeIndicator == this.parameterChangeIndicator &&
-			    otherParam.articulationAttachmentID == this.articulationAttachmentID &
+			    otherParam.articulationAttachmentID == this.articulationAttachmentID &&
 			    otherParam.parameterTypeVariant.equals(this.parameterTypeVariant) &&
-			    otherParam.articulationParamterValue.equals(this.articulationParamterValue) )
+			    otherParam.articulationParameterValue.equals(this.articulationParameterValue) )
 			{
 				return true;
 			}
@@ -91,6 +103,62 @@ public class ArticulationParameter
 		return false;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public ArticulationParameter clone()
+	{
+		ParameterType parameterTypeClone = parameterTypeVariant.clone();
+		DISUnsignedInt64 parameterValueClone = articulationParameterValue.clone();
+		
+		return new ArticulationParameter( parameterTypeDesignator, 
+		                                  parameterChangeIndicator, 
+		                                  articulationAttachmentID, 
+		                                  parameterTypeClone, 
+		                                  parameterValueClone );
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public void read( DISInputStream dis ) throws IOException
+    {
+		parameterTypeDesignator = dis.readUI8();
+		parameterChangeIndicator = dis.readUI8();
+		articulationAttachmentID = dis.readUI16();
+		parameterTypeVariant.read( dis );
+		articulationParameterValue.read( dis );
+    }
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public void write( DISOutputStream dos ) throws IOException
+    {
+		dos.writeUI8( parameterTypeDesignator );
+		dos.writeUI8( parameterChangeIndicator );
+		dos.writeUI16( articulationAttachmentID );
+		parameterTypeVariant.write( dos );
+		articulationParameterValue.write( dos );
+    }
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public int getByteLength()
+	{
+		int size = DISSizes.UI8_SIZE * 2;
+		size += DISSizes.UI16_SIZE;
+		size += parameterTypeVariant.getByteLength();
+		size += articulationParameterValue.getByteLength();
+		
+		return size;
+	}
+	
 	////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////// Accessor and Mutator Methods ///////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////
@@ -134,41 +202,17 @@ public class ArticulationParameter
     	this.parameterTypeVariant = parameterTypeVariant;
     }
 
-	public BigInteger getArticulationParamterValue()
+	public DISUnsignedInt64 getArticulationParameterValue()
     {
-    	return articulationParamterValue;
+    	return articulationParameterValue;
     }
 
-	public void setArticulationParamterValue( BigInteger articulationParamterValue )
+	public void setArticulationParameterValue( DISUnsignedInt64 articulationParameterValue )
     {
-    	this.articulationParamterValue = articulationParamterValue;
+    	this.articulationParameterValue = articulationParameterValue;
     }
 
 	//----------------------------------------------------------
 	//                     STATIC METHODS
 	//----------------------------------------------------------
-	/**
-	 * Reads an instance of this record from the provided DISInputStream.
-	 * 
-	 * @param dis The DISInputStream to read the record from.
-	 * 
-	 * @return The ArticulationParameter deserialised from the provided input stream.
-	 * 
-	 * @throws IOException Thrown if an error occurred reading the record from
-	 * the stream.
-	 */
-	public static ArticulationParameter read( DISInputStream dis ) throws IOException
-	{	
-		short parameterTypeDesignator = dis.readUI8();
-		short parameterChangeIndicator = dis.readUI8();
-		int articulationAttachmentID = dis.readUI16();
-		ParameterType parameterTypeVariant = ParameterType.read( dis );
-		BigInteger articulationParamterValue = dis.readUI64();
-		
-		return new ArticulationParameter( parameterTypeDesignator,
-		                                  parameterChangeIndicator, 
-		                                  articulationAttachmentID,
-		                                  parameterTypeVariant,
-		                                  articulationParamterValue );
-	}
 }

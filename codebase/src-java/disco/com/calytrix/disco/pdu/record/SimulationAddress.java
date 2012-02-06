@@ -17,18 +17,23 @@ package com.calytrix.disco.pdu.record;
 import java.io.IOException;
 
 import com.calytrix.disco.network.DISInputStream;
+import com.calytrix.disco.network.DISOutputStream;
+import com.calytrix.disco.pdu.IPDUComponent;
+import com.calytrix.disco.util.DISSizes;
 
 /**
  * An Entity's simulation address shall be specified by a Simulation Address 
  * Record. A Simulation Address record shall consist of the Site ID number and 
  * the Application ID number.
  */
-public class SimulationAddress
+public class SimulationAddress implements IPDUComponent, Cloneable
 {
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
 	//----------------------------------------------------------
-
+	public static final int ALL_SITES = 0xFFFF;
+	public static final int ALL_APPLIC = 0xFFFF;
+	
 	//----------------------------------------------------------
 	//                   INSTANCE VARIABLES
 	//----------------------------------------------------------
@@ -38,6 +43,11 @@ public class SimulationAddress
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
+	public SimulationAddress()
+	{
+		this( 0, 0 );
+	}
+	
 	public SimulationAddress( int siteIdentifier, int applicationIdentifier )
 	{
 		this.siteIdentifier = siteIdentifier;
@@ -56,7 +66,7 @@ public class SimulationAddress
 		if( other == this )
 			return true;
 
-		if ( other instanceof SimulationAddress )
+		if( other instanceof SimulationAddress )
 		{
 			SimulationAddress asSimulationAddress = (SimulationAddress)other;
 			if( asSimulationAddress.applicationIdentifier == this.applicationIdentifier &&
@@ -69,6 +79,44 @@ public class SimulationAddress
 		return false;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public SimulationAddress clone()
+	{
+		return new SimulationAddress( siteIdentifier, applicationIdentifier );
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public void read( DISInputStream dis ) throws IOException
+    {
+		siteIdentifier = dis.readUI16();
+		applicationIdentifier = dis.readUI16();
+    }
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public void write( DISOutputStream dos ) throws IOException
+    {
+		dos.writeUI16( siteIdentifier );
+		dos.writeUI16( applicationIdentifier );
+    }
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public int getByteLength()
+	{
+		return DISSizes.UI16_SIZE * 2;
+	}
+	
 	////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////// Accessor and Mutator Methods ///////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////
@@ -95,21 +143,4 @@ public class SimulationAddress
 	//----------------------------------------------------------
 	//                     STATIC METHODS
 	//----------------------------------------------------------
-	/**
-	 * Reads an instance of this record from the provided DISInputStream
-	 * 
-	 * @param dis The DISInputStream to read the record from
-	 * 
-	 * @return The SimulationAddress deserialised from the provided input stream
-	 * 
-	 * @throws IOException Thrown if an error occurred reading the record from
-	 * the stream
-	 */
-	public static SimulationAddress read( DISInputStream dis ) throws IOException
-	{
-		int siteIdentifier = dis.readUI16();
-		int applicationIdentifier = dis.readUI16();
-		
-		return new SimulationAddress( siteIdentifier, applicationIdentifier );
-	}
 }
