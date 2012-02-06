@@ -14,18 +14,16 @@
  */
 package com.calytrix.disco.pdu.simmanagement;
 
-import com.calytrix.disco.pdu.PDU;
 import com.calytrix.disco.pdu.field.PDUType;
 import com.calytrix.disco.pdu.record.PDUHeader;
 
 /**
- * This class represents an Data PDU.
- * <p/>
- * PDUs of this type contain information about...
+ * This class represents an Data PDU. A Data PDU is usually issued by the DIS node that handles a
+ * SetData PDU request
  * 
  * @see "IEEE Std 1278.1-1995 section 4.5.5.4.10"
  */
-public class DataPDU extends PDU
+public class DataPDU extends AbstractDataPDU
 {
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
@@ -34,10 +32,15 @@ public class DataPDU extends PDU
 	//----------------------------------------------------------
 	//                   INSTANCE VARIABLES
 	//----------------------------------------------------------
-
+		
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
+	/**
+	 * Constructor for type DataPDU with specified PDUHeader
+	 * 
+	 * @param header The <code>PDUHeader</code> to base this PDU on
+	 */
 	public DataPDU( PDUHeader header )
 	{
 		super( header );
@@ -53,4 +56,5 @@ public class DataPDU extends PDU
 	//----------------------------------------------------------
 	//                     STATIC METHODS
 	//----------------------------------------------------------
+	
 }

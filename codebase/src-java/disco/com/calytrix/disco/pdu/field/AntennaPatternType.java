@@ -14,6 +14,8 @@
  */
 package com.calytrix.disco.pdu.field;
 
+import com.calytrix.disco.util.DISSizes;
+
 /**
  * This field shall specify the type of representation used for the radiation 
  * pattern from the antenna. The value of this field shall determine the 
@@ -28,6 +30,8 @@ public class AntennaPatternType
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
 	//----------------------------------------------------------
+	public static final int BYTE_LENGTH = DISSizes.UI16_SIZE;
+	
 	public static final int OMNI_DIRECTIONAL = 0;
 	public static final int BEAM = 1;
 	public static final int SPHERICAL_HARMONIC = 2;

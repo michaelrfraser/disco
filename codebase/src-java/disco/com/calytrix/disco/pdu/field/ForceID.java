@@ -20,6 +20,8 @@
  */
 package com.calytrix.disco.pdu.field;
 
+import com.calytrix.disco.util.DISSizes;
+
 /**
  *  This field shall distinguish the different teams or sides in a DIS exercise.
  */
@@ -28,6 +30,8 @@ public class ForceID
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
 	//----------------------------------------------------------
+	public static final int BYTE_LENGTH = DISSizes.UI8_SIZE;
+	
 	public static final int OTHER = 0;
 	public static final int FRIENDLY = 1;
 	public static final int OPPOSING = 2;

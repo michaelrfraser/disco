@@ -23,6 +23,12 @@ package com.calytrix.disco.pdu.record;
 import java.io.IOException;
 
 import com.calytrix.disco.network.DISInputStream;
+import com.calytrix.disco.network.DISOutputStream;
+import com.calytrix.disco.pdu.IPDUComponent;
+import com.calytrix.disco.pdu.field.Country;
+import com.calytrix.disco.pdu.field.Domain;
+import com.calytrix.disco.pdu.field.EntityKind;
+import com.calytrix.disco.util.DISSizes;
 
 /**
  * The type of entity in a DIS exercise shall be specified by an Entity Type record. 
@@ -30,7 +36,7 @@ import com.calytrix.disco.network.DISInputStream;
  * the specific identification of the entity, and any extra information necessary for 
  * describing the entity. Fields not used shall contain the value zero.
  */
-public class EntityType
+public class EntityType implements IPDUComponent, Cloneable
 {
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
@@ -50,6 +56,11 @@ public class EntityType
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
+	public EntityType()
+	{
+		this( (short)0, (short)0, 0, (short)0, (short)0, (short)0, (short)0 );
+	}
+	
 	public EntityType( short entityKind,
 	                   short domain,
 	                   int country, 
@@ -95,6 +106,62 @@ public class EntityType
 		}
 
 		return false;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public EntityType clone()
+	{
+		return new EntityType( entityKind, domain, country, category, subcategory, specific, extra );
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public void read( DISInputStream dis ) throws IOException
+    {
+		entityKind = dis.readUI8();
+		domain = dis.readUI8();
+		country = dis.readUI16();
+		category = dis.readUI8();
+		subcategory = dis.readUI8();
+		specific = dis.readUI8();
+		extra = dis.readUI8();
+    }
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public void write( DISOutputStream dos ) throws IOException
+    {
+		dos.writeUI8( entityKind );
+		dos.writeUI8( domain );
+		dos.writeUI16( country );
+		dos.writeUI8( category );
+		dos.writeUI8( subcategory );
+		dos.writeUI8( specific );
+		dos.writeUI8( extra );
+    }
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int getByteLength()
+	{
+		int size = EntityKind.BYTE_LENGTH;
+		size += Domain.BYTE_LENGTH;
+		size += Country.BYTE_LENGTH;
+		size += DISSizes.UI8_SIZE;	// Category
+		size += DISSizes.UI8_SIZE;	// Sub Category
+		size += DISSizes.UI8_SIZE;	// Specific
+		size += DISSizes.UI8_SIZE;	// Extra
+		
+		return size;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////
@@ -173,27 +240,4 @@ public class EntityType
 	//----------------------------------------------------------
 	//                     STATIC METHODS
 	//----------------------------------------------------------
-	/**
-	 * Reads an instance of this record from the provided DISInputStream.
-	 * 
-	 * @param dis The DISInputStream to read the record from.
-	 * 
-	 * @return The EntityType deserialised from the provided input stream.
-	 * 
-	 * @throws IOException Thrown if an error occurred reading the record from
-	 * the stream.
-	 */
-	public static EntityType read( DISInputStream dis ) throws IOException
-	{
-		short entityKind = dis.readUI8();
-		short domain = dis.readUI8();
-		int country = dis.readUI16();
-		short category = dis.readUI8();
-		short subcategory = dis.readUI8();
-		short specific = dis.readUI8();
-		short extra = dis.readUI8();
-		
-		return new EntityType( entityKind, domain, country, category,
-		                       subcategory, specific, extra );
-	}
 }

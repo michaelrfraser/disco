@@ -20,6 +20,8 @@
  */
 package com.calytrix.disco.pdu.field;
 
+import com.calytrix.disco.util.DISSizes;
+
 /**
  * This field shall specify the domain in which the equipment operates (for example, subsurface,
  * surface, land, etc.) except for munition entities. For Munition entities this field shall
@@ -35,12 +37,14 @@ public class Domain
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
 	//----------------------------------------------------------
-	public static final int OTHER = 0;
-	public static final int LAND = 1;
-	public static final int AIR = 2;
-	public static final int SURFACE = 3;
-	public static final int SUBSURFACE = 4;
-	public static final int SPACE = 5;
+	public static final int BYTE_LENGTH = DISSizes.UI8_SIZE;
+	
+	public static final short OTHER = 0;
+	public static final short LAND = 1;
+	public static final short AIR = 2;
+	public static final short SURFACE = 3;
+	public static final short SUBSURFACE = 4;
+	public static final short SPACE = 5;
 
 	//----------------------------------------------------------
 	//                   INSTANCE VARIABLES
@@ -67,9 +71,9 @@ public class Domain
 	 * @return An int[] containing the ordered set of values that this 
 	 * enumeration field can assume
 	 */
-	public static int[] getValues()
+	public static short[] getValues()
 	{
-		int[] values = { OTHER, LAND, AIR, SURFACE, SUBSURFACE, SPACE };
+		short[] values = { OTHER, LAND, AIR, SURFACE, SUBSURFACE, SPACE };
 		return values;
 	}
 	
@@ -81,7 +85,7 @@ public class Domain
 	 * @return A String representing the description of the specified field
 	 * value
 	 */
-	public static String getDescription( int value )
+	public static String getDescription( short value )
 	{
 		String description = "Undefined";
 		

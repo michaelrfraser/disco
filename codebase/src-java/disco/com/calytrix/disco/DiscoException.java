@@ -14,6 +14,9 @@
  */
 package com.calytrix.disco;
 
+/**
+ * Common Exception class for the Disco framework
+ */
 public class DiscoException extends RuntimeException
 {
 	//----------------------------------------------------------

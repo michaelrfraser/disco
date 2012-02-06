@@ -17,16 +17,21 @@ package com.calytrix.disco.pdu.record;
 import java.io.IOException;
 
 import com.calytrix.disco.network.DISInputStream;
+import com.calytrix.disco.network.DISOutputStream;
+import com.calytrix.disco.pdu.field.PDUType;
+import com.calytrix.disco.pdu.field.ProtocolFamily;
+import com.calytrix.disco.pdu.field.ProtocolVersion;
+import com.calytrix.disco.util.DISSizes;
 
 /**
  * A PDU Header Record shall be the first part of each PDU.
  */
-public class PDUHeader
+public class PDUHeader implements Cloneable
 {
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
 	//----------------------------------------------------------
-	public static final int PDU_HEADER_LENGTH = 12;
+	public static final int PDU_HEADER_LENGTH_BYTES = 12;
 	
 	//----------------------------------------------------------
 	//                   INSTANCE VARIABLES
@@ -36,30 +41,108 @@ public class PDUHeader
 	private short pduType;
 	private short protocolFamily;
 	private long timestamp;
-	private int length;
 		
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
+	public PDUHeader()
+	{
+		this( ProtocolVersion.OTHER, 
+		      (short)0, 
+		      PDUType.OTHER, 
+		      ProtocolFamily.OTHER, 
+		      0 );
+	}
+	
 	public PDUHeader( short protocolVersion,
 	                  short exerciseIdentifier, 
 	                  short pduType,
 	                  short protocolFamily,
-	                  long timestamp,
-	                  int length )
+	                  long timestamp )
 	{
 		this.protocolVersion = protocolVersion;
 		this.exerciseIdentifier = exerciseIdentifier;
 		this.pduType = pduType;
 		this.protocolFamily = protocolFamily;
 		this.timestamp = timestamp;
-		this.length = length;
 	}
-	
+		
 	//----------------------------------------------------------
 	//                    INSTANCE METHODS
 	//----------------------------------------------------------
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals( Object other )
+	{
+		if( other == this )
+			return true;
+		
+		if( other instanceof PDUHeader )
+		{
+			PDUHeader asPDUHeader = (PDUHeader)other;
+			if( asPDUHeader.protocolVersion == this.protocolVersion &&
+				asPDUHeader.exerciseIdentifier == this.exerciseIdentifier &&
+				asPDUHeader.pduType == this.pduType &&
+				asPDUHeader.protocolFamily == this.protocolFamily &&
+				asPDUHeader.timestamp == this.timestamp )
+			{
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public PDUHeader clone()
+	{
+		return new PDUHeader( protocolVersion, exerciseIdentifier, pduType, 
+		                      protocolFamily, timestamp );
+	}
+	
+    public void read( DISInputStream dis ) throws IOException
+    {
+		protocolVersion = dis.readUI8();
+		exerciseIdentifier = dis.readUI8();
+		pduType = dis.readUI8();
+		protocolFamily = dis.readUI8();
+		timestamp = dis.readUI32();
+		
+		dis.readUI16(); // Length
+		dis.readUI16(); // padding bytes
+    }
 
+    public void write( DISOutputStream dos, int contentLength ) throws IOException
+    {
+    	int totalLength = getByteLength() + contentLength;
+    	
+    	dos.writeUI8( protocolVersion );
+    	dos.writeUI8( exerciseIdentifier );
+    	dos.writeUI8( pduType );
+    	dos.writeUI8( protocolFamily );
+    	dos.writeUI32( timestamp );
+    	dos.writeUI16( totalLength );
+    	dos.writePadding16();
+    }
+    
+    public int getByteLength()
+    {
+    	int size = ProtocolVersion.BYTE_LENGTH;
+    	size += DISSizes.UI8_SIZE;		// Exercise ID
+    	size += PDUType.BYTE_LENGTH;
+    	size += ProtocolFamily.BYTE_LENGTH;
+    	size += DISSizes.UI32_SIZE;		// Time Stamp
+    	size += DISSizes.UI16_SIZE;		// PDU Length
+    	size += 2;						// Padding
+    	
+    	return size;
+    }
+	
 	////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////// Accessor and Mutator Methods ///////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////
@@ -113,51 +196,7 @@ public class PDUHeader
 		this.timestamp = timestamp; 
 	}
 	
-	public int getLength()
-	{
-		return length;
-	}
-	
-	public void setLength( int newLength )
-	{
-		if( newLength < PDU_HEADER_LENGTH )
-		{
-			throw new IllegalStateException( "Invalid PDU length " + newLength +
-			                                 " (less than header size)" );
-		}
-		
-		this.length = newLength;
-	}
-	
 	//----------------------------------------------------------
 	//                     STATIC METHODS
 	//----------------------------------------------------------
-	/**
-	 * Reads an instance of this record from the provided DISInputStream
-	 * 
-	 * @param dis The DISInputStream to read the record from
-	 * 
-	 * @return The PDUHeader deserialised from the provided input stream
-	 * 
-	 * @throws IOException Thrown if an error occurred reading the record from
-	 * the stream
-	 */
-	public static PDUHeader read( DISInputStream dis ) throws IOException
-	{
-		short protocolVersion = dis.readUI8();
-		short exerciseIdentifier = dis.readUI8();
-		short pduType = dis.readUI8();
-		short protocolFamily = dis.readUI8();
-		long timestamp = dis.readUI32();
-		int length = dis.readUI16();
-		
-		dis.readUI16(); // padding bytes
-		
-		return new PDUHeader( protocolVersion,
-		                      exerciseIdentifier,
-		                      pduType,
-		                      protocolFamily,
-		                      timestamp,
-		                      length );
-	}
 }

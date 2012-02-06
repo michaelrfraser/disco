@@ -14,6 +14,8 @@
  */
 package com.calytrix.disco.pdu.field;
 
+import com.calytrix.disco.util.DISSizes;
+
 /**
  * This field shall indicate the spread spectrum technique or combination of 
  * spread spectrum techniques in use.<br/>
@@ -49,6 +51,8 @@ public class SpreadSpectrum
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
 	//----------------------------------------------------------
+	public static final int BYTE_LENGTH = DISSizes.UI16_SIZE;
+	
 	public static final int FREQUENCY_HOPPING = 0x01;
 	public static final int PSEUDO_NOISE = 0x02;
 	public static final int TIME_HOPPING = 0x04;

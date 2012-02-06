@@ -14,6 +14,8 @@
  */
 package com.calytrix.disco.pdu.field;
 
+import com.calytrix.disco.util.DISSizes;
+
 /**
  * This field shall indicate the type of PDU that follows.
  */
@@ -22,6 +24,8 @@ public class PDUType
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
 	//----------------------------------------------------------
+	public static final int BYTE_LENGTH = DISSizes.UI8_SIZE;
+	
 	public static final short OTHER = 0;
 	public static final short ENTITY_STATE = 1;
 	public static final short FIRE = 2;
@@ -44,7 +48,7 @@ public class PDUType
 	public static final short SET_DATA = 19;
 	public static final short DATA = 20;
 	public static final short EVENT_REPORT = 21;
-	public static final short MESSAGE = 22;
+	public static final short COMMENT = 22;
 	public static final short ELECTROMAGNETIC_EMISSION = 23;
 	public static final short DESIGNATOR = 24;
 	public static final short TRANSMITTER = 25;
@@ -123,7 +127,7 @@ public class PDUType
 		                   SET_DATA,
 		                   DATA,
 		                   EVENT_REPORT,
-		                   MESSAGE,
+		                   COMMENT,
 		                   ELECTROMAGNETIC_EMISSION,
 		                   DESIGNATOR,
 		                   TRANSMITTER,
@@ -256,8 +260,8 @@ public class PDUType
 				description = "Event Report";
 				break;
             
-			case MESSAGE:
-				description = "Message";
+			case COMMENT:
+				description = "Comment";
 				break;
             
 			case ELECTROMAGNETIC_EMISSION:

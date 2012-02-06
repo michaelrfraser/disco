@@ -16,139 +16,146 @@ package com.calytrix.disco.pdu.warfare;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import com.calytrix.disco.network.DISInputStream;
-import com.calytrix.disco.pdu.PDU;
+import com.calytrix.disco.network.DISOutputStream;
+import com.calytrix.disco.pdu.field.DetonationResult;
 import com.calytrix.disco.pdu.field.PDUType;
 import com.calytrix.disco.pdu.record.ArticulationParameter;
 import com.calytrix.disco.pdu.record.BurstDescriptor;
 import com.calytrix.disco.pdu.record.EntityCoordinate;
-import com.calytrix.disco.pdu.record.EntityIdentifier;
-import com.calytrix.disco.pdu.record.EventIdentifier;
 import com.calytrix.disco.pdu.record.PDUHeader;
 import com.calytrix.disco.pdu.record.VectorRecord;
 import com.calytrix.disco.pdu.record.WorldCoordinate;
+import com.calytrix.disco.util.DISSizes;
 
 /**
- * This class represents an Detonation PDU.
- * <p/>
- * PDUs of this type contain information about...
+ * This class represents an Detonation PDU. A Detonation PDU is raised when an ordinate detonates
+ * in the simulated world, and is usually traceable to a Fire PDU.
  * 
  * @see "IEEE Std 1278.1-1995 section 4.5.3.3"
  */
-public class DetonationPDU extends PDU
+public class DetonationPDU extends AbstractWarfarePDU
 {
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
 	//----------------------------------------------------------
-	private static final int DETONATION_BASE_SIZE = 832;
 
 	//----------------------------------------------------------
 	//                   INSTANCE VARIABLES
 	//----------------------------------------------------------	
-	private PDUHeader header;
-	private EntityIdentifier firingEntityID;
-	private EntityIdentifier targetEntityID;
-	private EntityIdentifier munitionID;
-	private EventIdentifier eventID;
 	private VectorRecord velocity;
 	private WorldCoordinate locationInWorld;
 	private BurstDescriptor burstDescriptor;
 	private EntityCoordinate locationInEntityCoordinates;
 	private short detonationResult;
-	private ArrayList<ArticulationParameter> articulationParameter;
+	private List<ArticulationParameter> articulationParameters;
 	
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
-	public DetonationPDU( PDUHeader header,
-	                      EntityIdentifier firingEntityID,
-	                      EntityIdentifier targetEntityID,
-	                      EntityIdentifier munitionID,
-	                      EventIdentifier eventID,
-	                      VectorRecord velocity,
-	                      WorldCoordinate locationInWorld,
-	                      BurstDescriptor burstDescriptor,
-	                      EntityCoordinate locationInEntityCoordinates,
-	                      short detonationResult,
-	                      ArrayList<ArticulationParameter> articulationParameter )
+	/**
+	 * Constructor for type DetonationPDU with specified PDUHeader
+	 * 
+	 * @param header The <code>PDUHeader</code> to base this PDU on
+	 */
+	public DetonationPDU( PDUHeader header )
 	{
 		super( header );
 		
 		if( header.getPDUType() != PDUType.DETONATION )
 	    	throw new IllegalStateException( "Invalid PDUType in Header" );
 		
-		this.header = header;
-		this.firingEntityID = firingEntityID;
-		this.targetEntityID = targetEntityID;
-		this.munitionID = munitionID;
-		this.eventID = eventID;
-		this.velocity = velocity;
-		this.locationInWorld = locationInWorld;
-		this.burstDescriptor = burstDescriptor;
-		this.locationInEntityCoordinates = locationInEntityCoordinates;
-		this.detonationResult = detonationResult;
-		setArticulationParameter( articulationParameter );
+
+		this.velocity = new VectorRecord();
+		this.locationInWorld = new WorldCoordinate();
+		this.burstDescriptor = new BurstDescriptor();
+		this.locationInEntityCoordinates = new EntityCoordinate();
+		this.detonationResult = DetonationResult.OTHER;
+		this.articulationParameters = new ArrayList<ArticulationParameter>();
 	}
 
 	//----------------------------------------------------------
 	//                    INSTANCE METHODS
 	//----------------------------------------------------------
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public void readContent( DISInputStream dis ) throws IOException
+    {
+		super.readContent( dis );
+		
+		velocity.read( dis );
+		locationInWorld.read( dis );
+		burstDescriptor.read( dis );
+		locationInEntityCoordinates.read( dis );
+		detonationResult = dis.readUI8();
+		
+		short numberOfArticulationParameters = dis.readUI8();
+		dis.skip16(); // Skip over padding
+		
+		articulationParameters.clear();
+		for( int i = 0; i < numberOfArticulationParameters; ++i )
+		{
+			ArticulationParameter parameter = new ArticulationParameter();
+			parameter.read( dis );
+			articulationParameters.add( parameter );
+		}
+    }
 	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public void writeContent( DISOutputStream dos ) throws IOException
+    {
+		super.writeContent( dos );
+		
+		velocity.write( dos );
+		locationInWorld.write( dos );
+		burstDescriptor.write( dos );
+		locationInEntityCoordinates.write( dos );
+		dos.writeUI8( detonationResult );
+		
+		int parameterCountRaw = articulationParameters.size();
+		if( parameterCountRaw > DISSizes.UI8_MAX_VALUE )
+		{
+			// TODO Warn about truncation
+		}
+		
+		short parameterCount = (short)parameterCountRaw;
+		dos.writeUI8( parameterCount );
+		dos.writePadding16();
+		
+		for( ArticulationParameter parameter : articulationParameters )
+			parameter.write( dos );
+    }
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public int getContentLength()
+	{
+		int size = super.getContentLength();
+		size += velocity.getByteLength();
+		size += locationInWorld.getByteLength();
+		size += burstDescriptor.getByteLength();
+		size += locationInEntityCoordinates.getByteLength();
+		size += DetonationResult.BYTE_LENGTH;
+		size += DISSizes.UI8_SIZE;		// Parameter Count
+		size += 2;						// Padding
+		size += DISSizes.getByteLengthOfCollection( articulationParameters );
+		
+		return size;
+		
+	}
 	
     ////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////// Accessor and Mutator Methods ///////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////
-	public PDUHeader getHeader()
-    {
-    	return header;
-    }
-
-	public void setHeader( PDUHeader header )
-    {
-    	this.header = header;
-    }
-
-	public EntityIdentifier getFiringEntityID()
-    {
-    	return firingEntityID;
-    }
-
-	public void setFiringEntityID( EntityIdentifier firingEntityID )
-    {
-    	this.firingEntityID = firingEntityID;
-    }
-
-	public EntityIdentifier getTargetEntityID()
-    {
-    	return targetEntityID;
-    }
-
-	public void setTargetEntityID( EntityIdentifier targetEntityID )
-    {
-    	this.targetEntityID = targetEntityID;
-    }
-
-	public EntityIdentifier getMunitionID()
-    {
-    	return munitionID;
-    }
-
-	public void setMunitionID( EntityIdentifier munitionID )
-    {
-    	this.munitionID = munitionID;
-    }
-
-	public EventIdentifier getEventID()
-    {
-    	return eventID;
-    }
-
-	public void setEventID( EventIdentifier eventID )
-    {
-    	this.eventID = eventID;
-    }
-
 	public VectorRecord getVelocity()
     {
     	return velocity;
@@ -199,51 +206,17 @@ public class DetonationPDU extends PDU
     	this.detonationResult = detonationResult;
     }
 
-	public ArrayList<ArticulationParameter> getArticulationParameter()
+	public List<ArticulationParameter> getArticulationParameters()
     {
-    	return articulationParameter;
+    	return articulationParameters;
     }
 
-	public void setArticulationParameter( ArrayList<ArticulationParameter> articulationParameter )
+	public void setArticulationParameter( List<ArticulationParameter> articulationParameters )
     {
-    	this.articulationParameter = articulationParameter;
-    	PDUHeader header = getHeader();
-		header.setLength( DETONATION_BASE_SIZE +
-		                  (articulationParameter.size() * ArticulationParameter.ARTICULATION_PARAMETER_SIZE) );
+    	this.articulationParameters = articulationParameters;
     }
 
 	//----------------------------------------------------------
 	//                     STATIC METHODS
 	//----------------------------------------------------------
-	public static DetonationPDU read( PDUHeader header, DISInputStream dis ) throws IOException
-	{
-		EntityIdentifier firingEntityID = EntityIdentifier.read( dis );
-		EntityIdentifier targetEntityID = EntityIdentifier.read( dis );
-		EntityIdentifier munitionID = EntityIdentifier.read( dis );
-		EventIdentifier eventID = EventIdentifier.read( dis );
-		VectorRecord velocity = VectorRecord.read( dis );
-		WorldCoordinate locationInWorld = WorldCoordinate.read( dis );
-		BurstDescriptor burstDescriptor = BurstDescriptor.read( dis );
-		EntityCoordinate locationInEntityCoordinates = EntityCoordinate.read( dis );
-		short detonationResult = dis.readUI8();
-		short numberOfArticulationParameters = dis.readUI8();
-		dis.skip16(); // Skip over padding
-		ArrayList<ArticulationParameter> articulationParameters = new ArrayList<ArticulationParameter>(numberOfArticulationParameters);
-		for( int i = 0; i < numberOfArticulationParameters; i++ )
-		{
-			articulationParameters.add( ArticulationParameter.read( dis ) );
-		}
-		
-		return new DetonationPDU( header,
-		                          firingEntityID,
-		                          targetEntityID,
-		                          munitionID,
-		                          eventID,
-		                          velocity,
-		                          locationInWorld,
-		                          burstDescriptor,
-		                          locationInEntityCoordinates, 
-		                          detonationResult,
-		                          articulationParameters );
-	}
 }

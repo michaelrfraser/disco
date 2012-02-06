@@ -17,37 +17,30 @@ package com.calytrix.disco.pdu.warfare;
 import java.io.IOException;
 
 import com.calytrix.disco.network.DISInputStream;
-import com.calytrix.disco.pdu.PDU;
+import com.calytrix.disco.network.DISOutputStream;
 import com.calytrix.disco.pdu.field.PDUType;
 import com.calytrix.disco.pdu.record.BurstDescriptor;
-import com.calytrix.disco.pdu.record.EntityIdentifier;
-import com.calytrix.disco.pdu.record.EventIdentifier;
 import com.calytrix.disco.pdu.record.PDUHeader;
 import com.calytrix.disco.pdu.record.VectorRecord;
 import com.calytrix.disco.pdu.record.WorldCoordinate;
+import com.calytrix.disco.util.DISSizes;
 
 /**
- * This class represents an Fire PDU.
- * <p/>
- * PDUs of this type contain information about...
+ * This class represents an Fire PDU. Fire PDUs represent the firing of ordinates in the Simulated
+ * World. The detonation of the ordinates is reported in a corresponding Detonation PDU when the
+ * modeled munitions eventually detonate.
  * 
  * @see "IEEE Std 1278.1-1995 section 4.5.3.2"
  */
-public class FirePDU extends PDU
+public class FirePDU extends AbstractWarfarePDU
 {
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
 	//----------------------------------------------------------
-	public static final int FIRE_BASE_SIZE = 768;
-
+	
 	//----------------------------------------------------------
 	//                   INSTANCE VARIABLES
 	//----------------------------------------------------------
-	private PDUHeader header;
-	private EntityIdentifier firingEntityID;
-	private EntityIdentifier targetEntityID;
-	private EntityIdentifier munitionID;
-	private EventIdentifier eventID;
 	private long fireMissionIndex;
 	private WorldCoordinate locationInWorld;
 	private BurstDescriptor burstDescriptor;
@@ -57,89 +50,77 @@ public class FirePDU extends PDU
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
-	public FirePDU( PDUHeader header, 
-	                EntityIdentifier firingEntityID,
-	                EntityIdentifier targetEntityID,
-	                EntityIdentifier munitionID,
-	                EventIdentifier eventID,
-	                long fireMissionIndex,
-	                WorldCoordinate locationInWorld,
-	                BurstDescriptor burstDescriptor,
-	                VectorRecord velocity,
-	                float range )
+	/**
+	 * Constructor for type FirePDU with specified PDUHeader
+	 * 
+	 * @param header The <code>PDUHeader</code> to base this PDU on
+	 */
+	public FirePDU( PDUHeader header )
 	{
 		super( header );
 		
 		if( header.getPDUType() != PDUType.FIRE )
 	    	throw new IllegalStateException( "Invalid PDUType in Header" );
-		
-		header.setLength( FIRE_BASE_SIZE );
-		
-		this.header = header;
-		this.firingEntityID = firingEntityID;
-		this.targetEntityID = targetEntityID;
-		this.munitionID = munitionID;
-		this.eventID = eventID;
-		this.fireMissionIndex = fireMissionIndex;
-		this.locationInWorld = locationInWorld;
-		this.burstDescriptor = burstDescriptor;
-		this.velocity = velocity;
-		this.range = range;
+				
+		this.fireMissionIndex = 0;
+		this.locationInWorld = new WorldCoordinate();
+		this.burstDescriptor = new BurstDescriptor();
+		this.velocity = new VectorRecord();
+		this.range = 0f;
 	}
 
 	//----------------------------------------------------------
 	//                    INSTANCE METHODS
 	//----------------------------------------------------------
-	public PDUHeader getHeader()
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void readContent( DISInputStream dis ) throws IOException
+	{
+		super.readContent( dis );
+		
+		fireMissionIndex = dis.readUI32();
+		locationInWorld.read( dis );
+		burstDescriptor.read( dis );
+		velocity.read( dis );
+		range = dis.readFloat();
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public void writeContent( DISOutputStream dos ) throws IOException
     {
-    	return header;
+		super.writeContent( dos );
+		
+		dos.writeUI32( fireMissionIndex );
+		locationInWorld.write( dos );
+		burstDescriptor.write( dos );
+		velocity.write( dos );
+		dos.writeFloat( range );
     }
-
-	public void setHeader( PDUHeader header )
-    {
-    	this.header = header;
-    }
-
-	public EntityIdentifier getFiringEntityID()
-    {
-    	return firingEntityID;
-    }
-
-	public void setFiringEntityID( EntityIdentifier firingEntityID )
-    {
-    	this.firingEntityID = firingEntityID;
-    }
-
-	public EntityIdentifier getTargetEntityID()
-    {
-    	return targetEntityID;
-    }
-
-	public void setTargetEntityID( EntityIdentifier targetEntityID )
-    {
-    	this.targetEntityID = targetEntityID;
-    }
-
-	public EntityIdentifier getMunitionID()
-    {
-    	return munitionID;
-    }
-
-	public void setMunitionID( EntityIdentifier munitionID )
-    {
-    	this.munitionID = munitionID;
-    }
-
-	public EventIdentifier getEventID()
-    {
-    	return eventID;
-    }
-
-	public void setEventID( EventIdentifier eventID )
-    {
-    	this.eventID = eventID;
-    }
-
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public int getContentLength()
+	{
+		int size = super.getContentLength();
+		size += DISSizes.UI32_SIZE;		// Fire Mission Index
+		size += locationInWorld.getByteLength();
+		size += burstDescriptor.getByteLength();
+		size += velocity.getByteLength();
+		size += DISSizes.FLOAT32_SIZE;				// Range
+		
+		return size;
+	}
+	
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////// Accessor and Mutator Methods ///////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////
 	public long getFireMissionIndex()
     {
     	return fireMissionIndex;
@@ -193,27 +174,4 @@ public class FirePDU extends PDU
 	//----------------------------------------------------------
 	//                     STATIC METHODS
 	//----------------------------------------------------------
-	public static FirePDU read( PDUHeader header, DISInputStream dis ) throws IOException
-	{
-		EntityIdentifier firingEntityID = EntityIdentifier.read( dis );
-		EntityIdentifier targetEntityID = EntityIdentifier.read( dis );
-		EntityIdentifier munitionID = EntityIdentifier.read( dis );
-		EventIdentifier eventID = EventIdentifier.read( dis );
-		long fireMissionIndex = dis.readUI32();
-		WorldCoordinate locationInWorld = WorldCoordinate.read( dis );
-		BurstDescriptor burstDescriptor = BurstDescriptor.read( dis );
-		VectorRecord velocity = VectorRecord.read( dis );
-		float range = dis.readFloat();		
-	
-		return new FirePDU( header,
-		                    firingEntityID,
-		                    targetEntityID,
-		                    munitionID,
-		                    eventID,
-		                    fireMissionIndex,
-		                    locationInWorld,
-		                    burstDescriptor,
-		                    velocity,
-		                    range );
-	}
 }

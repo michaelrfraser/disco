@@ -23,6 +23,9 @@ package com.calytrix.disco.pdu.record;
 import java.io.IOException;
 
 import com.calytrix.disco.network.DISInputStream;
+import com.calytrix.disco.network.DISOutputStream;
+import com.calytrix.disco.pdu.IPDUComponent;
+import com.calytrix.disco.util.DISSizes;
 import com.calytrix.disco.util.FloatingPointUtils;
 
 /**
@@ -30,7 +33,7 @@ import com.calytrix.disco.util.FloatingPointUtils;
  * shall specify three angles which are specified with respect to the entities coordinate system.
  * The three angles shall be represented in radians.
  */
-public class EulerAngles
+public class EulerAngles implements IPDUComponent, Cloneable
 {
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
@@ -46,6 +49,11 @@ public class EulerAngles
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
+	public EulerAngles()
+	{
+		this( 0f, 0f, 0f );
+	}
+	
 	public EulerAngles( float psi, float theta, float phi )
 	{
 		this.psi = psi;
@@ -79,6 +87,46 @@ public class EulerAngles
 		return false;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public EulerAngles clone()
+	{
+		return new EulerAngles( psi, theta, phi );
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public void read( DISInputStream dis ) throws IOException
+    {
+		psi = dis.readFloat();
+		theta = dis.readFloat();
+		phi = dis.readFloat();
+    }
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public void write( DISOutputStream dos ) throws IOException
+    {
+		dos.writeFloat( psi );
+		dos.writeFloat( theta );
+		dos.writeFloat( phi );
+    }
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public int getByteLength()
+	{
+		return DISSizes.FLOAT32_SIZE * 3;
+	}
+	
 	////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////// Accessor and Mutator Methods ///////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////
@@ -115,22 +163,4 @@ public class EulerAngles
 	//----------------------------------------------------------
 	//                     STATIC METHODS
 	//----------------------------------------------------------
-	/**
-	 * Reads an instance of this record from the provided DISInputStream.
-	 * 
-	 * @param dis The DISInputStream to read the record from.
-	 * 
-	 * @return The EulerAngles deserialised from the provided input stream.
-	 * 
-	 * @throws IOException Thrown if an error occurred reading the record from
-	 * the stream.
-	 */
-	public static EulerAngles read( DISInputStream dis ) throws IOException
-	{
-		float psi = dis.readFloat();
-		float theta = dis.readFloat();
-		float phi = dis.readFloat();
-		
-		return new EulerAngles( psi, theta, phi );
-	}
 }

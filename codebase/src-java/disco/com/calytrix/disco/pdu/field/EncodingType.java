@@ -26,7 +26,7 @@ public class EncodingType
 {
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
-	//----------------------------------------------------------
+	//----------------------------------------------------------	
 	public static final short MULAW_8 = 1;
 	public static final short CVSD = 2;
 	public static final short ADPCM = 3;

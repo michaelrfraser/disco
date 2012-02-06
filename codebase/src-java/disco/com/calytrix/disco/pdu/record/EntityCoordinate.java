@@ -17,6 +17,9 @@ package com.calytrix.disco.pdu.record;
 import java.io.IOException;
 
 import com.calytrix.disco.network.DISInputStream;
+import com.calytrix.disco.network.DISOutputStream;
+import com.calytrix.disco.pdu.IPDUComponent;
+import com.calytrix.disco.util.DISSizes;
 import com.calytrix.disco.util.FloatingPointUtils;
 
 /**
@@ -29,7 +32,7 @@ import com.calytrix.disco.util.FloatingPointUtils;
  * viewed from above, facing in the direction of the positive x-axis. The z-axis 
  * extends in the positive direction out the bottom of the entity.
  */
-public class EntityCoordinate
+public class EntityCoordinate implements IPDUComponent, Cloneable
 {
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
@@ -45,6 +48,11 @@ public class EntityCoordinate
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
+	public EntityCoordinate()
+	{
+		this( 0f, 0f, 0f );
+	}
+	
 	public EntityCoordinate( float x, float y, float z )
 	{
 		this.x = x;
@@ -76,6 +84,46 @@ public class EntityCoordinate
 		}
 		
 		return false;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public EntityCoordinate clone()
+	{
+		return new EntityCoordinate( x, y, z );
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public void read( DISInputStream dis ) throws IOException
+    {
+		x = dis.readFloat();
+		y = dis.readFloat();
+		z = dis.readFloat();
+    }
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public void write( DISOutputStream dos ) throws IOException
+    {
+		dos.writeFloat( x );
+		dos.writeFloat( y );
+		dos.writeFloat( z );
+    }
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public int getByteLength()
+	{
+		return DISSizes.FLOAT32_SIZE * 3;
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////
@@ -114,22 +162,4 @@ public class EntityCoordinate
 	//----------------------------------------------------------
 	//                     STATIC METHODS
 	//----------------------------------------------------------
-	/**
-	 * Reads an instance of this record from the provided DISInputStream
-	 * 
-	 * @param dis The DISInputStream to read the record from
-	 * 
-	 * @return The EntityCoordinate deserialised from the provided input stream
-	 * 
-	 * @throws IOException Thrown if an error occurred reading the record from
-	 * the stream
-	 */
-	public static EntityCoordinate read( DISInputStream dis ) throws IOException
-	{
-		float x = dis.readFloat();
-		float y = dis.readFloat();
-		float z = dis.readFloat();
-		
-		return new EntityCoordinate( x, y, z );
-	}
 }

@@ -20,6 +20,8 @@
  */
 package com.calytrix.disco.pdu.field;
 
+import com.calytrix.disco.util.DISSizes;
+
 /**
  * Indicates the type of dead reckoning algorithm used by an entity.
  */
@@ -28,16 +30,18 @@ public class DeadReckoningAlgorithm
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
 	//----------------------------------------------------------
-	public static final int OTHER = 0;
-	public static final int STATIC = 1;
-	public static final int FPW = 2;
-	public static final int RPW = 3;
-	public static final int RVW = 4;
-	public static final int FVW = 5;
-	public static final int FPB = 6;
-	public static final int RPB = 7;
-	public static final int RVB = 8;
-	public static final int FVB = 9;
+	public static final int BYTE_LENGTH = DISSizes.UI8_SIZE;
+	
+	public static final short OTHER = 0;
+	public static final short STATIC = 1;
+	public static final short FPW = 2;
+	public static final short RPW = 3;
+	public static final short RVW = 4;
+	public static final short FVW = 5;
+	public static final short FPB = 6;
+	public static final short RPB = 7;
+	public static final short RVB = 8;
+	public static final short FVB = 9;
 
 	//----------------------------------------------------------
 	//                   INSTANCE VARIABLES
@@ -61,21 +65,21 @@ public class DeadReckoningAlgorithm
 	/**
 	 * Returns the ordered set of values that this enumerated field can assume
 	 * 
-	 * @return An int[] containing the ordered set of values that this 
+	 * @return An short[] containing the ordered set of values that this 
 	 * enumeration field can assume
 	 */
-	public static int[] getValues()
+	public static short[] getValues()
 	{
-		int[] values = { OTHER,
-		                 STATIC,
-		                 FPW,
-		                 RPW,
-		                 RVW,
-		                 FVW,
-		                 FPB,
-		                 RPB,
-		                 RVB,
-		                 FVB };
+		short[] values = { OTHER,
+		                   STATIC,
+		                   FPW,
+		                   RPW,
+		                   RVW,
+		                   FVW,
+		                   FPB,
+		                   RPB,
+		                   RVB,
+		                   FVB };
 		return values;
 	}
 	
@@ -87,7 +91,7 @@ public class DeadReckoningAlgorithm
 	 * @return A String representing the description of the specified field
 	 * value
 	 */
-	public static String getDescription( int value )
+	public static String getDescription( short value )
 	{
 		String description = "Undefined";
 		switch( value )

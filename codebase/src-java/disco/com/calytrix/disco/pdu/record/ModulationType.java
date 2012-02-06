@@ -17,6 +17,10 @@ package com.calytrix.disco.pdu.record;
 import java.io.IOException;
 
 import com.calytrix.disco.network.DISInputStream;
+import com.calytrix.disco.network.DISOutputStream;
+import com.calytrix.disco.pdu.IPDUComponent;
+import com.calytrix.disco.pdu.field.MajorModulationType;
+import com.calytrix.disco.util.DISSizes;
 
 /**
  * Information about the type of modulation used for radio transmission shall be 
@@ -66,7 +70,7 @@ import com.calytrix.disco.network.DISInputStream;
  * 
  *  @see "Section 9 in EBV-DOC"
  */
-public class ModulationType
+public class ModulationType implements IPDUComponent, Cloneable
 {
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
@@ -83,6 +87,11 @@ public class ModulationType
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
+	public ModulationType()
+	{
+		this( 0, MajorModulationType.OTHER, 0, 0 );
+	}
+	
 	public ModulationType( int spreadSpectrum,
 	                       int majorModulationType, 
 	                       int detail,
@@ -119,6 +128,48 @@ public class ModulationType
 		}
 		
 		return false;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public ModulationType clone()
+	{
+		return new ModulationType( spreadSpectrum, majorModulationType, detail, system );
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public void read( DISInputStream dis ) throws IOException
+    {
+		spreadSpectrum = dis.readUI16();
+		majorModulationType = dis.readUI16(); 
+        detail = dis.readUI16();
+        system = dis.readUI16();
+    }
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public void write( DISOutputStream dos ) throws IOException
+    {
+		dos.writeUI16( spreadSpectrum );
+		dos.writeUI16( majorModulationType );
+		dos.writeUI16( detail );
+		dos.writeUI16( system );
+    }
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public int getByteLength()
+	{
+		return DISSizes.UI16_SIZE * 4;
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////
@@ -163,27 +214,8 @@ public class ModulationType
 	{
 		this.system = system;
 	}
-	
+
 	//----------------------------------------------------------
 	//                     STATIC METHODS
 	//----------------------------------------------------------
-	/**
-	 * Reads an instance of this record from the provided DISInputStream
-	 * 
-	 * @param dis The DISInputStream to read the record from
-	 * 
-	 * @return The ModulationType deserialised from the provided input stream
-	 * 
-	 * @throws IOException Thrown if an error occurred reading the record from
-	 * the stream
-	 */
-	public static ModulationType read( DISInputStream dis ) throws IOException
-	{
-		int spreadSpectrum = dis.readUI16();
-		int majorModulationType = dis.readUI16(); 
-        int detail = dis.readUI16();
-        int system = dis.readUI16();
-        
-        return new ModulationType( spreadSpectrum, majorModulationType, detail, system );
-	}
 }

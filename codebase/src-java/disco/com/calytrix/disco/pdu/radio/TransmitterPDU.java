@@ -15,16 +15,20 @@
 package com.calytrix.disco.pdu.radio;
 
 import java.io.IOException;
-import java.math.BigInteger;
 
 import com.calytrix.disco.network.DISInputStream;
-import com.calytrix.disco.pdu.PDU;
+import com.calytrix.disco.network.DISOutputStream;
+import com.calytrix.disco.pdu.field.AntennaPatternType;
+import com.calytrix.disco.pdu.field.CryptoSystem;
+import com.calytrix.disco.pdu.field.InputSource;
 import com.calytrix.disco.pdu.field.PDUType;
+import com.calytrix.disco.pdu.field.TransmitState;
 import com.calytrix.disco.pdu.record.AntennaLocation;
-import com.calytrix.disco.pdu.record.EntityIdentifier;
 import com.calytrix.disco.pdu.record.ModulationType;
 import com.calytrix.disco.pdu.record.PDUHeader;
 import com.calytrix.disco.pdu.record.RadioEntityType;
+import com.calytrix.disco.util.DISSizes;
+import com.calytrix.disco.util.DISUnsignedInt64;
 
 /**
  * This class represents an Transmitter PDU.
@@ -33,24 +37,21 @@ import com.calytrix.disco.pdu.record.RadioEntityType;
  * 
  * @see "IEEE Std 1278.1-1995 section 4.5.7.2"
  */
-public class TransmitterPDU extends PDU
+public class TransmitterPDU extends AbstractRadioPDU
 {
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
 	//----------------------------------------------------------
-	public static final int TRANSMITTER_BASE_SIZE = 104;
 	
 	//----------------------------------------------------------
 	//                   INSTANCE VARIABLES
 	//----------------------------------------------------------
-	private EntityIdentifier entityIdentifier;
-	private int radioID;
 	private RadioEntityType radioEntityType;
 	private short transmitState;
 	private short inputSource;
 	private AntennaLocation antennaLocation;
 	private int antennaPatternType;
-	private BigInteger transmissionFrequency;
+	private DISUnsignedInt64 transmissionFrequency;
 	private float transmissionFrequencyBandwidth;
 	private float power;
 	private ModulationType modulationType;
@@ -62,78 +63,133 @@ public class TransmitterPDU extends PDU
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
-	public TransmitterPDU( PDUHeader header,
-	                       EntityIdentifier entityIdentifier,
-	                       int radioID,
-	                       RadioEntityType radioEntityType, 
-	                       short transmitState,
-	                       short inputSource, 
-	                       AntennaLocation antennaLocation,
-	                       int antennaPatternType,
-	                       BigInteger transmissionFrequency, 
-	                       float transmissionFrequencyBandwidth,
-	                       float power,
-	                       ModulationType modulationType,
-	                       int cryptoSystem, 
-	                       int cryptoKey,
-	                       byte[] modulationParameter, 
-	                       byte[] antennaPatternParameter )
+	/**
+	 * Constructor for TransmitterPDU with provided PDUHeader
+	 * 
+	 * @param header The PDUHeader that this PDU will wrap 
+	 */
+	public TransmitterPDU( PDUHeader header )
 	{
 		super( header );
 		
 		if( header.getPDUType() != PDUType.TRANSMITTER )
 	    	throw new IllegalStateException( "Invalid PDUType in Header" );
 		
-		this.entityIdentifier = entityIdentifier;
-		this.radioID = radioID;
-		this.radioEntityType = radioEntityType;
-		this.transmitState = transmitState;
-		this.inputSource = inputSource;
-		this.antennaLocation = antennaLocation;
-		this.transmissionFrequency = transmissionFrequency;
-		this.transmissionFrequencyBandwidth = transmissionFrequencyBandwidth;
-		this.power = power;
-		this.cryptoSystem = cryptoSystem;
-		this.cryptoKey = cryptoKey;
+		this.radioEntityType = new RadioEntityType();
+		this.transmitState = TransmitState.OFF;
+		this.inputSource = InputSource.OTHER;
+		this.antennaLocation = new AntennaLocation();
+		this.transmissionFrequency = DISUnsignedInt64.ZERO;
+		this.transmissionFrequencyBandwidth = 0f;
+		this.power = 0f;
+		this.cryptoSystem = CryptoSystem.OTHER;
+		this.cryptoKey = 0;
 		
-		setModulation( modulationType, modulationParameter );
-		setAntennaPattern( antennaPatternType, antennaPatternParameter );
+		setModulation( new ModulationType(), new byte[0] );
+		setAntennaPattern( AntennaPatternType.OMNI_DIRECTIONAL, new byte[0] );
 	}
 
 	//----------------------------------------------------------
 	//                    INSTANCE METHODS
 	//----------------------------------------------------------
-	private void setPDULength()
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void readContent( DISInputStream dis ) throws IOException
 	{
-		int length = TRANSMITTER_BASE_SIZE;
-		if( modulationParameter != null )
-			length += modulationParameter.length;
+		super.readContent( dis );
 		
-		if( antennaPatternParameter != null )
-			length += antennaPatternParameter.length;
+		radioEntityType.read( dis );
+		transmitState = dis.readUI8();
+		inputSource = dis.readUI8();
 		
-		PDUHeader header = getHeader();
-		header.setLength( length );
+		// Padding
+		dis.skip16();
+				
+		antennaLocation.read( dis );
+		int antennaPatternType = dis.readUI16();
+		int antennaPatternLength = dis.readUI16();
+		transmissionFrequency.read( dis );
+		transmissionFrequencyBandwidth = dis.readFloat();
+		power = dis.readFloat();
+		modulationType.read( dis );
+		cryptoSystem = dis.readUI16();
+		cryptoKey = dis.readUI16();
+		
+		short modulationParametersLength = dis.readUI8();
+		
+		// Padding
+		dis.skip24();
+		byte[] modulationParameter = new byte[modulationParametersLength];
+		dis.readFully( modulationParameter );
+		setModulation( modulationType, modulationParameter );
+		
+		byte[] antennaParameter = new byte[antennaPatternLength];
+		dis.readFully( antennaParameter );
+		setAntennaPattern( antennaPatternType, antennaParameter );
 	}
 	
-	public EntityIdentifier getEntityIdentifier()
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void writeContent( DISOutputStream dos ) throws IOException
 	{
-		return entityIdentifier;
+		super.writeContent( dos );
+		
+		radioEntityType.write( dos );
+		dos.writeUI8( transmitState );
+		dos.writeUI8( inputSource );
+		
+		dos.writePadding16();
+		
+		antennaLocation.write( dos );
+		dos.writeUI16( antennaPatternType );
+		// This will never be beyond the bounds of a UI16 due to input verification in the setter
+		dos.writeUI16( antennaPatternParameter.length );
+		transmissionFrequency.write( dos );
+		dos.writeFloat( transmissionFrequencyBandwidth );
+		dos.writeFloat( power );
+		modulationType.write( dos );
+		dos.writeUI16( cryptoSystem );
+		dos.writeUI16( cryptoKey );
+				
+		// This will never be beyond the bounds of a UI8 due to input verification in the setter
+		dos.writeUI8( (short)modulationParameter.length );
+		
+		dos.writePadding24();
+		dos.write( modulationParameter );
+		dos.write( antennaPatternParameter );
 	}
 	
-	public void setEntityIdentifier( EntityIdentifier entityIdentifier )
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int getContentLength()
 	{
-		this.entityIdentifier = entityIdentifier;
-	}
-	
-	public int getRadioID()
-	{
-		return radioID;
-	}
-	
-	public void setRadioID( int radioID )
-	{
-		this.radioID = radioID;
+		int size = super.getContentLength();
+		
+		size += radioEntityType.getByteLength();
+		size += TransmitState.BYTE_LENGTH;
+		size += InputSource.BYTE_LENGTH;
+		size += 2;										// Padding
+		size += antennaLocation.getByteLength();
+		size += AntennaPatternType.BYTE_LENGTH;
+		size += DISSizes.UI16_SIZE;				// Antenna Pattern Parameter Length
+		size += transmissionFrequency.getByteLength();
+		size += DISSizes.FLOAT32_SIZE;						// Bandwidth
+		size += DISSizes.FLOAT32_SIZE;						// Power
+		size += modulationType.getByteLength();
+		size += CryptoSystem.BYTE_LENGTH;
+		size += DISSizes.UI16_SIZE;				// Crypto Key
+		size += DISSizes.UI8_SIZE;				// Modulation Parameter Length
+		size += 3;										// Padding
+		size += modulationParameter.length;
+		size += antennaPatternParameter.length;
+		
+		return size;
 	}
 	
 	public RadioEntityType getRadioEntityType()
@@ -178,13 +234,19 @@ public class TransmitterPDU extends PDU
 	
 	public void setAntennaPattern( int antennaPatternType, byte[] antennaParameter )
 	{
-		if ( antennaParameter.length % 8 != 0 )
-			throw new IllegalStateException( "Antenna Parameter BLOB must be aligned to 64bit boundary" );
+		int antennaParameterLength = antennaParameter.length;
+		if( (antennaParameterLength % 8) != 0 )
+		{
+			throw new IllegalArgumentException( "Antenna Parameter BLOB must be aligned to 64bit boundary" );
+		}
+		else if( antennaParameterLength > DISSizes.UI16_MAX_VALUE )
+		{
+			throw new IllegalArgumentException( "Antenna Parameter BLOB may not be larger than " + 
+				DISSizes.UI16_MAX_VALUE + "bytes" );
+		}
 		
 		this.antennaPatternType = antennaPatternType;
 		this.antennaPatternParameter = antennaParameter;
-		
-		setPDULength();
 	}
 	
 	public AntennaLocation getAntennaLocation()
@@ -197,12 +259,12 @@ public class TransmitterPDU extends PDU
 		this.antennaLocation = antennaLocation;
 	}
 	
-	public BigInteger getTransmissionFrequency()
+	public DISUnsignedInt64 getTransmissionFrequency()
 	{
 		return transmissionFrequency;
 	}
 	
-	public void setTransmissionFrequency( BigInteger transmissionFrequency )
+	public void setTransmissionFrequency( DISUnsignedInt64 transmissionFrequency )
 	{
 		this.transmissionFrequency = transmissionFrequency;
 	}
@@ -239,16 +301,20 @@ public class TransmitterPDU extends PDU
 	
 	public void setModulation( ModulationType modulationType, byte[] modulationParameter )
 	{
-		if( (modulationParameter.length % 8) != 0 )
+		int parameterLength = modulationParameter.length;
+		if( (parameterLength % 8) != 0 )
 		{
-			throw new IllegalStateException( "Modulation Parameter BLOB must be aligned to "+
+			throw new IllegalArgumentException( "Modulation Parameter BLOB must be aligned to "+
 			                                 "64bit boundary" );
+		}
+		else if( parameterLength > DISSizes.UI8_MAX_VALUE )
+		{
+			throw new IllegalArgumentException( "Modulation Parameter BLOB may not be larger than " + 
+				DISSizes.UI8_MAX_VALUE + "bytes" );
 		}
 		
 		this.modulationType = modulationType;
 		this.modulationParameter = modulationParameter;
-		
-		setPDULength();
 	}
 	
 	public int getCryptoSystem()
@@ -274,51 +340,4 @@ public class TransmitterPDU extends PDU
 	//----------------------------------------------------------
 	//                     STATIC METHODS
 	//----------------------------------------------------------
-	public static TransmitterPDU read( PDUHeader header, DISInputStream dis ) throws IOException
-	{
-		EntityIdentifier entityIdentifier = EntityIdentifier.read( dis );
-		int radioID = dis.readUI16();
-		RadioEntityType radioEntityType = RadioEntityType.read( dis );
-		short transmitState = dis.readUI8();
-		short inputSource = dis.readUI8();
-		
-		// Padding
-		dis.skip16();
-				
-		AntennaLocation antennaLocation = AntennaLocation.read( dis );
-		int antennaPatternType = dis.readUI16();
-		int antennaPatternLength = dis.readUI16();
-		BigInteger transmissionFrequency = dis.readUI64();
-		float transmissionFrequencyBandwidth = dis.readFloat();
-		float power = dis.readFloat();
-		ModulationType modulationType = ModulationType.read( dis );
-		int cryptoSystem = dis.readUI16();
-		int cryptoKey = dis.readUI16();
-		short modulationParametersLength = dis.readUI8();
-		
-		// Padding
-		dis.skip24();
-		byte[] modulationParameter = new byte[modulationParametersLength];
-		dis.readFully( modulationParameter );
-		
-		byte[] antennaPatternParameter = new byte[antennaPatternLength];
-		dis.readFully( antennaPatternParameter );
-		
-		return new TransmitterPDU( header,
-		                           entityIdentifier,
-		                           radioID, 
-		                           radioEntityType,
-		                           transmitState,
-		                           inputSource, 
-		                           antennaLocation,
-		                           antennaPatternType, 
-		                           transmissionFrequency, 
-		                           transmissionFrequencyBandwidth,
-		                           power, 
-		                           modulationType,
-		                           cryptoSystem,
-		                           cryptoKey, 
-		                           modulationParameter,
-		                           antennaPatternParameter );
-	}
 }

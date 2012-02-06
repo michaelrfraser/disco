@@ -14,6 +14,8 @@
  */
 package com.calytrix.disco.pdu.field;
 
+import com.calytrix.disco.util.DISSizes;
+
 /**
  * The warhead shall be specified by a 16-bit enumeration.
  * 
@@ -24,6 +26,8 @@ public class Warhead
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
 	//----------------------------------------------------------
+	public static final int BYTE_LENGTH = DISSizes.UI16_SIZE;
+	
 	public static final int OTHER = 0000;
 	public static final int CARGO = 0010;
 	public static final int FUEL_AIR_EXPLOSIVE = 0020;
@@ -476,4 +480,8 @@ public class Warhead
 		return description;
 	}
 
+	public static int getBitLength()
+	{
+		return DISSizes.UI16_SIZE;
+	}
 }

@@ -17,6 +17,9 @@ package com.calytrix.disco.pdu.record;
 import java.io.IOException;
 
 import com.calytrix.disco.network.DISInputStream;
+import com.calytrix.disco.network.DISOutputStream;
+import com.calytrix.disco.pdu.IPDUComponent;
+import com.calytrix.disco.util.DISSizes;
 
 /**
  * The event identification shall be specified by the Event Identifier Record. The record shall
@@ -26,7 +29,7 @@ import com.calytrix.disco.network.DISInputStream;
  * event or collision event. In the case where all possible values are exhausted, the numbers may
  * be reused, beginning at one.
  */
-public class EventIdentifier
+public class EventIdentifier implements IPDUComponent, Cloneable
 {
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
@@ -41,6 +44,11 @@ public class EventIdentifier
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
+	public EventIdentifier()
+	{
+		this( new SimulationAddress(), 0 );
+	}
+	
 	public EventIdentifier( SimulationAddress simulationAddress, int eventID )
 	{
 		this.simulationAddress = simulationAddress;
@@ -72,6 +80,48 @@ public class EventIdentifier
 		return false;
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public EventIdentifier clone()
+	{
+		SimulationAddress addressClone = simulationAddress.clone();
+		return new EventIdentifier( addressClone, eventID );
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public void read( DISInputStream dis ) throws IOException
+    {
+		simulationAddress.read( dis );
+		eventID = dis.readUI16();
+    }
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public void write( DISOutputStream dos ) throws IOException
+    {
+		simulationAddress.write( dos );
+		dos.writeUI16( eventID );
+    }
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public int getByteLength()
+	{
+		int size = simulationAddress.getByteLength();
+		size += DISSizes.UI16_SIZE;
+		
+		return size;
+	}
+	
 	////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////// Accessor and Mutator Methods ///////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////
@@ -98,23 +148,4 @@ public class EventIdentifier
 	//----------------------------------------------------------
 	//                     STATIC METHODS
 	//----------------------------------------------------------
-	/**
-	 * Reads an instance of this record from the provided DISInputStream.
-	 * 
-	 * @param dis The DISInputStream to read the record from.
-	 * 
-	 * @return The EventIdentifier deserialised from the provided input stream.
-	 * 
-	 * @throws IOException Thrown if an error occurred reading the record from
-	 * the stream.
-	 */
-	public static EventIdentifier read( DISInputStream dis ) throws IOException
-	{
-		SimulationAddress simulationAddress = SimulationAddress.read( dis );
-		int eventID = dis.readUI16();
-		
-		return new EventIdentifier( simulationAddress, eventID );
-	}
-
-	
 }

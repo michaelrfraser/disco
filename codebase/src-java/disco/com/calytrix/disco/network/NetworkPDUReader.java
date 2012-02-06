@@ -20,9 +20,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.MulticastSocket;
 import java.net.NetworkInterface;
-import java.net.SocketAddress;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
@@ -34,21 +32,25 @@ import org.apache.log4j.Logger;
 
 import com.calytrix.disco.DiscoException;
 import com.calytrix.disco.config.DiscoProperties;
-import com.calytrix.disco.event.IPDUListener;
 import com.calytrix.disco.pdu.PDU;
+import com.calytrix.disco.pdu.PDUFactory;
 import com.calytrix.disco.pdu.record.PDUHeader;
+import com.calytrix.disco.service.IPDUFilter;
+import com.calytrix.disco.service.IPDUListener;
+import com.calytrix.disco.service.IPDUReaderService;
+import com.calytrix.disco.util.DISSizes;
 
 /**
- * This class is responsible for connecting to the local network and queuing up received PDUs
- * for later processing.
+ * This class is responsible for connecting to the local network and receiving PDU data from it.
+ * Received data is converted to in memory PDU object instances and dispatched to 
+ * <code>IPDUListener</code>s who have registered with this <code>NetworkPDUReader</code>.
  */
-public class PDUReader
+public class NetworkPDUReader implements IPDUReaderService
 {
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
 	//----------------------------------------------------------
-	public static final int PDU_MAX_SIZE = 1024 * 1024 * PDUHeader.PDU_HEADER_LENGTH;
-	
+		
 	//----------------------------------------------------------
 	//                   INSTANCE VARIABLES
 	//----------------------------------------------------------
@@ -56,22 +58,26 @@ public class PDUReader
 	private DiscoProperties properties;
 	
 	private DatagramSocket socket;
-	private int multicastTTL;
-	private int multicastTrafficClass;
 	private Thread receiveThread;
 	private Thread dispatchThread;
-	private PDUCodec m_pduCodec;
+	private PDUFactory m_pduFactory;
 	private BlockingQueue<PDU> dispatchQueue;
 	private Set<IPDUListener> listenerSet;
 	private Lock listenerLock;
+	private Set<IPDUFilter> receiveFilters;
 	
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
-	public PDUReader( DiscoProperties properties )
+	/**
+	 * Constructor for type NetworkPDUReader with provided configuration properties
+	 * 
+	 * @param properties The property set to configure this PDUReader with
+	 */
+	public NetworkPDUReader( DiscoProperties properties )
 	{
 		// basic initialization
-		this.logger = properties.getLogger( "disco.network" );
+		this.logger = properties.getLogger( "disco.pduReader" );
 		this.properties = properties;
 		
 		this.socket = null;
@@ -79,12 +85,25 @@ public class PDUReader
 		this.dispatchQueue = new LinkedBlockingQueue<PDU>( Integer.MAX_VALUE );
 		this.listenerSet = new HashSet<IPDUListener>();
 		this.listenerLock = new ReentrantLock();
-		this.m_pduCodec = new PDUCodec();
+		this.m_pduFactory = new PDUFactory( properties );
+		this.receiveFilters = new HashSet<IPDUFilter>();
 	}
 
 	//----------------------------------------------------------
 	//                    INSTANCE METHODS
 	//----------------------------------------------------------
+	/**
+	 * Specifies whether this PDUReader is currently receiving PDUs off the network and dispatching
+	 * notification events to its listeners. 
+	 * 
+	 * @return true if this PDUReader is currently receiving and dispatching, otherwise false
+	 */
+	@Override
+	public synchronized boolean isStarted()
+	{
+		return socket != null;
+	}
+	
 	/**
 	 * Begins receiving PDUs from the network and dispatching them to registered
 	 * IPDUListeners (see {@link #addPDUListener(IPDUListener)})
@@ -92,14 +111,16 @@ public class PDUReader
 	 * @throws DiscoException thrown if the PDUReader could not be started on
 	 * due to a network configuration error.
 	 */
-	public void start() throws DiscoException
+	@Override
+	public synchronized void start() throws DiscoException
 	{
-		logger.debug( "Starting PDUReader" );
+		logger.debug( "ATTEMPT: Starting PDUReader" );
 		
-		if( socket == null )
+		if( !isStarted() )
 		{
 			InetAddress disAddress = properties.getNetworkAddress();
 			int disPort = properties.getNetworkPort();
+			InetSocketAddress hostAddress = new InetSocketAddress( disAddress, disPort );
 			NetworkInterface iface = properties.getNetworkInterface();
 			
 			try
@@ -107,22 +128,24 @@ public class PDUReader
 				// How we initialise the socket depends on the address type
 				// that is configured
 				if( disAddress.isMulticastAddress() )
-					socket = socketStartMulticast( disAddress, disPort, iface );
+					socket = NetworkUtilities.socketStartMulticast( hostAddress, iface );
 				else
-					socket = socketStartBroadcast( disAddress, disPort, iface );
+					socket = NetworkUtilities.socketStartBroadcast( hostAddress, iface );
 				
-				logger.info( "PDUReader started!" );
+				logger.info( "SUCCESS: PDUReader started!" );
 			}
 			catch( IOException ioe )
 			{
-				logger.error( "Could not start PDUReader", ioe );
+				logger.error( "FAIL Could not start PDUReader", ioe );
 				throw new DiscoException( ioe );
 			}
-						
+			
+			// Start the PDU Receiver thread
 			Runnable receiver = new PDUReceiver();
 			receiveThread = new Thread( receiver, "DiscoPDUReceiver" );
 			receiveThread.start();
 			
+			// Start the PDU Dispatcher thread
 			Runnable dispatcher = new PDUDispatcher();
 			dispatchThread = new Thread( dispatcher, "DiscoPDUDispatcher" );
 			dispatchThread.start();
@@ -137,11 +160,12 @@ public class PDUReader
 	/**
 	 * Stops receiving PDUs from the network.
 	 */
-	public void stop()
+	@Override
+	public synchronized void stop()
 	{
 		logger.debug( "Stopping PDUReader" );
 		
-		if( socket != null )
+		if( isStarted() )
 		{
 			socket.close();
 			socket = null;
@@ -179,7 +203,6 @@ public class PDUReader
 		else
 		{
 			// no-op, already stopped
-			
 		}
 	}
 	
@@ -189,6 +212,7 @@ public class PDUReader
 	 * 
 	 * @param listener The IPDUListener to register with this class
 	 */
+	@Override
 	public void addPDUListener( IPDUListener listener )
 	{
 		listenerLock.lock();
@@ -202,6 +226,7 @@ public class PDUReader
 	 * 
 	 * @param listener The IPDUListener to register with this class
 	 */
+	@Override
 	public void removePDUListener( IPDUListener listener )
 	{
 		listenerLock.lock();
@@ -210,50 +235,57 @@ public class PDUReader
 	}
 	
 	/**
-	 * Starts the internal socket in multicast mode
+	 * Adds the specified IPDUFilter to this PDUReader's filter set. The logic contained within 
+	 * the specified IPDUFilter will be called upon to decide whether PDUs received from the network
+	 * should be processed further or discarded.<br/>
+	 * <br/>
+	 * <b>Note:</b> IPDUFilters may only be added while the PDUReader is stopped.
 	 * 
-	 * @param address The multicast address to listen on
-	 * @param port The multicast port to listen on
-	 * @param iface The network interface to communicate through
+	 * @param filter The IPDUFilter to add to this PDUReader's filter set
 	 * 
-	 * @return A DatagramSocket representing the multicast socket connected
-	 * to the desired address
-	 * 
-	 * @throws IOException thrown if there was an error connecting the socket
+	 * @throws IllegalStateException Thrown if addPDUFilter() was called while the PDUReader was
+	 * started
 	 */
-	private DatagramSocket socketStartMulticast( InetAddress address, 
-	                                             int port, 
-	                                             NetworkInterface nic ) throws IOException
+	@Override
+	public void addPDUFilter( IPDUFilter filter )
 	{
-		MulticastSocket asMulticast = new MulticastSocket( port );
-		asMulticast.setTimeToLive( multicastTTL );
-		asMulticast.setTrafficClass( multicastTrafficClass );
+		if( !isStarted() )
+		{
+			receiveFilters.add( filter );
+		}
+		else
+		{
+			String message = "Can not modify PDU filter set while the PDUReader is started";
+			throw new IllegalStateException( message );
+		}
 		
-		SocketAddress disAddress = new InetSocketAddress( address, port );
-		asMulticast.joinGroup( disAddress, nic );
-		
-		return asMulticast;	
 	}
 	
+	
 	/**
-	 * Starts the internal socket in broadcast mode
+	 * Removes the specified IPDUFilter to this PDUReader's filter set.<br/>
+	 * <br/>
+	 * <b>Note:</b> IPDUFilters may only be removed while the PDUReader is stopped.
 	 * 
-	 * @param address The broadcast address to listen on
-	 * @param port The broadcast port to listen on
-	 * @param iface The network interface to communicate through
+	 * @param filter The IPDUFilter to remove from this PDUReader's filter set
 	 * 
-	 * @return A DatagramSocket representing the broadcast socket connected
-	 * to the desired address
-	 * 
-	 * @throws IOException thrown if there was an error connecting the socket
+	 * @throws IllegalStateException Thrown if removePDUFilter() was called while the PDUReader was
+	 * started
 	 */
-	private DatagramSocket socketStartBroadcast( InetAddress address,
-	                                             int port, 
-	                                             NetworkInterface iface ) throws IOException
+	@Override
+	public void removePDUFilter( IPDUFilter filter )
 	{
-		throw new IllegalStateException( "Not currently supported" );
+		if( !isStarted() )
+		{
+			receiveFilters.remove( filter );
+		}
+		else
+		{
+			String message = "Can not modify PDU filter set while the PDUReader is started";
+			throw new IllegalStateException( message );
+		}
 	}
-
+	
 	//----------------------------------------------------------
 	//                     STATIC METHODS
 	//----------------------------------------------------------
@@ -270,14 +302,14 @@ public class PDUReader
 		@Override
 		public void run()
 		{
-			logger.info( "DiscoPDUReceiver thread started!" );
+			logger.info( "INFO: DiscoPDUReceiver thread started!" );
 			boolean keepReceiving = true;
 			
 			// Initialise the buffer and datagram packet
-			byte[] rawBytes = new byte[ PDU_MAX_SIZE ];
+			byte[] rawBytes = new byte[ DISSizes.PDU_MAX_SIZE ];
 			ByteArrayInputStream bais = new ByteArrayInputStream( rawBytes );
 			DISInputStream dis = new DISInputStream( bais );
-			DatagramPacket packet = new DatagramPacket( rawBytes, PDU_MAX_SIZE );
+			DatagramPacket packet = new DatagramPacket( rawBytes, DISSizes.PDU_MAX_SIZE );
 			
 			while( keepReceiving )
 			{
@@ -287,31 +319,60 @@ public class PDUReader
 
 					// Receive into DatagramPacket
 					socket.receive( packet );
-					logger.trace( "Read " + packet.getData().length + " bytes from DIS socket" );
 
-					// Deserialise the PDU and place it on the dispatch queue
-					PDU pdu = m_pduCodec.readPDU( dis );
-					if( pdu != null )
+					// FILTER PHASE ONE: A packet has been received, allow the filters to 
+					// accept/deny it based on information at the DatagramPacket level
+					boolean processHeader = true;
+					for( IPDUFilter filter : receiveFilters )
+						processHeader &= filter.onPacketReceived( packet );
+					
+					if( processHeader )
 					{
-						logger.trace( "PDU deserialised successfully, adding to dispatch queue" );
-						dispatchQueue.put( pdu );
+						PDUHeader header = m_pduFactory.createPDUHeader( dis );
+						
+						// FILTER PHASE TWO: The PDUHeader has been deserialised from the received
+						// datagram packet. Allow the filters to accept/deny it based on information
+						// at the header level
+						boolean processContents = true;
+						for( IPDUFilter filter : receiveFilters )
+							processContents &= filter.onPDUHeaderReceived( header );
+						
+						if( processContents )
+						{
+    						// Deserialise the PDU
+    						PDU pdu = m_pduFactory.createPDU( header );
+    						pdu.readContent( dis );
+    						
+    						if( pdu != null )
+    						{
+    							// FILTER PHASE THREE: The full PDU has been deserialised from the 
+    							// received datagram packet. Allow the filters to accept/deny it 
+    							// based on information at the PDU level
+    							boolean dispatchPDU = true;
+    							for( IPDUFilter filter : receiveFilters )
+    								dispatchPDU &= filter.onPDUReceived( pdu );
+    							
+    							if( dispatchPDU )
+    								dispatchQueue.put( pdu );
+    						}
+						}
 					}
 				}
 				catch( InterruptedException ie )
 				{
 					// Interrupted, so stop receiving and fall through
 					keepReceiving = false;
-					logger.debug( "DiscoPDUReceiver shutting down due to interrupt" );
+					logger.debug( "INFO: DiscoPDUReceiver shutting down due to interrupt" );
 				}
 				catch( IOException ioe )
 				{
 					// IOException occured, so stop receiving and fall through
 					keepReceiving = false;
-					logger.debug( "DiscoPDUReceiver shutting down due to socket closure" );
+					logger.debug( "INFO: DiscoPDUReceiver shutting down due to socket closure" );
 				}
 			}
 			
-			logger.info( "DiscoPDUReceiver thread shutdown!" );
+			logger.info( "INFO: DiscoPDUReceiver thread shutdown!" );
 		}
 	}
 	
@@ -327,7 +388,7 @@ public class PDUReader
 		@Override
 		public void run()
 		{
-			logger.info( "DiscoPDUDispatcher thread started!" );
+			logger.info( "INFO: DiscoPDUDispatcher thread started!" );
 			
 			boolean running = true;
 			
@@ -338,7 +399,7 @@ public class PDUReader
 				{
 					// Get the next notification from the notification queue
 					PDU pdu = dispatchQueue.take();
-					logger.trace( "PDU taken from dispatch queue, notifying listeners" );
+					logger.trace( "INFO: PDU taken from dispatch queue, notifying listeners" );
 
 					// Broadcast to all listeners
 					listenerLock.lock();
@@ -350,7 +411,7 @@ public class PDUReader
 				{
 					// Interrupted, so stop running
 					running = false;
-					logger.debug( "DiscoPDUDispatcher draining due to interrupt" );
+					logger.debug( "INFO: DiscoPDUDispatcher draining due to interrupt" );
 				}
 			}
 		}

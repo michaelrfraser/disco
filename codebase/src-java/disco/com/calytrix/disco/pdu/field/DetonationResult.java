@@ -14,6 +14,8 @@
  */
 package com.calytrix.disco.pdu.field;
 
+import com.calytrix.disco.util.DISSizes;
+
 /**
  * This field shall specify the result of the detonation. This field shall be represented by an
  * 8-bit enumeration.
@@ -25,32 +27,34 @@ public class DetonationResult
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
 	//----------------------------------------------------------
-	public static final int OTHER = 0;
-	public static final int ENTITY_IMPACT = 1;
-	public static final int ARMORPIERCING_HIT = 10;
-	public static final int DIRT_BLAST_SMALL = 11;
-	public static final int DIRT_BLAST_MEDIUM = 12;
-	public static final int DIRT_BLAST_LARGE = 13;
-	public static final int WATER_BLAST_SMALL = 14;
-	public static final int WATER_BLAST_MEDIUM = 15;
-	public static final int WATER_BLAST_LARGE = 16;
-	public static final int AIR_HIT = 17;
-	public static final int BUILDING_HIT_SMALL = 18;
-	public static final int BUILDING_HIT_MEDIUM = 19;
-	public static final int ENTITY_PROXIMATE_DETONATION = 2;
-	public static final int BUILDING_HIT_LARGE = 20;
-	public static final int MINECLEARING_LINE_CHARGE = 21;
-	public static final int ENVIRONMENT_OBJECT_IMPACT = 22;
-	public static final int ENVIRONMENT_OBJECT_PROXIMATE_DETONATION = 23;
-	public static final int WATER_IMPACT = 24;
-	public static final int AIR_BURST = 25;
-	public static final int GROUND_IMPACT = 3;
-	public static final int GROUND_PROXIMATE_DETONATION = 4;
-	public static final int DETONATION = 5;
-	public static final int NONE = 6;
-	public static final int HE_HIT_SMALL = 7;
-	public static final int HE_HIT_MEDIUM = 8;
-	public static final int HE_HIT_LARGE = 9;
+	public static final int BYTE_LENGTH = DISSizes.UI8_SIZE;
+	
+	public static final short OTHER = 0;
+	public static final short ENTITY_IMPACT = 1;
+	public static final short ARMORPIERCING_HIT = 10;
+	public static final short DIRT_BLAST_SMALL = 11;
+	public static final short DIRT_BLAST_MEDIUM = 12;
+	public static final short DIRT_BLAST_LARGE = 13;
+	public static final short WATER_BLAST_SMALL = 14;
+	public static final short WATER_BLAST_MEDIUM = 15;
+	public static final short WATER_BLAST_LARGE = 16;
+	public static final short AIR_HIT = 17;
+	public static final short BUILDING_HIT_SMALL = 18;
+	public static final short BUILDING_HIT_MEDIUM = 19;
+	public static final short ENTITY_PROXIMATE_DETONATION = 2;
+	public static final short BUILDING_HIT_LARGE = 20;
+	public static final short MINECLEARING_LINE_CHARGE = 21;
+	public static final short ENVIRONMENT_OBJECT_IMPACT = 22;
+	public static final short ENVIRONMENT_OBJECT_PROXIMATE_DETONATION = 23;
+	public static final short WATER_IMPACT = 24;
+	public static final short AIR_BURST = 25;
+	public static final short GROUND_IMPACT = 3;
+	public static final short GROUND_PROXIMATE_DETONATION = 4;
+	public static final short DETONATION = 5;
+	public static final short NONE = 6;
+	public static final short HE_HIT_SMALL = 7;
+	public static final short HE_HIT_MEDIUM = 8;
+	public static final short HE_HIT_LARGE = 9;
 
 	//----------------------------------------------------------
 	//                   INSTANCE VARIABLES
@@ -73,34 +77,34 @@ public class DetonationResult
 	 * @return An int[] containing the ordered set of values that this 
 	 * enumeration field can assume
 	 */
-	public static int[] getValues()
+	public static short[] getValues()
 	{
-		int[] values = { OTHER,
-		                 ENTITY_IMPACT,
-		                 ARMORPIERCING_HIT,
-		                 DIRT_BLAST_SMALL,
-		                 DIRT_BLAST_MEDIUM,
-		                 DIRT_BLAST_LARGE,
-		                 WATER_BLAST_SMALL,
-		                 WATER_BLAST_MEDIUM,
-		                 WATER_BLAST_LARGE,
-		                 AIR_HIT,
-		                 BUILDING_HIT_SMALL,
-		                 BUILDING_HIT_MEDIUM,
-		                 ENTITY_PROXIMATE_DETONATION,
-		                 BUILDING_HIT_LARGE,
-		                 MINECLEARING_LINE_CHARGE,
-		                 ENVIRONMENT_OBJECT_IMPACT,
-		                 ENVIRONMENT_OBJECT_PROXIMATE_DETONATION,
-		                 WATER_IMPACT,
-		                 AIR_BURST,
-		                 GROUND_IMPACT,
-		                 GROUND_PROXIMATE_DETONATION,
-		                 DETONATION,
-		                 NONE,
-		                 HE_HIT_SMALL,
-		                 HE_HIT_MEDIUM,
-		                 HE_HIT_LARGE };
+		short[] values = { OTHER,
+		                   ENTITY_IMPACT,
+		                   ARMORPIERCING_HIT,
+		                   DIRT_BLAST_SMALL,
+		                   DIRT_BLAST_MEDIUM,
+		                   DIRT_BLAST_LARGE,
+		                   WATER_BLAST_SMALL,
+		                   WATER_BLAST_MEDIUM,
+		                   WATER_BLAST_LARGE,
+		                   AIR_HIT,
+		                   BUILDING_HIT_SMALL,
+		                   BUILDING_HIT_MEDIUM,
+		                   ENTITY_PROXIMATE_DETONATION,
+		                   BUILDING_HIT_LARGE,
+		                   MINECLEARING_LINE_CHARGE,
+		                   ENVIRONMENT_OBJECT_IMPACT,
+		                   ENVIRONMENT_OBJECT_PROXIMATE_DETONATION,
+		                   WATER_IMPACT,
+		                   AIR_BURST,
+		                   GROUND_IMPACT,
+		                   GROUND_PROXIMATE_DETONATION,
+		                   DETONATION,
+		                   NONE,
+		                   HE_HIT_SMALL,
+		                   HE_HIT_MEDIUM,
+		                   HE_HIT_LARGE };
 		return values;
 	}
 	
@@ -112,7 +116,7 @@ public class DetonationResult
 	 * @return A String representing the description of the specified field
 	 * value
 	 */
-	public static String getDescription( int value )
+	public static String getDescription( short value )
 	{
 		String description = "Undefined";
 		switch( value )
@@ -224,5 +228,4 @@ public class DetonationResult
 
 		return description;
 	}
-
 }

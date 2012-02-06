@@ -21,30 +21,40 @@
 package com.calytrix.disco.pdu.record;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import com.calytrix.disco.network.DISInputStream;
+import com.calytrix.disco.network.DISOutputStream;
+import com.calytrix.disco.pdu.IPDUComponent;
+import com.calytrix.disco.pdu.field.EntityMarkingCharacterSet;
 
 /**
  * This record shall be used to specify the character set used in the marking and the string of
  * characters to be interpreted for display. The character set shall be represented by an 8-bit
  * enumeration. The string of characters shall be represented by an 11 element character string.
  */
-public class EntityMarking
+public class EntityMarking implements IPDUComponent, Cloneable
 {
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
 	//----------------------------------------------------------
-
+	private static final int MARKING_CHARACTERS = 11;
+	
 	//----------------------------------------------------------
 	//                   INSTANCE VARIABLES
 	//----------------------------------------------------------
 	private short markingCharset;
-	private EntityMarkingString markingString;
+	private String markingString;
 
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
-	public EntityMarking( short markingCharset, EntityMarkingString markingString )
+	public EntityMarking()
+	{
+		this( EntityMarkingCharacterSet.ASCII, "" );
+	}
+	
+	public EntityMarking( short markingCharset, String markingString )
 	{
 		this.markingCharset = markingCharset;
 		this.markingString = markingString;
@@ -74,6 +84,52 @@ public class EntityMarking
 		
 		return false;
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public EntityMarking clone()
+	{
+		String markingStringClone = new String( markingString );
+		return new EntityMarking( markingCharset, markingStringClone );
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public void read( DISInputStream dis ) throws IOException
+    {
+		markingCharset = dis.readUI8();
+		String asString = dis.readString( MARKING_CHARACTERS );
+		setEntityMarkingString( asString );
+    }
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public void write( DISOutputStream dos ) throws IOException
+    {
+	    dos.writeUI8( markingCharset );
+	    
+	    // TODO FIX This will only work for ASCII, we need something to convert between other
+	    // formats
+	    byte[] asBytes = markingString.getBytes();
+	    byte[] finalBytes = Arrays.copyOf( asBytes, MARKING_CHARACTERS );
+
+	    dos.write( finalBytes );
+    }
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public int getByteLength()
+	{
+		return EntityMarkingCharacterSet.BIT_LENGTH + MARKING_CHARACTERS;
+	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////// Accessor and Mutator Methods ///////////////////////////////
@@ -88,34 +144,20 @@ public class EntityMarking
     	this.markingCharset = entityMarkingCharacterSet;
     }
 
-	public EntityMarkingString getEntityMarkingString()
+	public String getEntityMarkingString()
     {
     	return markingString;
     }
 
-	public void setEntityMarkingString( EntityMarkingString entityMarkingString )
+	public void setEntityMarkingString( String entityMarkingString )
     {
+		if ( entityMarkingString.length() > MARKING_CHARACTERS )
+			throw new IllegalArgumentException( "Entity Marking String can only be " + MARKING_CHARACTERS + " characters or less" );
+		
     	this.markingString = entityMarkingString;
     }
 
 	//----------------------------------------------------------
 	//                     STATIC METHODS
 	//----------------------------------------------------------
-	/**
-	 * Reads an instance of this record from the provided DISInputStream.
-	 * 
-	 * @param dis The DISInputStream to read the record from.
-	 * 
-	 * @return The EntityMarking deserialised from the provided input stream.
-	 * 
-	 * @throws IOException Thrown if an error occurred reading the record from
-	 * the stream.
-	 */
-	public static EntityMarking read( DISInputStream dis ) throws IOException
-	{
-		short entityMarkingCharacterSet = dis.readUI8();
-		EntityMarkingString entityMarkingString = EntityMarkingString.read( dis );
-		
-		return new EntityMarking( entityMarkingCharacterSet, entityMarkingString );
-	}
 }

@@ -26,6 +26,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import com.calytrix.disco.DiscoException;
+import com.calytrix.disco.pdu.field.ProtocolVersion;
 
 /**
  * Central storage location for all Disco-related properties. This class consumes either the 
@@ -67,6 +68,10 @@ public class DiscoProperties
 	public static final String PROP_NETWORK_PORT_DEFAULT     = "3000";
 	public static final String PROP_NETWORK_IFACE		 	 = "disco.network.iface";
 	public static final String PROP_NETWORK_IFACE_DEFAULT	 = "localhost";
+	
+	// DIS Protocol properties
+	public static final String PROP_DIS_PROTOCOL_VER		 = "disco.dis.protocolversion";
+	public static final String PROP_DIS_PROTOCOL_VER_DEFAULT = String.valueOf( ProtocolVersion.IEEE_1278_1 );
 
 	//----------------------------------------------------------
 	//                   INSTANCE VARIABLES
@@ -193,6 +198,12 @@ public class DiscoProperties
 		{
 			throw new DiscoException( exception );
 		}
+	}
+	
+	public short getDISProtocolVersion()
+	{
+		String value = properties.getProperty( PROP_DIS_PROTOCOL_VER, PROP_DIS_PROTOCOL_VER_DEFAULT );
+		return Short.parseShort( value );
 	}
 	
 	//----------------------------------------------------------

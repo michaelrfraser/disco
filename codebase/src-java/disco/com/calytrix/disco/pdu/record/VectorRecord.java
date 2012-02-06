@@ -23,13 +23,15 @@ package com.calytrix.disco.pdu.record;
 import java.io.IOException;
 
 import com.calytrix.disco.network.DISInputStream;
+import com.calytrix.disco.network.DISOutputStream;
+import com.calytrix.disco.pdu.IPDUComponent;
+import com.calytrix.disco.util.DISSizes;
 import com.calytrix.disco.util.FloatingPointUtils;
 
 /**
- * 
- * 
+ * An abstract Vector record with 3 dimensions
  */
-public class VectorRecord
+public class VectorRecord implements IPDUComponent, Cloneable
 {
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
@@ -45,6 +47,11 @@ public class VectorRecord
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
+	public VectorRecord()
+	{
+		this( 0f, 0f, 0f );
+	}
+	
 	public VectorRecord( float firstVectorComponent,
 	                     float secondVectorComponent,
 	                     float thirdVectorComponent )
@@ -69,9 +76,9 @@ public class VectorRecord
 		if( other instanceof VectorRecord )
 		{
 			VectorRecord otherVector = (VectorRecord)other;
-			if( FloatingPointUtils.floatEqual(otherVector.firstVectorComponent,this.firstVectorComponent) &&
-			    FloatingPointUtils.floatEqual(otherVector.secondVectorComponent,this.secondVectorComponent) &&
-			    FloatingPointUtils.floatEqual(otherVector.thirdVectorComponent,this.thirdVectorComponent) )
+			if( FloatingPointUtils.floatEqual(otherVector.firstVectorComponent, this.firstVectorComponent) &&
+			    FloatingPointUtils.floatEqual(otherVector.secondVectorComponent, this.secondVectorComponent) &&
+			    FloatingPointUtils.floatEqual(otherVector.thirdVectorComponent, this.thirdVectorComponent) )
 			{
 				return true;
 			}
@@ -80,6 +87,46 @@ public class VectorRecord
 		return false;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public VectorRecord clone()
+	{
+		return new VectorRecord( firstVectorComponent, secondVectorComponent, thirdVectorComponent );
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public void read( DISInputStream dis ) throws IOException
+    {
+		firstVectorComponent = dis.readFloat();
+		secondVectorComponent = dis.readFloat();
+		thirdVectorComponent = dis.readFloat();
+    }
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public void write( DISOutputStream dos ) throws IOException
+    {
+		dos.writeFloat( firstVectorComponent );
+		dos.writeFloat( secondVectorComponent );
+		dos.writeFloat( thirdVectorComponent );
+    }
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public int getByteLength()
+	{
+		return DISSizes.FLOAT32_SIZE * 3;
+	}
+	
 	////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////// Accessor and Mutator Methods ///////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////
@@ -116,22 +163,4 @@ public class VectorRecord
 	//----------------------------------------------------------
 	//                     STATIC METHODS
 	//----------------------------------------------------------
-	/**
-	 * Reads an instance of this record from the provided DISInputStream.
-	 * 
-	 * @param dis The DISInputStream to read the record from.
-	 * 
-	 * @return The Vector deserialised from the provided input stream.
-	 * 
-	 * @throws IOException Thrown if an error occurred reading the record from
-	 * the stream.
-	 */
-    public static VectorRecord read( DISInputStream dis ) throws IOException
-	{
-		float firstVectorComponent = dis.readFloat();
-		float secondVectorComponent = dis.readFloat();
-		float thirdVectorComponent = dis.readFloat();
-		
-		return new VectorRecord( firstVectorComponent, secondVectorComponent, thirdVectorComponent );
-	}
 }

@@ -20,6 +20,8 @@
  */
 package com.calytrix.disco.pdu.field;
 
+import com.calytrix.disco.util.DISSizes;
+
 /**
  *  This field shall identify the Kind of Entity.
  */
@@ -28,16 +30,18 @@ public class EntityKind
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
 	//----------------------------------------------------------
-	private static final int OTHER = 0;
-	private static final int PLATFORM = 1;
-	private static final int MUNITION = 2;
-	private static final int LIFEFORM = 3;
-	private static final int ENVIRONMENTAL = 4;
-	private static final int CULTURAL_FEATURE = 5;
-	private static final int SUPPLY = 6;
-	private static final int RADIO = 7;
-	private static final int EXPENDABLE = 8;
-	private static final int SENSOR_EMITTER = 9;
+	public static final int BYTE_LENGTH = DISSizes.UI8_SIZE;
+	
+	public static final short OTHER = 0;
+	public static final short PLATFORM = 1;
+	public static final short MUNITION = 2;
+	public static final short LIFEFORM = 3;
+	public static final short ENVIRONMENTAL = 4;
+	public static final short CULTURAL_FEATURE = 5;
+	public static final short SUPPLY = 6;
+	public static final short RADIO = 7;
+	public static final short EXPENDABLE = 8;
+	public static final short SENSOR_EMITTER = 9;
 
 	//----------------------------------------------------------
 	//                   INSTANCE VARIABLES
@@ -61,12 +65,12 @@ public class EntityKind
 	/**
 	 * Returns the ordered set of values that this enumerated field can assume
 	 * 
-	 * @return An int[] containing the ordered set of values that this 
+	 * @return An short[] containing the ordered set of values that this 
 	 * enumeration field can assume
 	 */
-	public static int[] getValues()
+	public static short[] getValues()
 	{
-		int[] values = { OTHER,
+		short[] values = { OTHER,
 		                 PLATFORM,
 		                 MUNITION,
 		                 LIFEFORM,
@@ -87,7 +91,7 @@ public class EntityKind
 	 * @return A String representing the description of the specified field
 	 * value
 	 */
-	public static String getDescription( int value )
+	public static String getDescription( short value )
 	{
 		String description = "Undefined";
 		

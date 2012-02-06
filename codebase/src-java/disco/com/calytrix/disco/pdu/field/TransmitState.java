@@ -14,6 +14,8 @@
  */
 package com.calytrix.disco.pdu.field;
 
+import com.calytrix.disco.util.DISSizes;
+
 /**
  * This field shall specify whether a radio is off, powered but not 
  * transmitting, or powered and transmitting.<br/>
@@ -27,6 +29,8 @@ public class TransmitState
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
 	//----------------------------------------------------------
+	public static final int BYTE_LENGTH = DISSizes.UI8_SIZE;
+	
 	public static final short OFF = 0;
 	public static final short ON_BUT_NOT_TRANSMITTING = 1;
 	public static final short ON_AND_TRANSMITTING = 2;

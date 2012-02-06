@@ -119,7 +119,8 @@ public class EncodingSchemeTest extends AbstractTest
     	{
     		// Voice/MuLaw-8
     		DISInputStream stream = TestUtils.convertToInputStream( (byte)0x00, (byte)0x01 );
-    		EncodingScheme scheme = EncodingScheme.read( stream );
+    		EncodingScheme scheme = new EncodingScheme();
+    		scheme.read( stream );
     		
     		Assert.assertNotNull( scheme );
     		Assert.assertEquals( scheme.getEncodingClass(), EncodingClass.ENCODED_VOICE );
@@ -135,7 +136,8 @@ public class EncodingSchemeTest extends AbstractTest
     	{
     		// Voice/CVSD
     		DISInputStream stream = TestUtils.convertToInputStream( (byte)0x00, (byte)0x02 );
-    		EncodingScheme scheme = EncodingScheme.read( stream );
+    		EncodingScheme scheme = new EncodingScheme();
+    		scheme.read( stream );
     		
     		Assert.assertNotNull( scheme );
     		Assert.assertEquals( scheme.getEncodingClass(), EncodingClass.ENCODED_VOICE );
@@ -151,7 +153,8 @@ public class EncodingSchemeTest extends AbstractTest
     	{
     		// Voice/ADPCM
     		DISInputStream stream = TestUtils.convertToInputStream( (byte)0x00, (byte)0x03 );
-    		EncodingScheme scheme = EncodingScheme.read( stream );
+    		EncodingScheme scheme = new EncodingScheme();
+    		scheme.read( stream );
     		
     		Assert.assertNotNull( scheme );
     		Assert.assertEquals( scheme.getEncodingClass(), EncodingClass.ENCODED_VOICE );
@@ -167,7 +170,8 @@ public class EncodingSchemeTest extends AbstractTest
     	{
     		// Voice/PCM-16
     		DISInputStream stream = TestUtils.convertToInputStream( (byte)0x00, (byte)0x04 );
-    		EncodingScheme scheme = EncodingScheme.read( stream );
+    		EncodingScheme scheme = new EncodingScheme();
+    		scheme.read( stream );
     		
     		Assert.assertNotNull( scheme );
     		Assert.assertEquals( scheme.getEncodingClass(), EncodingClass.ENCODED_VOICE );
@@ -183,7 +187,8 @@ public class EncodingSchemeTest extends AbstractTest
     	{
     		// Voice/PCM-8
     		DISInputStream stream = TestUtils.convertToInputStream( (byte)0x00, (byte)0x05 );
-    		EncodingScheme scheme = EncodingScheme.read( stream );
+    		EncodingScheme scheme = new EncodingScheme();
+    		scheme.read( stream );
     		
     		Assert.assertNotNull( scheme );
     		Assert.assertEquals( scheme.getEncodingClass(), EncodingClass.ENCODED_VOICE );
@@ -199,7 +204,8 @@ public class EncodingSchemeTest extends AbstractTest
     	{
     		// Voice/Vector Quantization
     		DISInputStream stream = TestUtils.convertToInputStream( (byte)0x00, (byte)0x06 );
-    		EncodingScheme scheme = EncodingScheme.read( stream );
+    		EncodingScheme scheme = new EncodingScheme();
+    		scheme.read( stream );
     		
     		Assert.assertNotNull( scheme );
     		Assert.assertEquals( scheme.getEncodingClass(), EncodingClass.ENCODED_VOICE );
@@ -219,7 +225,8 @@ public class EncodingSchemeTest extends AbstractTest
     	{
     		// Raw Binary Data
     		DISInputStream stream = TestUtils.convertToInputStream( (byte)0x40, (byte)0x00 );
-    		EncodingScheme scheme = EncodingScheme.read( stream );
+    		EncodingScheme scheme = new EncodingScheme();
+    		scheme.read( stream );
     		
     		Assert.assertNotNull( scheme );
     		Assert.assertEquals( scheme.getEncodingClass(), EncodingClass.RAW_BINARY_DATA );
@@ -235,7 +242,8 @@ public class EncodingSchemeTest extends AbstractTest
     	{
     		// Application Specific Data
     		DISInputStream stream = TestUtils.convertToInputStream( (byte)0x80, (byte)0x00 );
-    		EncodingScheme scheme = EncodingScheme.read( stream );
+    		EncodingScheme scheme = new EncodingScheme();
+    		scheme.read( stream );
     		
     		Assert.assertNotNull( scheme );
     		Assert.assertEquals( scheme.getEncodingClass(), EncodingClass.APPLICATION_SPECIFIC_DATA );
@@ -251,7 +259,8 @@ public class EncodingSchemeTest extends AbstractTest
     	{
     		// Database Index
     		DISInputStream stream = TestUtils.convertToInputStream( (byte)0xC0, (byte)0x00 );
-    		EncodingScheme scheme = EncodingScheme.read( stream );
+    		EncodingScheme scheme = new EncodingScheme();
+    		scheme.read( stream );
     		
     		Assert.assertNotNull( scheme );
     		Assert.assertEquals( scheme.getEncodingClass(), EncodingClass.DATABASE_INDEX );
@@ -268,7 +277,8 @@ public class EncodingSchemeTest extends AbstractTest
     		// Ensure that the max value for TDL count does not affect the
     		// encoding class
     		DISInputStream stream = TestUtils.convertToInputStream( (byte)0xBF, (byte)0xFF );
-    		EncodingScheme scheme = EncodingScheme.read( stream );
+    		EncodingScheme scheme = new EncodingScheme();
+    		scheme.read( stream );
     		
     		Assert.assertNotNull( scheme );
     		Assert.assertEquals( scheme.getEncodingClass(), EncodingClass.APPLICATION_SPECIFIC_DATA );
@@ -287,6 +297,8 @@ public class EncodingSchemeTest extends AbstractTest
     	ByteArrayOutputStream baos = new ByteArrayOutputStream( ENCODING_SCHEME_SIZE );
 		DISOutputStream dos = new DISOutputStream( baos );
 		
+		EncodingScheme scheme = new EncodingScheme();
+				
 		try
 		{
 			// Only write out one byte of data
@@ -295,7 +307,8 @@ public class EncodingSchemeTest extends AbstractTest
 			// Run the raw bytes through the deserialisation method. This should
 			// fail as the EncodingScheme record is incomplete
 			DISInputStream dis = TestUtils.convertToInputStream( baos );
-			EncodingScheme.read( dis );
+			
+    		scheme.read( dis );
 			
 			Assert.fail( "IOException should have been thrown" );
 		}
@@ -308,6 +321,207 @@ public class EncodingSchemeTest extends AbstractTest
 			Assert.fail( "Expected an IOException to be thrown but received " + e.getClass(), e );
 		}
 	}
+    
+    
+    @Test
+    public void testEncodingSchemeCompleteSerialisationVoice()
+    {
+    	try
+    	{
+    		// Voice/MuLaw-8
+    		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    		DISOutputStream dos = new DISOutputStream( baos );
+    		
+    		EncodingScheme scheme = new EncodingScheme();
+    		scheme.setEncodingClass( EncodingClass.ENCODED_VOICE );
+    		scheme.setEncodingType( EncodingType.MULAW_8 );
+    		
+    		scheme.write( dos );
+    		byte[] asBytes = baos.toByteArray();
+    		Assert.assertEquals( asBytes[0], (byte)0x00 );
+    		Assert.assertEquals( asBytes[1], (byte)0x01 );
+    		
+    	}
+    	catch ( Exception e )
+    	{
+    		// Unexpected Exception
+    		Assert.fail( "Unexpected exception while serialising a Voice/MuLaw-8 Encoding Scheme record", e );
+    	}
+    	
+    	try
+    	{
+    		// Voice/CVSD
+    		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    		DISOutputStream dos = new DISOutputStream( baos );
+    		
+    		EncodingScheme scheme = new EncodingScheme();
+    		scheme.setEncodingClass( EncodingClass.ENCODED_VOICE );
+    		scheme.setEncodingType( EncodingType.CVSD );
+    		
+    		scheme.write( dos );
+    		byte[] asBytes = baos.toByteArray();
+    		Assert.assertEquals( asBytes[0], (byte)0x00 );
+    		Assert.assertEquals( asBytes[1], (byte)0x02 );
+    	}
+    	catch ( Exception e )
+    	{
+    		// Unexpected Exception
+    		Assert.fail( "Unexpected exception while serialising a Voice/CVSD Encoding Scheme record", e );
+    	}
+    	
+    	try
+    	{
+    		// Voice/ADPCM
+    		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    		DISOutputStream dos = new DISOutputStream( baos );
+    		
+    		EncodingScheme scheme = new EncodingScheme();
+    		scheme.setEncodingClass( EncodingClass.ENCODED_VOICE );
+    		scheme.setEncodingType( EncodingType.ADPCM );
+    		
+    		scheme.write( dos );
+    		byte[] asBytes = baos.toByteArray();
+    		Assert.assertEquals( asBytes[0], (byte)0x00 );
+    		Assert.assertEquals( asBytes[1], (byte)0x03 );
+    	}
+    	catch ( Exception e )
+    	{
+    		// Unexpected Exception
+    		Assert.fail( "Unexpected exception while serialising a Voice/ADPCM Encoding Scheme record", e );
+    	}
+    	
+    	try
+    	{
+    		// Voice/PCM-16
+    		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    		DISOutputStream dos = new DISOutputStream( baos );
+    		
+    		EncodingScheme scheme = new EncodingScheme();
+    		scheme.setEncodingClass( EncodingClass.ENCODED_VOICE );
+    		scheme.setEncodingType( EncodingType.PCM_16 );
+    		
+    		scheme.write( dos );
+    		byte[] asBytes = baos.toByteArray();
+    		Assert.assertEquals( asBytes[0], (byte)0x00 );
+    		Assert.assertEquals( asBytes[1], (byte)0x04 );
+    	}
+    	catch ( Exception e )
+    	{
+    		// Unexpected Exception
+    		Assert.fail( "Unexpected exception while serialising a Voice/PCM-16 Encoding Scheme record", e );
+    	}
+    	
+    	try
+    	{
+    		// Voice/PCM-8
+    		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    		DISOutputStream dos = new DISOutputStream( baos );
+    		
+    		EncodingScheme scheme = new EncodingScheme();
+    		scheme.setEncodingClass( EncodingClass.ENCODED_VOICE );
+    		scheme.setEncodingType( EncodingType.PCM_8 );
+    		
+    		scheme.write( dos );
+    		byte[] asBytes = baos.toByteArray();
+    		Assert.assertEquals( asBytes[0], (byte)0x00 );
+    		Assert.assertEquals( asBytes[1], (byte)0x05 );
+    	}
+    	catch ( Exception e )
+    	{
+    		// Unexpected Exception
+    		Assert.fail( "Unexpected exception while serialising a Voice/PCM-8 Encoding Scheme record", e );
+    	}
+    	
+    	try
+    	{
+    		// Voice/Vector Quantization
+    		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    		DISOutputStream dos = new DISOutputStream( baos );
+    		
+    		EncodingScheme scheme = new EncodingScheme();
+    		scheme.setEncodingClass( EncodingClass.ENCODED_VOICE );
+    		scheme.setEncodingType( EncodingType.VQ );
+    		
+    		scheme.write( dos );
+    		byte[] asBytes = baos.toByteArray();
+    		Assert.assertEquals( asBytes[0], (byte)0x00 );
+    		Assert.assertEquals( asBytes[1], (byte)0x06 );
+    	}
+    	catch ( Exception e )
+    	{
+    		// Unexpected Exception
+    		Assert.fail( "Unexpected exception while serialising a Voice/VQ Encoding Scheme record", e );
+    	}
+    }
+    
+    @Test
+    public void testEncodingSchemeCompleteSerialisationOther()
+    {
+    	try
+    	{
+    		// Raw Binary Data
+    		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    		DISOutputStream dos = new DISOutputStream( baos );
+    		
+    		EncodingScheme scheme = new EncodingScheme();
+    		scheme.setEncodingClass( EncodingClass.RAW_BINARY_DATA );
+    		scheme.setEncodingType( (short)0 );
+    		
+    		scheme.write( dos );
+    		byte[] asBytes = baos.toByteArray();
+    		Assert.assertEquals( asBytes[0], (byte)0x40 );
+    		Assert.assertEquals( asBytes[1], (byte)0x00 );
+    	}
+    	catch ( Exception e )
+    	{
+    		// Unexpected Exception
+    		Assert.fail( "Unexpected exception while Serialising a Raw Binary Data Encoding Scheme record", e );
+    	}
+    	
+    	try
+    	{
+    		// Database Index
+    		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    		DISOutputStream dos = new DISOutputStream( baos );
+    		
+    		EncodingScheme scheme = new EncodingScheme();
+    		scheme.setEncodingClass( EncodingClass.DATABASE_INDEX );
+    		scheme.setEncodingType( (short)0 );
+    		
+    		scheme.write( dos );
+    		byte[] asBytes = baos.toByteArray();
+    		Assert.assertEquals( asBytes[0], (byte)0xC0 );
+    		Assert.assertEquals( asBytes[1], (byte)0x00 );
+    	}
+    	catch ( Exception e )
+    	{
+    		// Unexpected Exception
+    		Assert.fail( "Unexpected exception while Serialising a Database Index Encoding Scheme record", e );
+    	}
+    	
+    	try
+    	{
+    		// Ensure that the max value for TDL count does not affect the
+    		// encoding class
+    		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    		DISOutputStream dos = new DISOutputStream( baos );
+    		
+    		EncodingScheme scheme = new EncodingScheme();
+    		scheme.setEncodingClass( EncodingClass.APPLICATION_SPECIFIC_DATA );
+    		scheme.setEncodingType( (short)0x3FFF );
+    		
+    		scheme.write( dos );
+    		byte[] asBytes = baos.toByteArray();
+    		Assert.assertEquals( asBytes[0], (byte)0xBF );
+    		Assert.assertEquals( asBytes[1], (byte)0xFF );
+    		
+    	}
+    	catch ( Exception e )
+    	{
+    		Assert.fail( "Unexpected exception while Serialising a Encoding Scheme record", e );
+    	}
+
+    }
     
 	//----------------------------------------------------------
 	//                     STATIC METHODS

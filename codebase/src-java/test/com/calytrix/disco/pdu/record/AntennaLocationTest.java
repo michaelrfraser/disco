@@ -36,8 +36,6 @@ public class AntennaLocationTest extends AbstractTest
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
 	//----------------------------------------------------------
-	public static final int ANTENNA_LOCATION_SIZE = 36;
-	
 	public static final double APERY       = 1.20205690315959;
 	public static final double BRUN        = 1.90216058;
 	public static final double CATALAN     = 0.915965594177219015;
@@ -48,11 +46,14 @@ public class AntennaLocationTest extends AbstractTest
 	//----------------------------------------------------------
 	//                   INSTANCE VARIABLES
 	//----------------------------------------------------------
-
+	
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
-
+	public AntennaLocationTest()
+	{
+	}
+	
 	//----------------------------------------------------------
 	//                    INSTANCE METHODS
 	//----------------------------------------------------------
@@ -128,7 +129,7 @@ public class AntennaLocationTest extends AbstractTest
 	@Test
 	public void testAntennaLocationCompleteDeserialisation()
 	{
-		ByteArrayOutputStream baos = new ByteArrayOutputStream( ANTENNA_LOCATION_SIZE );
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		DISOutputStream dos = new DISOutputStream( baos );
 		
 		try
@@ -145,12 +146,10 @@ public class AntennaLocationTest extends AbstractTest
 			// Run the raw bytes through the deserialisation method to create
 			// an AntennaLocation object
 			DISInputStream dis = TestUtils.convertToInputStream( baos );
-			AntennaLocation location = AntennaLocation.read( dis );
-			
-			// Ensure that a valid object was returned
-			Assert.assertNotNull( location );
-			
-			// Ensure that the records contained within are also valid
+			AntennaLocation location = new AntennaLocation();
+			location.read( dis );
+						
+			// Ensure that the records contained within are valid
 			WorldCoordinate worldCoords = location.getAntennaLocation();
 			EntityCoordinate relativeCoords = location.getRelativeAntennaLocation();
 			Assert.assertNotNull( worldCoords );
@@ -177,8 +176,10 @@ public class AntennaLocationTest extends AbstractTest
 	@Test
 	public void testAntennaLocationIncompleteDeserialisation()
 	{
-		ByteArrayOutputStream baos = new ByteArrayOutputStream( ANTENNA_LOCATION_SIZE );
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		DISOutputStream dos = new DISOutputStream( baos );
+				
+		AntennaLocation location = new AntennaLocation();
 		
 		try
 		{
@@ -190,7 +191,7 @@ public class AntennaLocationTest extends AbstractTest
 			// Run the raw bytes through the deserialisation method. This should
 			// fail as the AntennaLocation record is incomplete
 			DISInputStream dis = TestUtils.convertToInputStream( baos );
-			AntennaLocation.read( dis );
+			location.read( dis );
 			
 			Assert.fail( "IOException should have been thrown" );
 		}

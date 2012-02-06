@@ -14,6 +14,8 @@
  */
 package com.calytrix.disco.pdu.field;
 
+import com.calytrix.disco.util.DISSizes;
+
 /**
  * The fuse shall be specified by a 16-bit enumeration.
  * 
@@ -24,6 +26,8 @@ public class Fuse
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
 	//----------------------------------------------------------
+	public static final int BYTE_LENGTH = DISSizes.UI16_SIZE;
+	
 	public static final int OTHER = 0000;
 	public static final int INTELLIGENT_INFLUENCE = 0010;
 	public static final int SENSOR = 0020;

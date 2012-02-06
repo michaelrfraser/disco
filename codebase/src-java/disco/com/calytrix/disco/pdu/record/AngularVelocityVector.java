@@ -23,6 +23,9 @@ package com.calytrix.disco.pdu.record;
 import java.io.IOException;
 
 import com.calytrix.disco.network.DISInputStream;
+import com.calytrix.disco.network.DISOutputStream;
+import com.calytrix.disco.pdu.IPDUComponent;
+import com.calytrix.disco.util.DISSizes;
 
 /**
  * The angular velocity of simulated entities shall be represented by the Angular Velocity Vector
@@ -32,7 +35,7 @@ import com.calytrix.disco.network.DISInputStream;
  * the x-axis, the second about the y-axis, and the third about the z-axis (see 5.3.32.1). The
  * positive direction of the angular velocity is defined by the right-hand rule.
  */
-public class AngularVelocityVector
+public class AngularVelocityVector implements IPDUComponent, Cloneable
 {
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
@@ -48,6 +51,11 @@ public class AngularVelocityVector
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
+	public AngularVelocityVector()
+	{
+		this( 0, 0, 0 );
+	}
+	
 	public AngularVelocityVector( long rateAboutXAxis, long rateAboutYAxis, long rateAboutZAxis )
 	{
 		this.rateAboutXAxis = rateAboutXAxis;
@@ -66,13 +74,13 @@ public class AngularVelocityVector
 	{
 		boolean equal = false;
 		
-		if ( other == this )
+		if( other == this )
 		{
 			equal = true;
 		}
 		else
 		{
-			if ( other instanceof AngularVelocityVector )
+			if( other instanceof AngularVelocityVector )
 			{
 				AngularVelocityVector asAngularVelocityVector = (AngularVelocityVector)other;
 				equal = asAngularVelocityVector.rateAboutXAxis == this.rateAboutXAxis 
@@ -82,6 +90,46 @@ public class AngularVelocityVector
 		}
 		
 		return equal;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override 
+	public AngularVelocityVector clone()
+	{
+		return new AngularVelocityVector( rateAboutXAxis, rateAboutYAxis, rateAboutZAxis );
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public void read( DISInputStream dis ) throws IOException
+    {
+		rateAboutXAxis = dis.readUI32();
+		rateAboutYAxis = dis.readUI32();
+		rateAboutZAxis = dis.readUI32();
+    }
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public void write( DISOutputStream dos ) throws IOException
+    {
+		dos.writeUI32( rateAboutXAxis );
+		dos.writeUI32( rateAboutYAxis );
+		dos.writeUI32( rateAboutZAxis );
+    }
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+    public int getByteLength()
+	{
+		return DISSizes.UI32_SIZE * 3;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////
@@ -120,22 +168,4 @@ public class AngularVelocityVector
 	//----------------------------------------------------------
 	//                     STATIC METHODS
 	//----------------------------------------------------------
-	/**
-	 * Reads an instance of this record from the provided DISInputStream.
-	 * 
-	 * @param dis The DISInputStream to read the record from.
-	 * 
-	 * @return The AngularVelocityVector deserialised from the provided input stream.
-	 * 
-	 * @throws IOException Thrown if an error occurred reading the record from
-	 * the stream.
-	 */
-	public static AngularVelocityVector read( DISInputStream dis ) throws IOException
-	{
-		long rateAboutXAxis = dis.readUI32();
-		long rateAboutYAxis = dis.readUI32();
-		long rateAboutZAxis = dis.readUI32();
-		
-		return new AngularVelocityVector( rateAboutXAxis, rateAboutYAxis, rateAboutZAxis );
-	}
 }

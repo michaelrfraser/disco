@@ -14,7 +14,6 @@
  */
 package com.calytrix.disco.pdu.radio;
 
-import com.calytrix.disco.pdu.PDU;
 import com.calytrix.disco.pdu.field.PDUType;
 import com.calytrix.disco.pdu.record.PDUHeader;
 
@@ -25,7 +24,7 @@ import com.calytrix.disco.pdu.record.PDUHeader;
  * 
  * @see "IEEE Std 1278.1-1995 section 4.5.7.4"
  */
-public class ReceiverPDU extends PDU
+public class ReceiverPDU extends AbstractRadioPDU
 {
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
@@ -38,6 +37,11 @@ public class ReceiverPDU extends PDU
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
+	/**
+	 * Constructor for type ReceiverPDU with specified header
+	 * 
+	 * @param header The PDUHeader to base the new PDU on
+	 */
 	public ReceiverPDU( PDUHeader header )
 	{
 		super( header );

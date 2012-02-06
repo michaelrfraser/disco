@@ -14,6 +14,8 @@
  */
 package com.calytrix.disco.pdu.field;
 
+import com.calytrix.disco.util.DISSizes;
+
 /**
  * This field shall specify the major classification of the modulation type.<br/>
  * <br/> 
@@ -26,6 +28,8 @@ public class MajorModulationType
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
 	//----------------------------------------------------------
+	public static final int BYTE_LENGTH = DISSizes.UI16_SIZE;
+	
 	public static final int OTHER = 0;
 	public static final int AMPLITUDE = 1;
 	public static final int AMPLITUDE_AND_ANGLE = 2;
@@ -57,8 +61,13 @@ public class MajorModulationType
 	 */
 	public static int[] getValues()
 	{
-		int[] values = { OTHER, AMPLITUDE, AMPLITUDE_AND_ANGLE, ANGLE, 
-		                 COMBINATION, PULSE, UNMODULATED };
+		int[] values = { OTHER, 
+		                 AMPLITUDE, 
+		                 AMPLITUDE_AND_ANGLE, 
+		                 ANGLE, 
+		                 COMBINATION, 
+		                 PULSE, 
+		                 UNMODULATED };
 		return values;
 	}
 	
